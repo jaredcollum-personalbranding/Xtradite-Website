@@ -1,32 +1,36 @@
 # Xtradite Digital — website frontend
 
 Plain static HTML/CSS/JS. No build step, no framework, no npm install. Every page is wired
-live to the **one** Wix site's CMS, Blog, and Forms data (site: "Xtradite Digital — H...",
-id `9f424aed-f9a6-4cf1-aaaa-5bb610a9defb`) — content you edit in the Wix dashboard appears
-here automatically, no code changes needed.
+live to a Supabase project (Postgres + auto-generated REST API) — content you edit in the
+Supabase Table Editor appears here automatically, no code changes needed.
 
 ## How it's wired
 
-- `assets/js/wix-client.js` — visitor-token transport, using this site's public
-  `WIX_CLIENT_ID`. Safe to keep hardcoded (it only mints anonymous read tokens).
-- `assets/js/wix-cms.js` / `wix-blog.js` — read helpers for the `Services`, `Industries`,
-  `CaseStudies` collections and the Blog.
-- `assets/js/forms.js` — submits the Contact page to the live "Contact Form"
-  (id `8ae888de-ed1f-43b8-9627-26c9d9799eda`).
+- `assets/js/supabase-client.js` — creates the Supabase client using this project's public
+  URL and anon (publishable) key. Safe to keep hardcoded: Row Level Security policies (see
+  `supabase/schema.sql`) restrict what the anon key can actually do — public read on content
+  tables, insert-only on `contact_submissions`.
+- `assets/js/cms.js` / `blog.js` — read helpers for the `services`, `industries`,
+  `case_studies` and `blog_posts` tables.
+- `assets/js/forms.js` — inserts Contact page submissions into `contact_submissions`.
 - `assets/js/pages/*.js` — one script per page, fetches and renders that page's data.
 
 Hub pages (`services.html`, `industries.html`, `case-studies.html`, `insights.html`) list
-everything live in their collection. Detail pages (`service-detail.html?slug=...`, etc.)
-read the `slug` query param and fetch that one item — add/remove/edit items in the Wix CMS
-dashboard and the site reflects it on next page load, no redeploy needed.
+everything live in their table. Detail pages (`service-detail.html?slug=...`, etc.) read the
+`slug` query param and fetch that one row — add/remove/edit rows in the Supabase Table Editor
+and the site reflects it on next page load, no redeploy needed.
 
 ## Editing content
 
-Everything text-wise on Services, Industries, Case Studies and Insights lives in the Wix
-dashboard, not in this code:
-- Collections & items — `https://manage.wix.com/dashboard/9f424aed-f9a6-4cf1-aaaa-5bb610a9defb/wix-cms`
-- Blog posts — `https://manage.wix.com/dashboard/9f424aed-f9a6-4cf1-aaaa-5bb610a9defb/blog/posts`
-- Contact form submissions — `https://manage.wix.com/dashboard/9f424aed-f9a6-4cf1-aaaa-5bb610a9defb/forms`
+Everything text-wise on Services, Industries, Case Studies and Insights lives in Supabase,
+not in this code — edit rows directly in the Supabase dashboard's Table Editor for this
+project (`services`, `industries`, `case_studies`, `blog_posts` tables). Contact form
+submissions land in the `contact_submissions` table (not readable by the public site itself,
+by design — RLS grants it insert-only).
+
+`supabase/schema.sql` at the repo root is the one-time setup script (tables, RLS policies,
+and the content migrated from the site's original Wix CMS/Blog) — only needs running once
+against a fresh Supabase project.
 
 Static chrome copy (Home hero/stats/FAQ/timeline, About page body, legal pages, nav labels)
 lives directly in the HTML files and is edited like any static site.

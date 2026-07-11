@@ -1,4 +1,4 @@
-import { getPostBySlug, queryPosts } from "../wix-blog.js";
+import { getPostBySlug, queryPosts } from "../blog.js";
 import { renderRicos, renderPlainText } from "../ricos-render.js";
 import { escapeHtml, relatedPostCardHtml, getSlugParam } from "../render-helpers.js";
 

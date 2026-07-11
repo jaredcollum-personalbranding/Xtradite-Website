@@ -1,4 +1,4 @@
-import { getDataItemBy } from "../wix-cms.js";
+import { getItemBySlug } from "../cms.js";
 import { escapeHtml, renderIcons, getSlugParam } from "../render-helpers.js";
 import { INDUSTRY_TO_SERVICES } from "./shared-data.js";
 
@@ -10,7 +10,7 @@ async function load() {
   if (!slug) return showNotFound();
   let item;
   try {
-    item = await getDataItemBy("Industries", "slug", slug);
+    item = await getItemBySlug("industries", "slug", slug);
   } catch (e) {
     console.error(e);
     return showNotFound("Couldn't load this page", "We couldn't reach the live content service. Please refresh, or try again in a moment.");
@@ -29,7 +29,7 @@ async function load() {
   const relatedWrap = document.getElementById("related-services");
   if (serviceSlugs.length && relatedWrap) {
     try {
-      const services = (await Promise.all(serviceSlugs.map((s) => getDataItemBy("Services", "slug", s)))).filter(Boolean);
+      const services = (await Promise.all(serviceSlugs.map((s) => getItemBySlug("services", "slug", s)))).filter(Boolean);
       if (services.length) {
         relatedWrap.innerHTML = services
           .map(

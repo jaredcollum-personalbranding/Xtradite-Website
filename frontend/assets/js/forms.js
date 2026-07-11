@@ -1,31 +1,19 @@
 /**
- * Contact form submission — Wix Forms (Forms app), NOT a CMS collection.
- * Form: "Contact Form", id 8ae888de-ed1f-43b8-9627-26c9d9799eda (site 9f424aed-f9a6-4cf1-aaaa-5bb610a9defb).
- * Confirmed live via List Forms (form-schema-service/v4/forms) on 2026-07-11 — field target
- * keys and submit endpoint below are taken directly from that response, not guessed.
+ * Contact form submission — writes to the `contact_submissions` table in Supabase.
+ * RLS on that table grants `anon` INSERT only (see supabase/schema.sql), so this can't be
+ * used to read back other visitors' submissions.
  */
-import { wixApiRequest } from "./wix-client.js";
-
-const CONTACT_FORM_ID = "8ae888de-ed1f-43b8-9627-26c9d9799eda";
+import { supabase } from "./supabase-client.js";
 
 /**
  * @param {{ name: string, email: string, company?: string, message: string }} fields
  */
 export async function submitContactForm(fields) {
-  const submissions = {
-    first_name_0001: fields.name,
-    email_0002: fields.email,
-    message_0004: fields.message,
-  };
-  if (fields.company) submissions.company_0003 = fields.company;
-
-  return wixApiRequest("/form-submission-service/v4/submissions", {
-    method: "POST",
-    body: {
-      submission: {
-        formId: CONTACT_FORM_ID,
-        submissions,
-      },
-    },
+  const { error } = await supabase.from("contact_submissions").insert({
+    name: fields.name,
+    email: fields.email,
+    company: fields.company || null,
+    message: fields.message,
   });
+  if (error) throw error;
 }

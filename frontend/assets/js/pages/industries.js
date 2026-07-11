@@ -1,4 +1,4 @@
-import { queryDataItems } from "../wix-cms.js";
+import { queryItems } from "../cms.js";
 import { industryCardHtml, showSkeletons, showEmpty, renderIcons } from "../render-helpers.js";
 
 async function loadIndustries() {
@@ -6,8 +6,8 @@ async function loadIndustries() {
   if (!grid) return;
   showSkeletons(grid, 6);
   try {
-    const { items } = await queryDataItems("Industries", { sort: [{ fieldName: "order", order: "ASC" }] });
-    if (!items.length) return showEmpty(grid, "Industries are managed in the Wix CMS — add items in the dashboard to show them here.");
+    const { items } = await queryItems("industries", { sort: [{ fieldName: "sort_order", order: "ASC" }] });
+    if (!items.length) return showEmpty(grid, "Industries are managed in Supabase — add rows to the industries table to show them here.");
     grid.innerHTML = items.map(industryCardHtml).join("");
     renderIcons();
   } catch (e) {

@@ -1,4 +1,4 @@
-import { getDataItemBy } from "../wix-cms.js";
+import { getItemBySlug } from "../cms.js";
 import { escapeHtml, renderIcons, getSlugParam } from "../render-helpers.js";
 import { SERVICE_TO_CASE_STUDY } from "./shared-data.js";
 
@@ -10,7 +10,7 @@ async function load() {
   if (!slug) return showNotFound();
   let item;
   try {
-    item = await getDataItemBy("Services", "slug", slug);
+    item = await getItemBySlug("services", "slug", slug);
   } catch (e) {
     console.error(e);
     return showNotFound("Couldn't load this page", "We couldn't reach the live content service. Please refresh, or try again in a moment.");
@@ -28,7 +28,7 @@ async function load() {
   const relatedSlug = SERVICE_TO_CASE_STUDY[item.slug];
   if (relatedSlug) {
     try {
-      const cs = await getDataItemBy("CaseStudies", "slug", relatedSlug);
+      const cs = await getItemBySlug("case_studies", "slug", relatedSlug);
       const relatedWrap = document.getElementById("related-case-study");
       if (cs && relatedWrap) {
         relatedWrap.innerHTML = `

@@ -1,4 +1,4 @@
-import { getDataItemBy, queryDataItems } from "../wix-cms.js";
+import { getItemBySlug, queryItems } from "../cms.js";
 import { escapeHtml, caseStudyCardHtml, renderIcons, getSlugParam } from "../render-helpers.js";
 
 const root = document.getElementById("case-study-detail-root");
@@ -19,7 +19,7 @@ async function load() {
   if (!slug) return showNotFound();
   let item;
   try {
-    item = await getDataItemBy("CaseStudies", "slug", slug);
+    item = await getItemBySlug("case_studies", "slug", slug);
   } catch (e) {
     console.error(e);
     return showNotFound("Couldn't load this page", "We couldn't reach the live content service. Please refresh, or try again in a moment.");
@@ -47,7 +47,7 @@ async function load() {
   const relatedWrap = document.getElementById("related-case-studies");
   if (relatedWrap) {
     try {
-      const { items } = await queryDataItems("CaseStudies", { sort: [{ fieldName: "order", order: "ASC" }] });
+      const { items } = await queryItems("case_studies", { sort: [{ fieldName: "sort_order", order: "ASC" }] });
       const others = items.filter((c) => c.slug !== item.slug);
       if (others.length) {
         relatedWrap.innerHTML = others.map(caseStudyCardHtml).join("");

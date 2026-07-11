@@ -1,4 +1,4 @@
-import { queryDataItems } from "../wix-cms.js";
+import { queryItems } from "../cms.js";
 import { serviceCardHtml, caseStudyCardHtml, showSkeletons, showEmpty, renderIcons } from "../render-helpers.js";
 
 async function loadServices() {
@@ -6,8 +6,8 @@ async function loadServices() {
   if (!grid) return;
   showSkeletons(grid, 6);
   try {
-    const { items } = await queryDataItems("Services", { sort: [{ fieldName: "order", order: "ASC" }] });
-    if (!items.length) return showEmpty(grid, "Services are managed in the Wix CMS — add items in the dashboard to show them here.");
+    const { items } = await queryItems("services", { sort: [{ fieldName: "sort_order", order: "ASC" }] });
+    if (!items.length) return showEmpty(grid, "Services are managed in Supabase — add rows to the services table to show them here.");
     grid.innerHTML = items.map(serviceCardHtml).join("");
     renderIcons();
   } catch (e) {
@@ -21,8 +21,8 @@ async function loadCaseStudies() {
   if (!grid) return;
   showSkeletons(grid, 3);
   try {
-    const { items } = await queryDataItems("CaseStudies", { sort: [{ fieldName: "order", order: "ASC" }] });
-    if (!items.length) return showEmpty(grid, "Case studies are managed in the Wix CMS — add items in the dashboard to show them here.");
+    const { items } = await queryItems("case_studies", { sort: [{ fieldName: "sort_order", order: "ASC" }] });
+    if (!items.length) return showEmpty(grid, "Case studies are managed in Supabase — add rows to the case_studies table to show them here.");
     grid.innerHTML = items.map(caseStudyCardHtml).join("");
     renderIcons();
   } catch (e) {
