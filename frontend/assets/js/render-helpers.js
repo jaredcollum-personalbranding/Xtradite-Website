@@ -39,13 +39,28 @@ export function caseStudyCardHtml(item) {
     </a>`;
 }
 
+/** Non-interactive tag badges — used inside card links, where a nested <a> would be invalid HTML. */
+export function tagListHtml(tags) {
+  if (!tags?.length) return "";
+  return `<div class="tag-chip-list">${tags.map((t) => `<span class="tag-chip">${escapeHtml(t)}</span>`).join("")}</div>`;
+}
+
+/** Clickable tag links to the filtered blog landing page — for use outside any wrapping <a>. */
+export function tagLinksHtml(tags) {
+  if (!tags?.length) return "";
+  return `<div class="tag-chip-list">${tags
+    .map((t) => `<a class="tag-chip tag-chip-link" href="insights.html?tag=${encodeURIComponent(t)}">${escapeHtml(t)}</a>`)
+    .join("")}</div>`;
+}
+
 export function blogCardHtml(post) {
   const date = post.firstPublishedDate ? new Date(post.firstPublishedDate).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "";
   return `
-    <a class="card" href="insights-post.html?slug=${encodeURIComponent(post.slug)}">
+    <a class="card blog-card" href="insights-post.html?slug=${encodeURIComponent(post.slug)}" data-tags="${escapeHtml((post.tags || []).join("|"))}">
       <span class="card-category">${escapeHtml(date)}${post.minutesToRead ? ` &middot; ${post.minutesToRead} min read` : ""}</span>
       <h3>${escapeHtml(post.title)}</h3>
       <p class="card-desc">${escapeHtml(post.excerpt)}</p>
+      ${tagListHtml(post.tags)}
       <span class="card-link">Read More <i data-lucide="arrow-right"></i></span>
     </a>`;
 }
@@ -73,4 +88,8 @@ export function showSkeletons(container, count) {
 
 export function getSlugParam() {
   return new URLSearchParams(window.location.search).get("slug");
+}
+
+export function getTagParam() {
+  return new URLSearchParams(window.location.search).get("tag");
 }

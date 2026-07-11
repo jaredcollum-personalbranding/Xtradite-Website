@@ -3,7 +3,7 @@ import { supabase } from "./supabase-client.js";
 /**
  * Supabase blog helpers — same shape (camelCase field names) the page scripts already
  * expect from the old Wix Blog layer: title, slug, excerpt, firstPublishedDate,
- * minutesToRead, richContent, contentText.
+ * minutesToRead, richContent, contentText, plus tags and SEO overrides.
  */
 
 function mapPost(row) {
@@ -19,6 +19,9 @@ function mapPost(row) {
     featured: row.featured,
     pinned: row.pinned,
     firstPublishedDate: row.first_published_at,
+    tags: row.tags ?? [],
+    seoTitle: row.seo_title,
+    seoDescription: row.seo_description,
   };
 }
 

@@ -1,5 +1,6 @@
 import { queryItems } from "../cms.js";
-import { serviceCardHtml, caseStudyCardHtml, showSkeletons, showEmpty, renderIcons } from "../render-helpers.js";
+import { queryPosts } from "../blog.js";
+import { serviceCardHtml, caseStudyCardHtml, blogCardHtml, showSkeletons, showEmpty, renderIcons } from "../render-helpers.js";
 
 async function loadServices() {
   const grid = document.getElementById("services-grid");
@@ -31,5 +32,21 @@ async function loadCaseStudies() {
   }
 }
 
+async function loadInsights() {
+  const grid = document.getElementById("home-insights-grid");
+  if (!grid) return;
+  showSkeletons(grid, 3);
+  try {
+    const { posts } = await queryPosts({ limit: 3 });
+    if (!posts.length) return showEmpty(grid, "Insights are managed in Supabase — add rows to the blog_posts table to show them here.");
+    grid.innerHTML = posts.map(blogCardHtml).join("");
+    renderIcons();
+  } catch (e) {
+    console.error(e);
+    showEmpty(grid, "Couldn't load insights right now.");
+  }
+}
+
 loadServices();
 loadCaseStudies();
+loadInsights();

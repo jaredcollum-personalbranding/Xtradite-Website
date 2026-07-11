@@ -1,6 +1,6 @@
 import { getPostBySlug, queryPosts } from "../blog.js";
 import { renderRicos, renderPlainText } from "../ricos-render.js";
-import { escapeHtml, relatedPostCardHtml, getSlugParam } from "../render-helpers.js";
+import { escapeHtml, relatedPostCardHtml, tagLinksHtml, getSlugParam } from "../render-helpers.js";
 
 const root = document.getElementById("post-root");
 const notFound = document.getElementById("not-found");
@@ -11,12 +11,81 @@ function formatDate(iso) {
   return new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
 }
 
+function setMetaByName(name, content) {
+  if (!content) return;
+  let el = document.querySelector(`meta[name="${name}"]`);
+  if (!el) {
+    el = document.createElement("meta");
+    el.setAttribute("name", name);
+    document.head.appendChild(el);
+  }
+  el.setAttribute("content", content);
+}
+
+function setMetaByProperty(property, content) {
+  if (!content) return;
+  let el = document.querySelector(`meta[property="${property}"]`);
+  if (!el) {
+    el = document.createElement("meta");
+    el.setAttribute("property", property);
+    document.head.appendChild(el);
+  }
+  el.setAttribute("content", content);
+}
+
+function setCanonical(href) {
+  let el = document.querySelector('link[rel="canonical"]');
+  if (!el) {
+    el = document.createElement("link");
+    el.setAttribute("rel", "canonical");
+    document.head.appendChild(el);
+  }
+  el.setAttribute("href", href);
+}
+
+function setJsonLd(post, title, description) {
+  const script = document.createElement("script");
+  script.type = "application/ld+json";
+  script.textContent = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: title,
+    description,
+    datePublished: post.firstPublishedDate,
+    dateModified: post.firstPublishedDate,
+    author: { "@type": "Organization", name: "Xtradite Digital" },
+    publisher: { "@type": "Organization", name: "Xtradite Digital" },
+    keywords: (post.tags || []).join(", ") || undefined,
+    mainEntityOfPage: window.location.href,
+  });
+  document.head.appendChild(script);
+}
+
+function applySeo(post) {
+  const title = `${post.seoTitle || post.title} — Xtradite Digital Insights`;
+  const description = post.seoDescription || post.excerpt || "";
+  const url = `${window.location.origin}${window.location.pathname}?slug=${encodeURIComponent(post.slug)}`;
+
+  document.title = title;
+  setMetaByName("description", description);
+  setMetaByProperty("og:title", post.seoTitle || post.title);
+  setMetaByProperty("og:description", description);
+  setMetaByProperty("og:type", "article");
+  setMetaByProperty("og:url", url);
+  setMetaByName("twitter:card", "summary_large_image");
+  setMetaByName("twitter:title", post.seoTitle || post.title);
+  setMetaByName("twitter:description", description);
+  setCanonical(url);
+  setJsonLd(post, post.seoTitle || post.title, description);
+}
+
 async function load() {
   if (!slug) return showNotFound();
   const post = await getPostBySlug(slug);
   if (!post) return showNotFound();
 
-  document.title = `${post.title} — Xtradite Digital Insights`;
+  applySeo(post);
+
   document.getElementById("post-title").textContent = post.title;
   document.getElementById("post-date").textContent = formatDate(post.firstPublishedDate);
   const readTimeEl = document.getElementById("post-read-time");
@@ -26,19 +95,25 @@ async function load() {
     readTimeEl.remove();
   }
 
+  const tagsEl = document.getElementById("post-tags");
+  if (tagsEl) tagsEl.innerHTML = tagLinksHtml(post.tags);
+
   const bodyEl = document.getElementById("post-body");
   const rendered = renderRicos(post.richContent);
   bodyEl.innerHTML = rendered || renderPlainText(post.contentText) || `<p>${escapeHtml(post.excerpt || "")}</p>`;
 
-  // Related Insights — the live posts don't have relatedPostIds set, so show up to 2
-  // other published posts (excluding this one) as related reading.
+  // Related Insights — prefer posts sharing a tag with this one, then fill up to 2
+  // with other recent posts (excluding this one).
   const relatedWrap = document.getElementById("related-posts");
   if (relatedWrap) {
     try {
-      const { posts } = await queryPosts({ limit: 10 });
-      const others = posts.filter((p) => p.slug !== post.slug).slice(0, 2);
-      if (others.length) {
-        relatedWrap.innerHTML = others.map(relatedPostCardHtml).join("");
+      const { posts } = await queryPosts({ limit: 20 });
+      const others = posts.filter((p) => p.slug !== post.slug);
+      const sameTag = others.filter((p) => (p.tags || []).some((t) => (post.tags || []).includes(t)));
+      const rest = others.filter((p) => !sameTag.includes(p));
+      const related = [...sameTag, ...rest].slice(0, 2);
+      if (related.length) {
+        relatedWrap.innerHTML = related.map(relatedPostCardHtml).join("");
         relatedWrap.parentElement.hidden = false;
       }
     } catch (e) {

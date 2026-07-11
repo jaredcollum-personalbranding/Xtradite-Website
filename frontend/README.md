@@ -30,7 +30,12 @@ by design — RLS grants it insert-only).
 
 `supabase/schema.sql` at the repo root is the one-time setup script (tables, RLS policies,
 and the content migrated from the site's original Wix CMS/Blog) — only needs running once
-against a fresh Supabase project.
+against a fresh Supabase project. `supabase/migrations/` holds later schema changes, applied
+in order — e.g. `002_blog_tags_seo.sql` adds `blog_posts.tags` (a `text[]`, used for the
+tag filter on the Insights page — just add tag strings to a post's `tags` array in the
+Table Editor) and `blog_posts.seo_title` / `seo_description` (optional overrides for a
+post's `<title>`/meta description/Open Graph tags; leave null to fall back to the post's
+title/excerpt).
 
 Static chrome copy (Home hero/stats/FAQ/timeline, About page body, legal pages, nav labels)
 lives directly in the HTML files and is edited like any static site.
