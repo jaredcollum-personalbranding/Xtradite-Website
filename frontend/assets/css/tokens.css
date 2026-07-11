@@ -1,40 +1,60 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Manrope:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
 :root {
-  /* Colors */
-  --color-primary: #FFD84C;
-  --color-primary-hover: #FFE07A;
-  --color-primary-active: #FFC91A;
-  --color-bg: #0D0D0D;
-  --color-bg-secondary: #151515;
-  --color-bg-tertiary: #1A1A1A;
-  --color-text-primary: #FFFFFF;
-  --color-text-secondary: #D7DAE0;
-  --color-text-tertiary: #A6ACB8;
-  --color-text-muted: #6B7280;
-  --color-border: rgba(255, 255, 255, 0.08);
-  --color-border-hover: rgba(255, 216, 76, 0.4);
+  /* Colors — "Sunset Blaze" design system: warm off-white canvas, blazing orange primary,
+     magenta + amber + indigo accents. Ported from radiant-design-system/src/styles.css. */
+  --color-primary: oklch(0.71 0.19 40);          /* blaze, #ff6b35 */
+  --color-primary-hover: oklch(0.79 0.16 65);    /* ember, #f7931e */
+  --color-primary-active: oklch(0.62 0.20 35);
+  --color-magenta: oklch(0.63 0.24 358);         /* #e84393 */
+  --color-indigo: oklch(0.55 0.20 285);          /* #6c5ce7 */
+  --color-ink: oklch(0.19 0.03 285);              /* deep indigo-black */
+  --color-cream: oklch(0.965 0.018 60);
+
+  --color-bg: oklch(0.985 0.008 70);             /* canvas, warm off-white */
+  --color-bg-secondary: var(--color-cream);
+  --color-bg-tertiary: oklch(0.94 0.015 65);
+  --color-text-primary: var(--color-ink);
+  --color-text-secondary: oklch(0.32 0.025 285);
+  --color-text-tertiary: oklch(0.45 0.02 285);
+  --color-text-muted: oklch(0.55 0.02 285);
+  --color-border: oklch(0.90 0.015 65);
+  --color-border-hover: color-mix(in oklab, var(--color-primary) 40%, transparent);
   --color-success: #00C26F;
   --color-error: #FF4136;
 
+  /* Gradients & shadows */
+  --gradient-sunset: linear-gradient(135deg, var(--color-primary-hover) 0%, var(--color-primary) 45%, var(--color-magenta) 100%);
+  --gradient-blaze: linear-gradient(120deg, var(--color-primary), var(--color-magenta));
+  --gradient-dusk: linear-gradient(140deg, var(--color-magenta) 0%, var(--color-indigo) 100%);
+  --shadow-soft:
+    0 2px 4px -2px color-mix(in oklab, var(--color-ink) 12%, transparent),
+    0 12px 24px -12px color-mix(in oklab, var(--color-ink) 22%, transparent);
+  --shadow-glow:
+    0 10px 30px -12px color-mix(in oklab, var(--color-primary) 55%, transparent),
+    0 40px 90px -30px color-mix(in oklab, var(--color-magenta) 45%, transparent);
+  --shadow-lift:
+    0 6px 10px -6px color-mix(in oklab, var(--color-ink) 18%, transparent),
+    0 20px 40px -18px color-mix(in oklab, var(--color-ink) 28%, transparent);
+
   /* Typography */
-  --font-display: 'Space Grotesk', sans-serif;
-  --font-body: 'Manrope', sans-serif;
+  --font-display: 'Syne', sans-serif;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
   --font-size-display-lg: 68px;
   --font-size-display-md: 52px;
   --font-size-display-sm: 40px;
-  --line-height-display: 1.05;
+  --line-height-display: 1.02;
   --font-size-heading-lg: 38px;
   --font-size-heading-md: 28px;
   --font-size-heading-sm: 20px;
-  --line-height-heading: 1.15;
+  --line-height-heading: 1.12;
   --font-size-body-lg: 19px;
   --font-size-body-md: 16px;
   --font-size-body-sm: 15px;
   --font-size-body-xs: 14px;
   --font-size-body-xxs: 13px;
   --line-height-body: 1.6;
-  --letter-spacing-tight: -0.02em;
+  --letter-spacing-tight: -0.03em;
   --letter-spacing-normal: 0;
   --letter-spacing-wide: 0.08em;
   --letter-spacing-wider: 0.1em;
@@ -59,10 +79,10 @@
   --space-120: 120px;
   --space-160: 160px;
 
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 14px;
-  --radius-xl: 20px;
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
   --radius-full: 999px;
 
   --transition-fast: 200ms cubic-bezier(0.4, 0, 0.2, 1);
