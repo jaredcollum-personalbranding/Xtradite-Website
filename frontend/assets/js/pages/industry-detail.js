@@ -34,7 +34,7 @@ async function load() {
         relatedWrap.innerHTML = services
           .map(
             (s) => `
-          <a class="card" href="service-detail.html?slug=${encodeURIComponent(s.slug)}">
+          <a class="card" href="/service-detail?slug=${encodeURIComponent(s.slug)}">
             <div class="card-icon"><i data-lucide="${escapeHtml(s.icon || "circle")}"></i></div>
             <h3>${escapeHtml(s.title)}</h3>
             <p class="card-desc">${escapeHtml(s.summary)}</p>

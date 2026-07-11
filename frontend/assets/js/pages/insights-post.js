@@ -1,6 +1,6 @@
 import { getPostBySlug, queryPosts } from "../blog.js";
 import { renderRicos, renderPlainText } from "../ricos-render.js";
-import { escapeHtml, relatedPostCardHtml, tagLinksHtml, renderIcons, getSlugParam } from "../render-helpers.js";
+import { escapeHtml, relatedPostCardHtml, tagLinksHtml, renderIcons, openLightbox, getSlugParam } from "../render-helpers.js";
 
 const root = document.getElementById("post-root");
 const notFound = document.getElementById("not-found");
@@ -100,11 +100,13 @@ async function load() {
 
   const coverWrap = document.getElementById("post-cover-wrap");
   if (coverWrap && post.coverImageUrl) {
+    const coverAlt = `Whiteboard summary diagram: ${post.title}`;
     coverWrap.innerHTML = `
-      <a class="post-cover" href="${escapeHtml(post.coverImageUrl)}" target="_blank" rel="noopener" aria-label="Open full-size diagram in a new tab">
-        <img src="${escapeHtml(post.coverImageUrl)}" alt="Whiteboard summary diagram: ${escapeHtml(post.title)}" loading="eager">
+      <button type="button" class="post-cover" aria-label="Expand full-size diagram">
+        <img src="${escapeHtml(post.coverImageUrl)}" alt="${escapeHtml(coverAlt)}" loading="eager">
         <span class="post-cover-expand"><i data-lucide="maximize-2"></i><span>View full size</span></span>
-      </a>`;
+      </button>`;
+    coverWrap.querySelector(".post-cover").addEventListener("click", () => openLightbox(post.coverImageUrl, coverAlt));
   }
 
   const bodyEl = document.getElementById("post-body");

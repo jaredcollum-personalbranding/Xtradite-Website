@@ -36,7 +36,7 @@ async function load() {
           <h3>${escapeHtml(cs.client)}</h3>
           <p class="card-desc">${escapeHtml(cs.challenge || "")}</p>
           <span class="metric">${escapeHtml(cs.metric || "")}</span>
-          <a class="card-link" href="case-study-detail.html?slug=${encodeURIComponent(cs.slug)}">View Case Study <i data-lucide="arrow-right"></i></a>`;
+          <a class="card-link" href="/case-study-detail?slug=${encodeURIComponent(cs.slug)}">View Case Study <i data-lucide="arrow-right"></i></a>`;
         relatedWrap.hidden = false;
       }
     } catch (e) {
