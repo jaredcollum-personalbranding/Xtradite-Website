@@ -1,6 +1,6 @@
 import { getPostBySlug, queryPosts } from "../blog.js";
 import { renderRicos, renderPlainText } from "../ricos-render.js";
-import { escapeHtml, relatedPostCardHtml, tagLinksHtml, getSlugParam } from "../render-helpers.js";
+import { escapeHtml, relatedPostCardHtml, tagLinksHtml, renderIcons, getSlugParam } from "../render-helpers.js";
 
 const root = document.getElementById("post-root");
 const notFound = document.getElementById("not-found");
@@ -98,6 +98,15 @@ async function load() {
   const tagsEl = document.getElementById("post-tags");
   if (tagsEl) tagsEl.innerHTML = tagLinksHtml(post.tags);
 
+  const coverWrap = document.getElementById("post-cover-wrap");
+  if (coverWrap && post.coverImageUrl) {
+    coverWrap.innerHTML = `
+      <a class="post-cover" href="${escapeHtml(post.coverImageUrl)}" target="_blank" rel="noopener" aria-label="Open full-size diagram in a new tab">
+        <img src="${escapeHtml(post.coverImageUrl)}" alt="Whiteboard summary diagram: ${escapeHtml(post.title)}" loading="eager">
+        <span class="post-cover-expand"><i data-lucide="maximize-2"></i><span>View full size</span></span>
+      </a>`;
+  }
+
   const bodyEl = document.getElementById("post-body");
   const rendered = renderRicos(post.richContent);
   bodyEl.innerHTML = rendered || renderPlainText(post.contentText) || `<p>${escapeHtml(post.excerpt || "")}</p>`;
@@ -122,6 +131,7 @@ async function load() {
   }
 
   root.hidden = false;
+  renderIcons();
 }
 
 function showNotFound() {

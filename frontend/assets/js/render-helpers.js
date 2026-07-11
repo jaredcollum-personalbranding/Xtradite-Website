@@ -53,10 +53,30 @@ export function tagLinksHtml(tags) {
     .join("")}</div>`;
 }
 
+/**
+ * Cover illustration slot for a blog card. Posts' covers are whiteboard-style hand-drawn
+ * illustrations — shown uncropped-feeling on a plain light backdrop (object-fit: contain,
+ * not cover) so linework doesn't get clipped, with a small doodle placeholder for posts
+ * that don't have one yet so the grid stays visually uniform either way.
+ */
+export function blogCoverHtml(post) {
+  if (post.coverImageUrl) {
+    return `
+      <div class="blog-card-cover">
+        <img src="${escapeHtml(post.coverImageUrl)}" alt="" loading="lazy" decoding="async">
+      </div>`;
+  }
+  return `
+    <div class="blog-card-cover blog-card-cover-placeholder">
+      <i data-lucide="pen-tool"></i>
+    </div>`;
+}
+
 export function blogCardHtml(post) {
   const date = post.firstPublishedDate ? new Date(post.firstPublishedDate).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "";
   return `
     <a class="card blog-card" href="insights-post.html?slug=${encodeURIComponent(post.slug)}" data-tags="${escapeHtml((post.tags || []).join("|"))}">
+      ${blogCoverHtml(post)}
       <span class="card-category">${escapeHtml(date)}${post.minutesToRead ? ` &middot; ${post.minutesToRead} min read` : ""}</span>
       <h3>${escapeHtml(post.title)}</h3>
       <p class="card-desc">${escapeHtml(post.excerpt)}</p>
@@ -68,7 +88,10 @@ export function blogCardHtml(post) {
 export function relatedPostCardHtml(post) {
   const date = post.firstPublishedDate ? new Date(post.firstPublishedDate).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "";
   return `
-    <a class="card" href="insights-post.html?slug=${encodeURIComponent(post.slug)}">
+    <a class="card related-post-card" href="insights-post.html?slug=${encodeURIComponent(post.slug)}">
+      <div class="blog-card-cover blog-card-cover-sm${post.coverImageUrl ? "" : " blog-card-cover-placeholder"}">
+        ${post.coverImageUrl ? `<img src="${escapeHtml(post.coverImageUrl)}" alt="" loading="lazy" decoding="async">` : `<i data-lucide="pen-tool"></i>`}
+      </div>
       <h4>${escapeHtml(post.title)}</h4>
       <p class="card-desc">${escapeHtml(date)}</p>
     </a>`;

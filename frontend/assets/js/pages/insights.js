@@ -1,5 +1,5 @@
 import { queryPosts, getTotalPosts } from "../blog.js";
-import { blogCardHtml, showSkeletons, showEmpty, escapeHtml, getTagParam } from "../render-helpers.js";
+import { blogCardHtml, showSkeletons, showEmpty, escapeHtml, renderIcons, getTagParam } from "../render-helpers.js";
 
 let allPosts = [];
 
@@ -48,6 +48,7 @@ function applyFilter(tag) {
     return;
   }
   grid.innerHTML = filtered.map(blogCardHtml).join("");
+  renderIcons();
 }
 
 async function loadPosts() {
