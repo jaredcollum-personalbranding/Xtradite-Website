@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -15,7 +15,11 @@
 
   gtag('config', 'G-WYXTKGJ9JS');
 </script>
-<!-- Google AdSense -->
+<!--
+  Google AdSense is loaded once and released only after Cookiebot marketing
+  consent. Individual ad units are initialised after the dynamic industry
+  content has rendered.
+-->
 <!-- Vercel Speed Insights -->
 <script src="assets/js/speed-insights-init.js" defer></script>
 <script type="text/plain" data-cookieconsent="marketing" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7308041122340160" crossorigin="anonymous"></script>
@@ -34,16 +38,59 @@
 <link rel="canonical" href="https://www.xtradite-digital.co.uk/industry-detail">
 <meta property="og:site_name" content="Xtradite Digital">
 <meta property="og:locale" content="en_GB">
-<meta property="og:title" content="Industry â€” Xtradite Digital">
+<meta property="og:title" content="Industry — Xtradite Digital">
 <meta property="og:description" content="Explore how Xtradite Digital helps this industry.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://www.xtradite-digital.co.uk/industry-detail">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Industry â€” Xtradite Digital">
+<meta name="twitter:title" content="Industry — Xtradite Digital">
 <meta name="twitter:description" content="Explore how Xtradite Digital helps this industry.">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Organization", "name": "Xtradite Digital", "url": "https://www.xtradite-digital.co.uk/", "description": "UK digital consultancy helping ambitious retail, ecommerce and manufacturing businesses close operational and commercial gaps with hands-on delivery.", "areaServed": "GB", "knowsAbout": ["Digital Strategy", "AI & Automation", "eCommerce Growth", "Operational Excellence", "Fractional Leadership", "Project Delivery"]}</script>
 <!-- Vercel Web Analytics -->
 <script defer src="https://cdn.vercel-insights.com/v1/script.js"></script>
+
+<style>
+  .industry-ad {
+    width: 100%;
+  }
+
+  .industry-ad__label {
+    display: block;
+    margin-bottom: var(--space-8);
+    color: var(--color-text-muted, #8f8f8f);
+    font-size: var(--font-size-xs, 0.75rem);
+    line-height: 1;
+    letter-spacing: 0.05em;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  .industry-ad--display {
+    max-width: 970px;
+    min-height: 250px;
+    margin: 0 auto var(--space-64);
+    padding-top: var(--space-16);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .industry-ad--multiplex {
+    max-width: 1100px;
+    min-height: 280px;
+    margin: 0 auto var(--space-64);
+  }
+
+  @media (max-width: 767px) {
+    .industry-ad--display,
+    .industry-ad--multiplex {
+      margin-bottom: var(--space-48);
+    }
+
+    .industry-ad--display {
+      min-height: 200px;
+    }
+  }
+</style>
+
 </head>
 <body>
 
@@ -97,6 +144,23 @@
           </div>
         </div>
 
+        <aside
+          class="industry-ad industry-ad--display"
+          id="industry-display-ad"
+          aria-label="Advertisement"
+          hidden
+        >
+          <span class="industry-ad__label">Advertisement</span>
+          <ins
+            class="adsbygoogle"
+            style="display:block"
+            data-ad-client="ca-pub-7308041122340160"
+            data-ad-slot="6205733112"
+            data-ad-format="auto"
+            data-full-width-responsive="true"
+          ></ins>
+        </aside>
+
         <div hidden>
           <div class="section-head left">
             <span class="eyebrow">Related Services</span>
@@ -107,6 +171,26 @@
       </div>
     </div>
   </section>
+  <section class="section-tight">
+    <div class="container">
+      <aside
+        class="industry-ad industry-ad--multiplex"
+        id="industry-multiplex-ad"
+        aria-label="Advertisement"
+        hidden
+      >
+        <span class="industry-ad__label">Advertisement</span>
+        <ins
+          class="adsbygoogle"
+          style="display:block"
+          data-ad-format="autorelaxed"
+          data-ad-client="ca-pub-7308041122340160"
+          data-ad-slot="2190466483"
+        ></ins>
+      </aside>
+    </div>
+  </section>
+
   <section>
     <div class="container">
       <div class="cta-banner">
@@ -162,7 +246,7 @@
     <div class="footer-bottom">
       <span>&copy; 2026 Xtradite Digital. All rights reserved.</span>
       <div class="footer-social">
-        <a href="#" aria-label="LinkedIn â€” add your company URL" title="Add your real LinkedIn URL here"><i data-lucide="linkedin"></i></a>
+        <a href="#" aria-label="LinkedIn — add your company URL" title="Add your real LinkedIn URL here"><i data-lucide="linkedin"></i></a>
       </div>
     </div>
   </div>
@@ -171,7 +255,151 @@
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js" defer></script>
 <script src="assets/js/site.js" defer></script>
 <script type="module" src="assets/js/pages/industry-detail.js"></script>
+
+<script>
+  (() => {
+    let observer;
+    let loaderCheck;
+
+    function hasMarketingConsent() {
+      return Boolean(
+        window.Cookiebot &&
+        window.Cookiebot.consent &&
+        window.Cookiebot.consent.marketing
+      );
+    }
+
+    function adsenseIsAvailable() {
+      return Array.isArray(window.adsbygoogle);
+    }
+
+    function industryContentIsReady() {
+      const root = document.getElementById("industry-detail-root");
+      const title = document.getElementById("industry-title");
+      const challenge = document.getElementById("industry-challenge");
+      const solution = document.getElementById("industry-solution");
+      const outcomes = document.getElementById("industry-outcomes");
+
+      return Boolean(
+        root &&
+        !root.hidden &&
+        title &&
+        title.textContent.trim() &&
+        challenge &&
+        challenge.textContent.trim() &&
+        solution &&
+        solution.textContent.trim() &&
+        outcomes &&
+        outcomes.textContent.trim()
+      );
+    }
+
+    function initialiseAd(adElement) {
+      const wrapper = adElement.closest(".industry-ad");
+
+      if (!wrapper || wrapper.dataset.initialised === "true") {
+        return;
+      }
+
+      wrapper.hidden = false;
+
+      try {
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+        wrapper.dataset.initialised = "true";
+      } catch (error) {
+        wrapper.hidden = true;
+        console.warn("AdSense unit could not be initialised.", error);
+      }
+    }
+
+    function initialiseEligibleAds() {
+      if (
+        !hasMarketingConsent() ||
+        !adsenseIsAvailable() ||
+        !industryContentIsReady()
+      ) {
+        return;
+      }
+
+      document
+        .querySelectorAll(".industry-ad .adsbygoogle")
+        .forEach(initialiseAd);
+    }
+
+    function waitForAdSense() {
+      if (!hasMarketingConsent() || !industryContentIsReady()) {
+        return;
+      }
+
+      if (adsenseIsAvailable()) {
+        initialiseEligibleAds();
+        return;
+      }
+
+      if (loaderCheck) {
+        return;
+      }
+
+      let attempts = 0;
+
+      loaderCheck = window.setInterval(() => {
+        attempts += 1;
+
+        if (adsenseIsAvailable()) {
+          window.clearInterval(loaderCheck);
+          loaderCheck = null;
+          initialiseEligibleAds();
+        } else if (attempts >= 20) {
+          window.clearInterval(loaderCheck);
+          loaderCheck = null;
+        }
+      }, 500);
+    }
+
+    function watchIndustryContent() {
+      const root = document.getElementById("industry-detail-root");
+
+      if (!root) {
+        return;
+      }
+
+      observer = new MutationObserver(() => {
+        if (!industryContentIsReady()) {
+          return;
+        }
+
+        waitForAdSense();
+        observer.disconnect();
+      });
+
+      observer.observe(root, {
+        attributes: true,
+        attributeFilter: ["hidden"],
+        childList: true,
+        subtree: true,
+        characterData: true
+      });
+
+      if (industryContentIsReady()) {
+        waitForAdSense();
+        observer.disconnect();
+      }
+    }
+
+    window.addEventListener("CookiebotOnConsentReady", waitForAdSense);
+    window.addEventListener("CookiebotOnAccept", waitForAdSense);
+
+    window.addEventListener("CookiebotOnDecline", () => {
+      document.querySelectorAll(".industry-ad").forEach((ad) => {
+        if (ad.dataset.initialised !== "true") {
+          ad.hidden = true;
+        }
+      });
+    });
+
+    document.addEventListener("DOMContentLoaded", watchIndustryContent);
+  })();
+</script>
+
 </body>
 </html>
-
-
