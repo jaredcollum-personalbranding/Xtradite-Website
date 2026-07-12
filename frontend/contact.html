@@ -40,6 +40,24 @@
 
 <!-- Synchronise genuine Cookiebot choices with Google Consent Mode -->
 <script>
+  function loadAdSenseAfterConsent() {
+    if (
+      !window.Cookiebot ||
+      !Cookiebot.hasResponse ||
+      !Cookiebot.consent.marketing ||
+      document.getElementById("adsense-loader")
+    ) {
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.id = "adsense-loader";
+    script.async = true;
+    script.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7308041122340160";
+    script.crossOrigin = "anonymous";
+    document.head.appendChild(script);
+  }
+
   function updateGoogleConsentFromCookiebot() {
     if (!window.Cookiebot || !Cookiebot.hasResponse) {
       return;
@@ -60,6 +78,10 @@
     });
 
     gtag("set", "ads_data_redaction", !marketingGranted);
+
+    if (marketingGranted) {
+      loadAdSenseAfterConsent();
+    }
   }
 
   window.addEventListener("CookiebotOnConsentReady", updateGoogleConsentFromCookiebot);
@@ -73,14 +95,6 @@
   gtag("js", new Date());
   gtag("config", "G-WYXTKGJ9JS");
 </script>
-
-<!-- Google AdSense -->
-<script
-  async
-  data-cookieconsent="ignore"
-  src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7308041122340160"
-  crossorigin="anonymous"
-></script>
 
 <!-- Vercel Speed Insights -->
 <script src="assets/js/speed-insights-init.js" defer></script>

@@ -40,6 +40,24 @@
 
 <!-- Synchronise genuine Cookiebot choices with Google Consent Mode -->
 <script>
+  function loadAdSenseAfterConsent() {
+    if (
+      !window.Cookiebot ||
+      !Cookiebot.hasResponse ||
+      !Cookiebot.consent.marketing ||
+      document.getElementById("adsense-loader")
+    ) {
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.id = "adsense-loader";
+    script.async = true;
+    script.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7308041122340160";
+    script.crossOrigin = "anonymous";
+    document.head.appendChild(script);
+  }
+
   function updateGoogleConsentFromCookiebot() {
     if (!window.Cookiebot || !Cookiebot.hasResponse) {
       return;
@@ -60,6 +78,10 @@
     });
 
     gtag("set", "ads_data_redaction", !marketingGranted);
+
+    if (marketingGranted) {
+      loadAdSenseAfterConsent();
+    }
   }
 
   window.addEventListener("CookiebotOnConsentReady", updateGoogleConsentFromCookiebot);
@@ -74,14 +96,6 @@
   gtag("config", "G-WYXTKGJ9JS");
 </script>
 
-<!-- Google AdSense -->
-<script
-  async
-  data-cookieconsent="ignore"
-  src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7308041122340160"
-  crossorigin="anonymous"
-></script>
-
 <!-- Vercel Speed Insights -->
 <script src="assets/js/speed-insights-init.js" defer></script>
 <title>Insight — Xtradite Digital</title>
@@ -93,6 +107,7 @@
 <!-- Overridden per-post by assets/js/pages/insights-post.js once the post loads. -->
 <link rel="stylesheet" href="assets/css/tokens.css">
 <link rel="stylesheet" href="assets/css/main.css">
+<link rel="stylesheet" href="assets/css/adsense.css">
 <link rel="icon" href="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/favicon-dark.ico" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/favicon-light.ico" media="(prefers-color-scheme: light)">
 <link rel="icon" href="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/favicon-light.ico">
@@ -565,5 +580,6 @@
   })();
 </script>
 
+<script src="assets/js/adsense-units.js" defer></script>
 </body>
 </html>
