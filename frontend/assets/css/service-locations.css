@@ -1,0 +1,25 @@
+/* UK coverage module used on core service-detail pages */
+.service-location-section {
+  margin-top: var(--space-80);
+  padding: var(--space-56);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lift);
+}
+.service-location-intro { max-width: 780px; color: var(--color-text-tertiary); font-size: var(--font-size-body-lg); }
+.service-location-layout { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(300px, .85fr); gap: var(--space-32); margin-top: var(--space-32); align-items: stretch; }
+.service-location-map { min-height: 390px; overflow: hidden; border-radius: var(--radius-lg); border: 1px solid var(--color-border); background: var(--color-bg-tertiary); }
+.service-location-map iframe { width: 100%; height: 100%; min-height: 390px; border: 0; display: block; }
+.service-location-directory { display: flex; flex-direction: column; min-width: 0; }
+.service-location-tabs { display: flex; flex-wrap: wrap; gap: var(--space-8); margin-bottom: var(--space-20); }
+.service-location-tab { border: 1px solid var(--color-border); background: var(--color-bg); color: var(--color-text-secondary); padding: var(--space-8) var(--space-16); border-radius: var(--radius-full); font: inherit; font-size: var(--font-size-body-sm); font-weight: 700; }
+.service-location-tab[aria-selected="true"] { background: var(--gradient-sunset); color: #fff; border-color: transparent; }
+.service-location-panel[hidden] { display: none; }
+.service-location-links { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-12); }
+.service-location-link { display: flex; align-items: center; justify-content: space-between; gap: var(--space-12); padding: var(--space-14) var(--space-16); background: var(--color-bg); border: 1px solid var(--color-border); border-radius: var(--radius-md); color: var(--color-text-primary); font-size: var(--font-size-body-sm); font-weight: 700; transition: transform var(--transition-fast), border-color var(--transition-fast); }
+.service-location-link:hover { transform: translateY(-2px); border-color: var(--color-border-hover); }
+.service-location-link svg { width: 15px; height: 15px; flex-shrink: 0; color: var(--color-primary); }
+.service-location-actions { display: flex; flex-wrap: wrap; gap: var(--space-12); margin-top: auto; padding-top: var(--space-24); }
+@media (max-width: 900px) { .service-location-layout { grid-template-columns: 1fr; } .service-location-map { min-height: 320px; } .service-location-map iframe { min-height: 320px; } }
+@media (max-width: 640px) { .service-location-section { margin-top: var(--space-56); padding: var(--space-24); } .service-location-intro { font-size: 1rem; } .service-location-links { grid-template-columns: 1fr; } .service-location-actions .btn { width: 100%; } .service-location-map, .service-location-map iframe { min-height: 280px; } }
