@@ -1,0 +1,40 @@
+name: Apply consent migration
+
+on:
+  push:
+    branches:
+      - fix/cookiebot-consent-adsense
+    paths:
+      - scripts/update_consent_headers.py
+      - .github/workflows/apply-consent-migration.yml
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v4
+        with:
+          ref: fix/cookiebot-consent-adsense
+          fetch-depth: 0
+
+      - name: Apply and validate consent migration
+        run: python scripts/update_consent_headers.py
+
+      - name: Commit generated HTML changes
+        run: |
+          if git diff --quiet; then
+            echo "No generated changes required."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add frontend
+          git commit -m "Fix Cookiebot consent and AdSense loading across pages"
+          git push origin HEAD:fix/cookiebot-consent-adsense
