@@ -302,7 +302,7 @@ section { padding: var(--space-96) 0; }
 /* ---- Stat strip ----------------------------------------------------------- */
 .stats-strip {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(var(--strip-cols, 4), 1fr);
   gap: var(--space-32);
   padding: var(--space-56) 0;
   border-top: 1px solid var(--color-border);
@@ -327,7 +327,7 @@ section { padding: var(--space-96) 0; }
   letter-spacing: var(--letter-spacing-wide);
 }
 @media (max-width: 720px) {
-  .stats-strip { grid-template-columns: repeat(2, 1fr); }
+  .stats-strip { grid-template-columns: repeat(min(var(--strip-cols, 4), 2), 1fr); }
 }
 
 /* ---- Grids & Cards --------------------------------------------------------- */
@@ -394,7 +394,7 @@ section { padding: var(--space-96) 0; }
   text-transform: uppercase;
   letter-spacing: var(--letter-spacing-wide);
 }
-.case-card .tag {
+.tag {
   display: inline-block;
   font-size: var(--font-size-body-xxs);
   font-weight: 700;
@@ -403,7 +403,7 @@ section { padding: var(--space-96) 0; }
   color: var(--color-primary-active);
   margin-bottom: var(--space-12);
 }
-.case-card .metric {
+.metric {
   font-family: var(--font-display);
   font-weight: 700;
   font-size: var(--font-size-heading-sm);
@@ -527,8 +527,8 @@ section { padding: var(--space-96) 0; }
 }
 
 /* ---- Timeline / process ------------------------------------------------------ */
-.timeline { display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--space-20); }
-@media (max-width: 960px) { .timeline { grid-template-columns: repeat(2, 1fr); } }
+.timeline { display: grid; grid-template-columns: repeat(var(--timeline-cols, 5), 1fr); gap: var(--space-20); }
+@media (max-width: 960px) { .timeline { grid-template-columns: repeat(min(var(--timeline-cols, 5), 2), 1fr); } }
 @media (max-width: 560px) { .timeline { grid-template-columns: 1fr; } }
 .timeline-step .step-num {
   font-family: var(--font-display);

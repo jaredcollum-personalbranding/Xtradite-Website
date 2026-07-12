@@ -63,18 +63,57 @@
       </div>
 
       <div id="case-study-detail-root" hidden>
+
+        <!-- 1. Hero -->
         <span class="tag" id="cs-tag" style="font-size: var(--font-size-body-xxs);"></span>
-        <h1 id="cs-headline" style="font-size: var(--font-size-display-sm); margin: var(--space-16) 0 var(--space-24);"></h1>
-        <p class="hero-sub" id="cs-challenge-line" style="margin-bottom: var(--space-40); max-width: 720px;"></p>
-        <div class="stats-strip" style="grid-template-columns: 1fr; max-width: 320px; margin-bottom: var(--space-56); padding: var(--space-32) 0;">
-          <div class="stat-item"><span class="stat-number" id="cs-metric"></span><span class="stat-label">Headline Result</span></div>
+        <h1 id="cs-headline" style="font-size: var(--font-size-display-sm); margin: var(--space-16) 0 var(--space-12);"></h1>
+        <p class="card-category" id="cs-client" style="margin-bottom: var(--space-24);"></p>
+        <span class="metric" id="cs-primary-metric" style="margin-bottom: var(--space-32); display: block;"></span>
+        <div class="hero-ctas" style="justify-content: flex-start; margin-bottom: var(--space-56);">
+          <a href="/contact" class="btn btn-primary">Book a Consultation <i data-lucide="arrow-right" class="btn-icon"></i></a>
         </div>
 
-        <div class="richtext" id="cs-description" style="max-width: 760px; margin-bottom: var(--space-56);"></div>
+        <!-- 2. Metrics strip -->
+        <div id="cs-metrics" style="margin-bottom: var(--space-64);"></div>
 
-        <blockquote class="card" id="cs-testimonial" style="border-left: 3px solid var(--color-primary); max-width: 640px;" hidden></blockquote>
+        <!-- 3. The Challenge -->
+        <div style="max-width: 760px; margin-bottom: var(--space-64);">
+          <div class="section-head left">
+            <span class="eyebrow">The Challenge</span>
+          </div>
+          <p class="card-desc" id="cs-challenge" style="font-size: var(--font-size-body-md);"></p>
+        </div>
 
-        <div style="margin-top: var(--space-64);" hidden>
+        <!-- 4. Our Approach -->
+        <div id="cs-approach-section" style="margin-bottom: var(--space-64);" hidden>
+          <div class="section-head left">
+            <span class="eyebrow">Approach</span>
+            <h2>Our Approach</h2>
+          </div>
+          <div id="cs-approach"></div>
+        </div>
+
+        <!-- 5. The Results -->
+        <div style="max-width: 760px; margin-bottom: var(--space-64);">
+          <div class="section-head left">
+            <span class="eyebrow">Outcome</span>
+            <h2>The Results</h2>
+          </div>
+          <div class="richtext" id="cs-results"></div>
+        </div>
+
+        <!-- 6. Related service cross-link -->
+        <a class="card" id="related-service" style="margin-bottom: var(--space-64); display: block;" hidden></a>
+
+        <!-- 7. Testimonial -->
+        <div id="cs-testimonial-section" style="margin-bottom: var(--space-64);" hidden>
+          <div class="section-head left">
+            <span class="eyebrow">In Their Words</span>
+          </div>
+          <blockquote class="card" id="cs-testimonial" style="border-left: 3px solid var(--color-primary); max-width: 640px;"></blockquote>
+        </div>
+
+        <div style="margin-top: var(--space-64);" id="related-case-studies-section" hidden>
           <div class="section-head left">
             <span class="eyebrow">More Case Studies</span>
             <h2>Other engagements.</h2>

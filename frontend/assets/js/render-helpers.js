@@ -159,6 +159,10 @@ export function getTagParam() {
   return new URLSearchParams(window.location.search).get("tag");
 }
 
+export function getIndustryParam() {
+  return new URLSearchParams(window.location.search).get("industry");
+}
+
 /** Public URL for a "Tech Stack Logos" Storage file, given its bare brand key (e.g. "aws",
  * "postfresql", "c++") — matches the real uploaded filenames exactly, quirks included. */
 export function techLogoUrl(file) {
@@ -205,11 +209,14 @@ export function deliverableListHtml(deliverables) {
     </div>`;
 }
 
-/** Renders a 5-phase "How It Works" timeline, reusing the homepage's .timeline markup. */
+/** Renders a "How It Works" / "Our Approach" timeline, reusing the homepage's .timeline
+ * markup. Column count adapts to the number of steps (2-5) rather than forcing every
+ * process onto a fixed 5-phase grid. */
 export function timelineHtml(steps) {
   if (!steps?.length) return "";
+  const cols = Math.min(steps.length, 5);
   return `
-    <div class="timeline">
+    <div class="timeline" style="--timeline-cols: ${cols};">
       ${steps
         .map(
           (s, i) => `
@@ -217,6 +224,64 @@ export function timelineHtml(steps) {
         )
         .join("")}
     </div>`;
+}
+
+/** Renders a metrics strip (2-4 stats), reusing the homepage's .stats-strip markup.
+ * Entries with `animate: true` count up on scroll via wireMetricsCounters — the rest
+ * (compound or qualitative values like "32% → 98%") render as static text. */
+export function metricsStripHtml(metrics) {
+  if (!metrics?.length) return "";
+  const cols = Math.min(metrics.length, 4);
+  return `
+    <div class="stats-strip" style="--strip-cols: ${cols};">
+      ${metrics
+        .map(
+          (m) => `
+          <div class="stat-item"><span class="stat-number"${m.animate ? ` data-count-to="${escapeHtml(m.value)}"` : ""}>${m.animate ? "0" : escapeHtml(m.value)}</span><span class="stat-label">${escapeHtml(m.label)}</span></div>`
+        )
+        .join("")}
+    </div>`;
+}
+
+/** Wires the count-up animation for stat-number elements injected after site.js's initial
+ * load-time pass (dynamically-rendered content misses that pass, since it doesn't exist
+ * yet) — same duplication rationale as wireFaqAccordion above. */
+export function wireMetricsCounters(container) {
+  const counters = container.querySelectorAll(".stat-number[data-count-to]");
+  if (!counters.length || !("IntersectionObserver" in window)) return;
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        animateCount(entry.target);
+        observer.unobserve(entry.target);
+      });
+    },
+    { threshold: 0.4 }
+  );
+  counters.forEach((c) => observer.observe(c));
+}
+
+function animateCount(el) {
+  const target = el.getAttribute("data-count-to");
+  const match = target.match(/^([^\d]*)(\d+(?:\.\d+)?)(.*)$/);
+  if (!match) {
+    el.textContent = target;
+    return;
+  }
+  const [, prefix, numStr, suffix] = match;
+  const end = parseFloat(numStr);
+  const decimals = (numStr.split(".")[1] || "").length;
+  const duration = 1200;
+  const start = performance.now();
+  function tick(now) {
+    const progress = Math.min((now - start) / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const value = (end * eased).toFixed(decimals);
+    el.textContent = `${prefix}${value}${suffix}`;
+    if (progress < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
 }
 
 /** Renders an FAQ accordion, reusing the homepage's .faq-item markup. */

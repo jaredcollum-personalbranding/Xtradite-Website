@@ -24,7 +24,7 @@ async function loadCaseStudies() {
   try {
     const { items } = await queryItems("case_studies", { sort: [{ fieldName: "sort_order", order: "ASC" }] });
     if (!items.length) return showEmpty(grid, "Case studies are managed in Supabase — add rows to the case_studies table to show them here.");
-    grid.innerHTML = items.map(caseStudyCardHtml).join("");
+    grid.innerHTML = items.slice(0, 3).map(caseStudyCardHtml).join("");
     renderIcons();
   } catch (e) {
     console.error(e);
