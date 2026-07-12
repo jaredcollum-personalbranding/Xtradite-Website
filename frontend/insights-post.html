@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -15,7 +15,11 @@
 
   gtag('config', 'G-WYXTKGJ9JS');
 </script>
-<!-- Google AdSense -->
+<!--
+  Google AdSense is loaded once and released only after Cookiebot marketing
+  consent. In-article, multiplex and responsive rail units are initialised
+  after the dynamic post content has rendered.
+-->
 <!-- Vercel Speed Insights -->
 <script src="assets/js/speed-insights-init.js" defer></script>
 <script type="text/plain" data-cookieconsent="marketing" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7308041122340160" crossorigin="anonymous"></script>
@@ -84,6 +88,64 @@
       padding: var(--space-16) 0;
     }
   }
+
+  .article-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 760px) minmax(180px, 300px);
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: start;
+    justify-content: center;
+  }
+
+  .article-layout__main,
+  .article-layout__rail {
+    min-width: 0;
+  }
+
+  .article-rail-sticky {
+    position: sticky;
+    top: calc(var(--space-24) + 80px);
+  }
+
+  .article-ad--rail {
+    margin: 0;
+  }
+
+  .article-ad--vertical {
+    min-height: 600px;
+  }
+
+  .article-ad--square {
+    display: none;
+    min-height: 250px;
+  }
+
+  @media (max-width: 1100px) {
+    .article-layout {
+      grid-template-columns: minmax(0, 760px) minmax(180px, 250px);
+      gap: var(--space-32);
+    }
+
+    .article-ad--vertical {
+      display: none;
+    }
+
+    .article-ad--square {
+      display: block;
+    }
+  }
+
+  @media (max-width: 860px) {
+    .article-layout {
+      display: block;
+      max-width: 760px;
+    }
+
+    .article-layout__rail {
+      display: none;
+    }
+  }
+
 </style>
 
 </head>
@@ -110,7 +172,8 @@
 <main>
 
   <section class="section-tight">
-    <div class="container" style="max-width: 760px;">
+    <div class="container article-layout">
+      <article class="article-layout__main">
       <a href="/insights" class="back-link"><i data-lucide="arrow-left"></i> Back to Insights</a>
 
       <div id="not-found" class="not-found" hidden>
@@ -169,6 +232,45 @@
           <div class="related-grid" id="related-posts"></div>
         </div>
       </div>
+      </article>
+
+      <aside class="article-layout__rail" aria-label="Sponsored content">
+        <div class="article-rail-sticky">
+          <div
+            class="article-ad article-ad--rail article-ad--vertical"
+            id="post-vertical-ad"
+            aria-label="Advertisement"
+            hidden
+          >
+            <span class="article-ad__label">Advertisement</span>
+            <ins
+              class="adsbygoogle"
+              style="display:block"
+              data-ad-client="ca-pub-7308041122340160"
+              data-ad-slot="9921616846"
+              data-ad-format="auto"
+              data-full-width-responsive="true"
+            ></ins>
+          </div>
+
+          <div
+            class="article-ad article-ad--rail article-ad--square"
+            id="post-square-ad"
+            aria-label="Advertisement"
+            hidden
+          >
+            <span class="article-ad__label">Advertisement</span>
+            <ins
+              class="adsbygoogle"
+              style="display:block"
+              data-ad-client="ca-pub-7308041122340160"
+              data-ad-slot="6205733112"
+              data-ad-format="auto"
+              data-full-width-responsive="true"
+            ></ins>
+          </div>
+        </div>
+      </aside>
     </div>
   </section>
 
@@ -316,7 +418,21 @@
         return;
       }
 
-      document.querySelectorAll('.article-ad .adsbygoogle').forEach(initialiseAd);
+      document.querySelectorAll('.article-ad .adsbygoogle').forEach((adElement) => {
+        const wrapper = adElement.closest('.article-ad');
+
+        if (!wrapper) {
+          return;
+        }
+
+        const isRailAd = wrapper.classList.contains('article-ad--rail');
+        const isVisible = window.getComputedStyle(wrapper).display !== 'none';
+
+        if (!isRailAd || isVisible) {
+          initialiseAd(adElement);
+        }
+      });
+
       adsInitialised = true;
     }
 
@@ -365,6 +481,17 @@
         observer.disconnect();
       }
     }
+
+
+    let resizeTimer;
+
+    window.addEventListener('resize', () => {
+      window.clearTimeout(resizeTimer);
+
+      resizeTimer = window.setTimeout(() => {
+        initialiseEligibleAds();
+      }, 200);
+    });
 
     window.addEventListener('CookiebotOnConsentReady', initialiseEligibleAds);
     window.addEventListener('CookiebotOnAccept', initialiseEligibleAds);
