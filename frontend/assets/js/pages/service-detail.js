@@ -13,6 +13,7 @@ import {
 } from "../render-helpers.js";
 import { SERVICE_TO_CASE_STUDY, SERVICE_TO_RELATED_POSTS } from "./shared-data.js";
 import { renderServiceLocationCoverage } from "./service-locations.js";
+import { enhanceServiceExperience } from "./service-experience.js";
 
 const root = document.getElementById("service-detail-root");
 const notFound = document.getElementById("not-found");
@@ -136,6 +137,7 @@ async function load() {
   }
 
   renderServiceLocationCoverage(item);
+  enhanceServiceExperience(item);
 
   const relatedSlug = SERVICE_TO_CASE_STUDY[item.slug];
   if (relatedSlug) {
