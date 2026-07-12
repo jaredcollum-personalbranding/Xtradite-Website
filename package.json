@@ -1,0 +1,9 @@
+{
+  "name": "xtradite-website",
+  "version": "1.0.0",
+  "description": "Xtradite Digital Website",
+  "private": true,
+  "dependencies": {
+    "@vercel/speed-insights": "^1.0.12"
+  }
+}
