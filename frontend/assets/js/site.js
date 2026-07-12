@@ -6,16 +6,35 @@
 (function () {
   "use strict";
 
+  const currentScript = document.currentScript;
+  const scriptBase = currentScript && currentScript.src
+    ? new URL(".", currentScript.src)
+    : new URL("/assets/js/", window.location.origin);
+
   // ---- Shared mobile responsive stylesheet ---------------------------------
   if (!document.querySelector('link[data-xtradite-mobile-css]')) {
-    const currentScript = document.currentScript;
     const stylesheet = document.createElement("link");
     stylesheet.rel = "stylesheet";
     stylesheet.dataset.xtraditeMobileCss = "true";
-    stylesheet.href = currentScript && currentScript.src
-      ? new URL("../css/mobile.css", currentScript.src).href
-      : "/assets/css/mobile.css";
+    stylesheet.href = new URL("../css/mobile.css", scriptBase).href;
     document.head.appendChild(stylesheet);
+  }
+
+  // ---- Site-wide enquiry form distribution ---------------------------------
+  if (!document.querySelector('link[data-xtradite-enquiry-css]')) {
+    const stylesheet = document.createElement("link");
+    stylesheet.rel = "stylesheet";
+    stylesheet.dataset.xtraditeEnquiryCss = "true";
+    stylesheet.href = new URL("../css/enquiry.css", scriptBase).href;
+    document.head.appendChild(stylesheet);
+  }
+
+  if (!window.__xtraditeEnquiryLoading) {
+    window.__xtraditeEnquiryLoading = true;
+    const enquiryScript = document.createElement("script");
+    enquiryScript.type = "module";
+    enquiryScript.src = new URL("enquiry.js", scriptBase).href;
+    document.body.appendChild(enquiryScript);
   }
 
   // ---- Sticky header frosted-glass on scroll -----------------------------
