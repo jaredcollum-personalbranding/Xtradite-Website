@@ -190,6 +190,16 @@ p { margin: 0; }
   color: var(--color-text-primary);
   letter-spacing: var(--letter-spacing-tight);
   flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+}
+.logo-img {
+  height: 22px;
+  width: auto;
+  display: block;
+}
+.footer-brand .logo-img {
+  height: 26px;
 }
 .site-nav {
   display: flex;
