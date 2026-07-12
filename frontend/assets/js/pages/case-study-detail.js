@@ -15,6 +15,71 @@ const TESTIMONIALS = {
   },
 };
 
+function setMetaByName(name, content) {
+  if (!content) return;
+  let el = document.querySelector(`meta[name="${name}"]`);
+  if (!el) {
+    el = document.createElement("meta");
+    el.setAttribute("name", name);
+    document.head.appendChild(el);
+  }
+  el.setAttribute("content", content);
+}
+
+function setMetaByProperty(property, content) {
+  if (!content) return;
+  let el = document.querySelector(`meta[property="${property}"]`);
+  if (!el) {
+    el = document.createElement("meta");
+    el.setAttribute("property", property);
+    document.head.appendChild(el);
+  }
+  el.setAttribute("content", content);
+}
+
+function setCanonical(href) {
+  let el = document.querySelector('link[rel="canonical"]');
+  if (!el) {
+    el = document.createElement("link");
+    el.setAttribute("rel", "canonical");
+    document.head.appendChild(el);
+  }
+  el.setAttribute("href", href);
+}
+
+function setJsonLd(title, description, url) {
+  const script = document.createElement("script");
+  script.type = "application/ld+json";
+  script.textContent = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: title,
+    description,
+    author: { "@type": "Organization", name: "Xtradite Digital" },
+    publisher: { "@type": "Organization", name: "Xtradite Digital" },
+    mainEntityOfPage: url,
+  });
+  document.head.appendChild(script);
+}
+
+function applySeo(item) {
+  const title = `${item.client} — Xtradite Digital Case Study`;
+  const description = item.challenge || item.headline || `How Xtradite Digital helped ${item.client}.`;
+  const url = `${window.location.origin}/case-study-detail?slug=${encodeURIComponent(item.slug)}`;
+
+  document.title = title;
+  setMetaByName("description", description);
+  setMetaByProperty("og:title", item.headline || item.client);
+  setMetaByProperty("og:description", description);
+  setMetaByProperty("og:type", "article");
+  setMetaByProperty("og:url", url);
+  setMetaByName("twitter:card", "summary");
+  setMetaByName("twitter:title", item.headline || item.client);
+  setMetaByName("twitter:description", description);
+  setCanonical(url);
+  setJsonLd(title, description, url);
+}
+
 async function load() {
   if (!slug) return showNotFound();
   let item;
@@ -26,7 +91,7 @@ async function load() {
   }
   if (!item) return showNotFound();
 
-  document.title = `${item.client} — Xtradite Digital`;
+  applySeo(item);
   document.getElementById("breadcrumb-current").textContent = item.client;
   document.getElementById("cs-tag").textContent = item.industry || "";
   document.getElementById("cs-headline").textContent = item.headline || item.client;

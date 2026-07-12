@@ -51,6 +51,32 @@ reasons.
 Quick local preview: from inside this folder, run `python3 -m http.server 8000` (or any
 static file server) and open `http://localhost:8000`.
 
+## Analytics, ads, sitemap & LLM discoverability
+
+- **Google Analytics (GA4)** — the `gtag.js` snippet (measurement ID `G-WYXTKGJ9JS`) is
+  in every page's `<head>`, so page views are tracked on every load without any extra
+  wiring (this is a multi-page site, not an SPA, so the default `gtag('config', ...)`
+  call is all page-view tracking needs).
+- **Server-side lead tracking** — `api/track-lead.js` (Vercel serverless function) sends
+  a `generate_lead` event straight to GA4 via the Measurement Protocol after a successful
+  Contact form submission (`assets/js/forms.js`), so leads are still recorded if the
+  visitor's browser blocks `gtag.js`. **Requires a `GA_MP_API_SECRET` environment
+  variable in the Vercel project settings** (the GA4 Measurement Protocol API secret) —
+  without it the function no-ops silently.
+- **AdSense** — the `adsbygoogle.js` loader (`ca-pub-9395583799806156`) is in every
+  page's `<head>`; `ads.txt` at the site root declares the same publisher ID as Google
+  requires.
+- **Sitemap** — `https://www.xtradite-digital.co.uk/sitemap.xml` is served by
+  `api/sitemap.js` (rewritten in `vercel.json`), which queries Supabase at request time
+  for every service/industry/case study/insights post slug. New content added in the
+  Table Editor appears in the sitemap automatically — nothing to regenerate.
+- **robots.txt / llms.txt** — `robots.txt` allows all crawlers (including named AI/LLM
+  bots) and points at the sitemap; `llms.txt` gives LLMs a plain-language summary of the
+  site and its key pages (per the llmstxt.org convention). Per-page `<link
+  rel="canonical">`, Open Graph/Twitter meta and `Organization`/`Article`/`Service`/
+  `WebPage` JSON-LD are set statically in each HTML file and, on the dynamic detail
+  pages, re-applied per-slug by their `assets/js/pages/*.js` script once the row loads.
+
 ## Known gaps to close before launch
 
 - **LinkedIn link** — the footer's LinkedIn icon points to `#`. Update it in the footer

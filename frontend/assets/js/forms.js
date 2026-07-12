@@ -16,4 +16,8 @@ export async function submitContactForm(fields) {
     message: fields.message,
   });
   if (error) throw error;
+
+  // Server-side GA4 conversion hit (Measurement Protocol) — records the lead even if
+  // the browser's gtag.js call is blocked. Best-effort: never fails the form submission.
+  fetch("/api/track-lead", { method: "POST" }).catch(() => {});
 }

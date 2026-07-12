@@ -6,6 +6,69 @@ const root = document.getElementById("industry-detail-root");
 const notFound = document.getElementById("not-found");
 const slug = getSlugParam();
 
+function setMetaByName(name, content) {
+  if (!content) return;
+  let el = document.querySelector(`meta[name="${name}"]`);
+  if (!el) {
+    el = document.createElement("meta");
+    el.setAttribute("name", name);
+    document.head.appendChild(el);
+  }
+  el.setAttribute("content", content);
+}
+
+function setMetaByProperty(property, content) {
+  if (!content) return;
+  let el = document.querySelector(`meta[property="${property}"]`);
+  if (!el) {
+    el = document.createElement("meta");
+    el.setAttribute("property", property);
+    document.head.appendChild(el);
+  }
+  el.setAttribute("content", content);
+}
+
+function setCanonical(href) {
+  let el = document.querySelector('link[rel="canonical"]');
+  if (!el) {
+    el = document.createElement("link");
+    el.setAttribute("rel", "canonical");
+    document.head.appendChild(el);
+  }
+  el.setAttribute("href", href);
+}
+
+function setJsonLd(title, description, url) {
+  const script = document.createElement("script");
+  script.type = "application/ld+json";
+  script.textContent = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: title,
+    description,
+    url,
+  });
+  document.head.appendChild(script);
+}
+
+function applySeo(item) {
+  const title = `${item.title} — Xtradite Digital`;
+  const description = item.summary || `How Xtradite Digital helps ${item.title} businesses.`;
+  const url = `${window.location.origin}/industry-detail?slug=${encodeURIComponent(item.slug)}`;
+
+  document.title = title;
+  setMetaByName("description", description);
+  setMetaByProperty("og:title", item.title);
+  setMetaByProperty("og:description", description);
+  setMetaByProperty("og:type", "website");
+  setMetaByProperty("og:url", url);
+  setMetaByName("twitter:card", "summary");
+  setMetaByName("twitter:title", item.title);
+  setMetaByName("twitter:description", description);
+  setCanonical(url);
+  setJsonLd(title, description, url);
+}
+
 async function load() {
   if (!slug) return showNotFound();
   let item;
@@ -17,7 +80,7 @@ async function load() {
   }
   if (!item) return showNotFound();
 
-  document.title = `${item.title} — Xtradite Digital`;
+  applySeo(item);
   document.getElementById("breadcrumb-current").textContent = item.title;
   document.getElementById("industry-title").textContent = item.title;
   document.getElementById("industry-summary").textContent = item.summary || "";
