@@ -1,25 +1,51 @@
 /* UK coverage module used on core service-detail pages */
-.service-location-section {
-  margin-top: var(--space-80);
-  padding: var(--space-56);
-  background: var(--color-bg-secondary);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-lift);
-}
-.service-location-intro { max-width: 780px; color: var(--color-text-tertiary); font-size: var(--font-size-body-lg); }
-.service-location-layout { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(300px, .85fr); gap: var(--space-32); margin-top: var(--space-32); align-items: stretch; }
-.service-location-map { min-height: 390px; overflow: hidden; border-radius: var(--radius-lg); border: 1px solid var(--color-border); background: var(--color-bg-tertiary); }
-.service-location-map iframe { width: 100%; height: 100%; min-height: 390px; border: 0; display: block; }
-.service-location-directory { display: flex; flex-direction: column; min-width: 0; }
+.service-location-section { margin-top: var(--space-80); padding: var(--space-56); background: var(--color-bg-secondary); border: 1px solid var(--color-border); border-radius: var(--radius-xl); box-shadow: var(--shadow-lift); }
+.service-location-heading { max-width: 820px; margin-bottom: var(--space-28); }
+.service-location-heading p { color: var(--color-text-tertiary); font-size: var(--font-size-body-lg); }
+.service-coverage-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-10); margin-bottom: var(--space-20); }
+.service-coverage-tabs button { display: flex; align-items: center; gap: var(--space-10); padding: var(--space-16) var(--space-18); border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-bg); color: var(--color-text-secondary); font: inherit; font-weight: 750; text-align: left; transition: border-color .2s ease, transform .2s ease, background .2s ease; }
+.service-coverage-tabs button span { color: var(--color-primary); font-size: .68rem; letter-spacing: .1em; }
+.service-coverage-tabs button:hover { transform: translateY(-2px); border-color: var(--color-border-hover); }
+.service-coverage-tabs button[aria-selected="true"] { background: var(--color-text-primary); color: var(--color-bg); border-color: var(--color-text-primary); }
+.service-coverage-tabs button[aria-selected="true"] span { color: #ff6b35; }
+.service-coverage-shell { padding: var(--space-28); border: 1px solid var(--color-border); border-radius: var(--radius-xl); background: var(--color-bg); }
+[data-coverage-panel][hidden], .service-location-panel[hidden] { display: none; }
+.service-coverage-overview { display: grid; grid-template-columns: minmax(260px, .72fr) minmax(0, 1.28fr); gap: var(--space-32); align-items: center; }
+.service-location-map { overflow: hidden; border-radius: var(--radius-lg); border: 1px solid var(--color-border); background: var(--color-bg-tertiary); }
+.service-location-map--compact, .service-location-map--compact iframe { min-height: 260px; }
+.service-location-map iframe { width: 100%; height: 100%; border: 0; display: block; }
+.service-coverage-copy { max-width: 680px; }
+.service-coverage-copy p, .service-coverage-enquiry > div p { color: var(--color-text-tertiary); }
+.service-coverage-copy p + p { margin-top: var(--space-14); }
+.service-coverage-kicker { display: inline-block; margin-bottom: var(--space-12); color: var(--color-primary); font-size: .72rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.service-coverage-copy .card-link { margin-top: var(--space-20); }
 .service-location-tabs { display: flex; flex-wrap: wrap; gap: var(--space-8); margin-bottom: var(--space-20); }
-.service-location-tab { border: 1px solid var(--color-border); background: var(--color-bg); color: var(--color-text-secondary); padding: var(--space-8) var(--space-16); border-radius: var(--radius-full); font: inherit; font-size: var(--font-size-body-sm); font-weight: 700; }
+.service-location-tab { border: 1px solid var(--color-border); background: var(--color-bg-secondary); color: var(--color-text-secondary); padding: var(--space-8) var(--space-16); border-radius: var(--radius-full); font: inherit; font-size: var(--font-size-body-sm); font-weight: 700; }
 .service-location-tab[aria-selected="true"] { background: var(--gradient-sunset); color: #fff; border-color: transparent; }
-.service-location-panel[hidden] { display: none; }
-.service-location-links { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-12); }
-.service-location-link { display: flex; align-items: center; justify-content: space-between; gap: var(--space-12); padding: var(--space-14) var(--space-16); background: var(--color-bg); border: 1px solid var(--color-border); border-radius: var(--radius-md); color: var(--color-text-primary); font-size: var(--font-size-body-sm); font-weight: 700; transition: transform var(--transition-fast), border-color var(--transition-fast); }
+.service-location-links { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-12); }
+.service-location-link { display: flex; align-items: center; justify-content: space-between; gap: var(--space-12); padding: var(--space-14) var(--space-16); background: var(--color-bg-secondary); border: 1px solid var(--color-border); border-radius: var(--radius-md); color: var(--color-text-primary); font-size: var(--font-size-body-sm); font-weight: 700; transition: transform var(--transition-fast), border-color var(--transition-fast); }
 .service-location-link:hover { transform: translateY(-2px); border-color: var(--color-border-hover); }
 .service-location-link svg { width: 15px; height: 15px; flex-shrink: 0; color: var(--color-primary); }
-.service-location-actions { display: flex; flex-wrap: wrap; gap: var(--space-12); margin-top: auto; padding-top: var(--space-24); }
-@media (max-width: 900px) { .service-location-layout { grid-template-columns: 1fr; } .service-location-map { min-height: 320px; } .service-location-map iframe { min-height: 320px; } }
-@media (max-width: 640px) { .service-location-section { margin-top: var(--space-56); padding: var(--space-24); } .service-location-intro { font-size: 1rem; } .service-location-links { grid-template-columns: 1fr; } .service-location-actions .btn { width: 100%; } .service-location-map, .service-location-map iframe { min-height: 280px; } }
+.service-coverage-enquiry { display: grid; grid-template-columns: minmax(0, .8fr) minmax(360px, 1.2fr); gap: var(--space-40); align-items: start; }
+.service-coverage-enquiry h3 { margin-bottom: var(--space-12); font-size: clamp(1.5rem, 3vw, 2rem); }
+.service-coverage-enquiry form { padding: var(--space-24); border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-bg-secondary); }
+.service-enquiry-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-14); }
+.service-coverage-enquiry .form-field { margin-bottom: var(--space-16); }
+.service-coverage-enquiry .btn { width: 100%; justify-content: center; }
+
+@media (max-width: 900px) {
+  .service-coverage-overview, .service-coverage-enquiry { grid-template-columns: 1fr; }
+  .service-location-links { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .service-location-map--compact, .service-location-map--compact iframe { min-height: 230px; }
+}
+@media (max-width: 640px) {
+  .service-location-section { margin-top: var(--space-56); padding: var(--space-24); }
+  .service-location-heading p { font-size: 1rem; }
+  .service-coverage-tabs { display: flex; overflow-x: auto; margin-inline: -4px; padding: 0 4px 6px; scrollbar-width: none; }
+  .service-coverage-tabs::-webkit-scrollbar { display: none; }
+  .service-coverage-tabs button { flex: 0 0 auto; min-width: 132px; padding: var(--space-12) var(--space-14); }
+  .service-coverage-shell { padding: var(--space-20); }
+  .service-location-links, .service-enquiry-grid { grid-template-columns: 1fr; }
+  .service-location-map--compact, .service-location-map--compact iframe { min-height: 200px; }
+  .service-coverage-enquiry form { padding: var(--space-18); }
+}
