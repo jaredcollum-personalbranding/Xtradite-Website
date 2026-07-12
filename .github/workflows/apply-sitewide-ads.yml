@@ -1,0 +1,39 @@
+name: Apply sitewide AdSense placements
+
+on:
+  push:
+    branches:
+      - feat/sitewide-adsense-placements
+    paths:
+      - .github/workflows/apply-sitewide-ads.yml
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/sitewide-adsense-placements
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Apply and validate sitewide AdSense implementation
+        run: python scripts/complete_adsense_sitewide.py
+
+      - name: Commit generated changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add frontend scripts/complete_adsense_sitewide.py
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Complete AdSense implementation site wide"
+            git push origin feat/sitewide-adsense-placements
+          fi
