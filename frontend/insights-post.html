@@ -21,7 +21,7 @@
 <script type="text/plain" data-cookieconsent="marketing" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7308041122340160" crossorigin="anonymous"></script>
 <title>Insight — Xtradite Digital</title>
 <meta name="description" content="Read the latest thinking from Xtradite Digital on operations, growth and leadership.">
-<meta property="og:title" content="Insight â€” Xtradite Digital">
+<meta property="og:title" content="Insight — Xtradite Digital">
 <meta property="og:description" content="Read the latest thinking from Xtradite Digital on operations, growth and leadership.">
 <meta property="og:type" content="article">
 <meta name="twitter:card" content="summary_large_image">
@@ -40,11 +40,52 @@
 <meta property="og:site_name" content="Xtradite Digital">
 <meta property="og:locale" content="en_GB">
 <meta property="og:url" content="https://www.xtradite-digital.co.uk/insights-post">
-<meta name="twitter:title" content="Insight â€” Xtradite Digital">
+<meta name="twitter:title" content="Insight — Xtradite Digital">
 <meta name="twitter:description" content="Read the latest thinking from Xtradite Digital on operations, growth and leadership.">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Organization", "name": "Xtradite Digital", "url": "https://www.xtradite-digital.co.uk/", "description": "UK digital consultancy helping ambitious retail, ecommerce and manufacturing businesses close operational and commercial gaps with hands-on delivery.", "areaServed": "GB", "knowsAbout": ["Digital Strategy", "AI & Automation", "eCommerce Growth", "Operational Excellence", "Fractional Leadership", "Project Delivery"]}</script>
 <!-- Vercel Web Analytics -->
 <script defer src="https://cdn.vercel-insights.com/v1/script.js"></script>
+
+<style>
+  .article-ad {
+    clear: both;
+    width: 100%;
+    margin: var(--space-48) 0;
+  }
+
+  .article-ad__label {
+    display: block;
+    margin-bottom: var(--space-8);
+    color: var(--color-text-muted, #8f8f8f);
+    font-size: var(--font-size-xs, 0.75rem);
+    line-height: 1;
+    letter-spacing: 0.05em;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  .article-ad--in-content {
+    padding: var(--space-20) 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .article-ad--multiplex {
+    min-height: 280px;
+    margin-top: var(--space-56);
+  }
+
+  @media (max-width: 767px) {
+    .article-ad {
+      margin: var(--space-40) 0;
+    }
+
+    .article-ad--in-content {
+      padding: var(--space-16) 0;
+    }
+  }
+</style>
+
 </head>
 <body>
 
@@ -91,11 +132,27 @@
         <div id="post-cover-wrap"></div>
         <div class="richtext" id="post-body"></div>
 
+        <aside
+          class="article-ad article-ad--multiplex"
+          id="post-multiplex-ad"
+          aria-label="Advertisement"
+          hidden
+        >
+          <span class="article-ad__label">Advertisement</span>
+          <ins
+            class="adsbygoogle"
+            style="display:block"
+            data-ad-format="autorelaxed"
+            data-ad-client="ca-pub-7308041122340160"
+            data-ad-slot="2190466483"
+          ></ins>
+        </aside>
+
         <div class="author-box">
           <div class="author-avatar">XD</div>
           <div>
             <h4>About Xtradite Digital</h4>
-            <p>Practical consultancy for retail, ecommerce and manufacturing businesses ready to accelerate digital-first growth â€” hands-on delivery, not just strategy decks.</p>
+            <p>Practical consultancy for retail, ecommerce and manufacturing businesses ready to accelerate digital-first growth — hands-on delivery, not just strategy decks.</p>
           </div>
         </div>
 
@@ -160,7 +217,7 @@
     <div class="footer-bottom">
       <span>&copy; 2026 Xtradite Digital. All rights reserved.</span>
       <div class="footer-social">
-        <a href="#" aria-label="LinkedIn â€” add your company URL" title="Add your real LinkedIn URL here"><i data-lucide="linkedin"></i></a>
+        <a href="#" aria-label="LinkedIn — add your company URL" title="Add your real LinkedIn URL here"><i data-lucide="linkedin"></i></a>
       </div>
     </div>
   </div>
@@ -169,7 +226,159 @@
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js" defer></script>
 <script src="assets/js/site.js" defer></script>
 <script type="module" src="assets/js/pages/insights-post.js"></script>
+
+<script>
+  (() => {
+    const ADSENSE_CLIENT = 'ca-pub-7308041122340160';
+    const IN_ARTICLE_SLOT = '5137183702';
+    const MIN_PARAGRAPHS_FOR_IN_ARTICLE_AD = 7;
+    const INSERT_AFTER_PARAGRAPH = 4;
+
+    let adsInitialised = false;
+    let observer;
+
+    function hasMarketingConsent() {
+      return Boolean(
+        window.Cookiebot &&
+        window.Cookiebot.consent &&
+        window.Cookiebot.consent.marketing
+      );
+    }
+
+    function adsenseIsAvailable() {
+      return Array.isArray(window.adsbygoogle);
+    }
+
+    function createInArticleAd() {
+      const wrapper = document.createElement('aside');
+      wrapper.className = 'article-ad article-ad--in-content';
+      wrapper.setAttribute('aria-label', 'Advertisement');
+      wrapper.hidden = true;
+      wrapper.dataset.adUnit = 'in-article';
+
+      const label = document.createElement('span');
+      label.className = 'article-ad__label';
+      label.textContent = 'Advertisement';
+
+      const ad = document.createElement('ins');
+      ad.className = 'adsbygoogle';
+      ad.style.display = 'block';
+      ad.style.textAlign = 'center';
+      ad.dataset.adLayout = 'in-article';
+      ad.dataset.adFormat = 'fluid';
+      ad.dataset.adClient = ADSENSE_CLIENT;
+      ad.dataset.adSlot = IN_ARTICLE_SLOT;
+
+      wrapper.append(label, ad);
+      return wrapper;
+    }
+
+    function placeInArticleAd() {
+      const postBody = document.getElementById('post-body');
+      if (!postBody || postBody.querySelector('[data-ad-unit="in-article"]')) {
+        return;
+      }
+
+      const paragraphs = Array.from(postBody.querySelectorAll(':scope > p'))
+        .filter((paragraph) => paragraph.textContent.trim().length >= 80);
+
+      if (paragraphs.length < MIN_PARAGRAPHS_FOR_IN_ARTICLE_AD) {
+        return;
+      }
+
+      const insertionPoint = paragraphs[Math.min(
+        INSERT_AFTER_PARAGRAPH - 1,
+        paragraphs.length - 1
+      )];
+
+      insertionPoint.insertAdjacentElement('afterend', createInArticleAd());
+    }
+
+    function initialiseAd(adElement) {
+      const wrapper = adElement.closest('.article-ad');
+      if (!wrapper || wrapper.dataset.initialised === 'true') {
+        return;
+      }
+
+      wrapper.hidden = false;
+
+      try {
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+        wrapper.dataset.initialised = 'true';
+      } catch (error) {
+        wrapper.hidden = true;
+        console.warn('AdSense unit could not be initialised.', error);
+      }
+    }
+
+    function initialiseEligibleAds() {
+      if (!hasMarketingConsent() || !adsenseIsAvailable()) {
+        return;
+      }
+
+      document.querySelectorAll('.article-ad .adsbygoogle').forEach(initialiseAd);
+      adsInitialised = true;
+    }
+
+    function prepareAds() {
+      placeInArticleAd();
+
+      initialiseEligibleAds();
+
+      if (hasMarketingConsent() && !adsenseIsAvailable()) {
+        let attempts = 0;
+        const loaderCheck = window.setInterval(() => {
+          attempts += 1;
+
+          if (adsenseIsAvailable()) {
+            window.clearInterval(loaderCheck);
+            initialiseEligibleAds();
+          } else if (attempts >= 20) {
+            window.clearInterval(loaderCheck);
+          }
+        }, 500);
+      }
+    }
+
+    function watchForPostContent() {
+      const postBody = document.getElementById('post-body');
+      if (!postBody) {
+        return;
+      }
+
+      observer = new MutationObserver(() => {
+        if (!postBody.textContent.trim()) {
+          return;
+        }
+
+        prepareAds();
+        observer.disconnect();
+      });
+
+      observer.observe(postBody, {
+        childList: true,
+        subtree: true
+      });
+
+      if (postBody.textContent.trim()) {
+        prepareAds();
+        observer.disconnect();
+      }
+    }
+
+    window.addEventListener('CookiebotOnConsentReady', initialiseEligibleAds);
+    window.addEventListener('CookiebotOnAccept', initialiseEligibleAds);
+    window.addEventListener('CookiebotOnDecline', () => {
+      document.querySelectorAll('.article-ad').forEach((ad) => {
+        if (ad.dataset.initialised !== 'true') {
+          ad.hidden = true;
+        }
+      });
+    });
+
+    document.addEventListener('DOMContentLoaded', watchForPostContent);
+  })();
+</script>
+
 </body>
 </html>
-
-
