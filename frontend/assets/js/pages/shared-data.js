@@ -19,6 +19,12 @@ export const SERVICE_TO_RELATED_POSTS = {
   "project-delivery": ["why-your-website-launch-didnt-fix-the-real-problem", "the-cost-of-treating-operations-as-an-afterthought"],
 };
 
+/** Reverse of SERVICE_TO_CASE_STUDY — the single most relevant service for a case study's
+ * cross-link, derived from the same curatorial map so the two pages never disagree. */
+export const CASE_STUDY_TO_SERVICE = Object.fromEntries(
+  Object.entries(SERVICE_TO_CASE_STUDY).map(([service, caseStudy]) => [caseStudy, service])
+);
+
 export const INDUSTRY_TO_SERVICES = {
   retail: ["ecommerce-growth", "operational-excellence", "ai-automation"],
   ecommerce: ["ecommerce-growth", "digital-strategy", "ai-automation"],
