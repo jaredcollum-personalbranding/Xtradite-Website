@@ -1,0 +1,182 @@
+name: Apply consent mode migration
+
+on:
+  push:
+    branches:
+      - Init-Changes
+    paths:
+      - '.github/workflows/apply-consent-mode.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  migrate-consent:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v4
+        with:
+          ref: Init-Changes
+          fetch-depth: 0
+
+      - name: Update consent implementation
+        shell: bash
+        run: |
+          python <<'PY'
+          from pathlib import Path
+          import re
+
+          root = Path('.')
+
+          consent_block = '''<script>
+            window.dataLayer = window.dataLayer || [];
+
+            function gtag() {
+              dataLayer.push(arguments);
+            }
+
+            gtag("consent", "default", {
+              ad_storage: "denied",
+              ad_user_data: "denied",
+              ad_personalization: "denied",
+              analytics_storage: "denied",
+              functionality_storage: "denied",
+              personalization_storage: "denied",
+              security_storage: "granted",
+              wait_for_update: 500
+            });
+
+            gtag("set", "ads_data_redaction", true);
+            gtag("set", "url_passthrough", false);
+          </script>
+
+          <script
+            id="Cookiebot"
+            src="https://consent.cookiebot.com/uc.js"
+            data-cbid="07680bbc-6c7e-4a44-9d8b-a2ff6766646c"
+            data-blockingmode="auto"
+            data-framework="IAB"
+            type="text/javascript"
+          ></script>'''
+
+          prohibited_events = {
+              'cookie_consent_preferences',
+              'cookie_consent_statistics',
+              'cookie_consent_marketing',
+              'cookie_consent_update',
+          }
+
+          def strip_prohibited_logic(text: str) -> str:
+              text = re.sub(
+                  r'gtag\(\s*["\']consent["\']\s*,\s*["\']update["\']\s*,\s*\{.*?\}\s*\)\s*;?',
+                  '',
+                  text,
+                  flags=re.I | re.S,
+              )
+              for event in prohibited_events:
+                  text = re.sub(
+                      rf'dataLayer\.push\(\s*\{{\s*event\s*:\s*["\']{re.escape(event)}["\']\s*\}}\s*\)\s*;?',
+                      '',
+                      text,
+                      flags=re.I | re.S,
+                  )
+              return text
+
+          html_files = sorted(root.rglob('*.html'))
+          js_files = sorted(root.rglob('*.js'))
+
+          for path in html_files:
+              text = path.read_text(encoding='utf-8-sig')
+              original = text
+
+              text = strip_prohibited_logic(text)
+
+              text = re.sub(
+                  r'<script\b[^>]*\bid=["\']Cookiebot["\'][^>]*>\s*</script>',
+                  '',
+                  text,
+                  flags=re.I | re.S,
+              )
+
+              text = re.sub(
+                  r'<script\b[^>]*>\s*window\.dataLayer\s*=\s*window\.dataLayer\s*\|\|\s*\[\]\s*;.*?gtag\(\s*["\']consent["\']\s*,\s*["\']default["\']\s*,\s*\{.*?wait_for_update\s*:\s*500.*?</script>',
+                  '',
+                  text,
+                  flags=re.I | re.S,
+              )
+
+              if not re.search(r'<head\b[^>]*>', text, flags=re.I):
+                  raise RuntimeError(f'Missing <head> in {path}')
+
+              text = re.sub(
+                  r'(<head\b[^>]*>)',
+                  r'\1\n' + consent_block,
+                  text,
+                  count=1,
+                  flags=re.I,
+              )
+
+              text = re.sub(r'\n{3,}', '\n\n', text)
+
+              if text != original:
+                  path.write_text(text, encoding='utf-8')
+
+          for path in js_files:
+              text = path.read_text(encoding='utf-8-sig')
+              cleaned = strip_prohibited_logic(text)
+              if cleaned != text:
+                  path.write_text(cleaned, encoding='utf-8')
+
+          # Repository-wide validation.
+          for path in html_files:
+              text = path.read_text(encoding='utf-8')
+              head_start = re.search(r'<head\b[^>]*>', text, flags=re.I)
+              if not head_start:
+                  raise RuntimeError(f'Missing <head> in {path}')
+              after_head = text[head_start.end():]
+              first_script = re.search(r'<script\b', after_head, flags=re.I)
+              if not first_script:
+                  raise RuntimeError(f'No script found in <head> for {path}')
+              prefix = after_head[:first_script.start()]
+              if re.search(r'<script\b', prefix, flags=re.I):
+                  raise RuntimeError(f'Unexpected script ordering in {path}')
+              if 'gtag("consent", "default"' not in after_head[:2000]:
+                  raise RuntimeError(f'Consent default not first in {path}')
+              if 'data-framework="IAB"' not in after_head[:3000]:
+                  raise RuntimeError(f'IAB Cookiebot configuration missing in {path}')
+              if after_head.count('id="Cookiebot"') != 1:
+                  raise RuntimeError(f'Expected exactly one Cookiebot script in {path}')
+
+          all_text = '\n'.join(
+              p.read_text(encoding='utf-8', errors='ignore')
+              for p in [*html_files, *js_files]
+          )
+
+          if re.search(
+              r'gtag\(\s*["\']consent["\']\s*,\s*["\']update["\']\s*,\s*\{.*?["\']granted["\']',
+              all_text,
+              flags=re.I | re.S,
+          ):
+              raise RuntimeError('Automatic granted consent update remains')
+
+          for event in prohibited_events:
+              if event in all_text:
+                  raise RuntimeError(f'Prohibited synthetic consent event remains: {event}')
+
+          print(f'Validated {len(html_files)} HTML files and {len(js_files)} JavaScript files.')
+          PY
+
+      - name: Commit migration
+        shell: bash
+        run: |
+          if git diff --quiet; then
+            echo "No changes required."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add --all
+          git commit -m "Apply Cookiebot-led Consent Mode v2 across all pages"
+          git push origin HEAD:Init-Changes
