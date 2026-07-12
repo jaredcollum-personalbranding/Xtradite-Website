@@ -7,11 +7,7 @@
 <!-- Google Consent Mode defaults: must run before Cookiebot and Google tags -->
 <script>
   window.dataLayer = window.dataLayer || [];
-
-  function gtag() {
-    dataLayer.push(arguments);
-  }
-
+  function gtag() { dataLayer.push(arguments); }
   gtag("consent", "default", {
     ad_storage: "denied",
     ad_user_data: "denied",
@@ -22,32 +18,16 @@
     security_storage: "granted",
     wait_for_update: 500
   });
-
   gtag("set", "ads_data_redaction", true);
   gtag("set", "url_passthrough", false);
 </script>
-
-<!-- Cookiebot CMP -->
-<script
-  id="Cookiebot"
-  src="https://consent.cookiebot.com/uc.js"
-  data-cbid="07680bbc-6c7e-4a44-9d8b-a2ff6766646c"
-  data-blockingmode="auto"
-  data-framework="IAB"
-  type="text/javascript"
-></script>
-
-<!-- Synchronise genuine Cookiebot choices with Google Consent Mode -->
+<script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="07680bbc-6c7e-4a44-9d8b-a2ff6766646c" data-blockingmode="auto" data-framework="IAB" type="text/javascript"></script>
 <script>
   function updateGoogleConsentFromCookiebot() {
-    if (!window.Cookiebot || !Cookiebot.hasResponse) {
-      return;
-    }
-
+    if (!window.Cookiebot || !Cookiebot.hasResponse) return;
     const marketingGranted = Cookiebot.consent.marketing === true;
     const statisticsGranted = Cookiebot.consent.statistics === true;
     const preferencesGranted = Cookiebot.consent.preferences === true;
-
     gtag("consent", "update", {
       ad_storage: marketingGranted ? "granted" : "denied",
       ad_user_data: marketingGranted ? "granted" : "denied",
@@ -57,44 +37,15 @@
       personalization_storage: preferencesGranted ? "granted" : "denied",
       security_storage: "granted"
     });
-
     gtag("set", "ads_data_redaction", !marketingGranted);
   }
-
-  window.addEventListener(
-    "CookiebotOnConsentReady",
-    updateGoogleConsentFromCookiebot
-  );
-
-  window.addEventListener(
-    "CookiebotOnAccept",
-    updateGoogleConsentFromCookiebot
-  );
-
-  window.addEventListener(
-    "CookiebotOnDecline",
-    updateGoogleConsentFromCookiebot
-  );
+  window.addEventListener("CookiebotOnConsentReady", updateGoogleConsentFromCookiebot);
+  window.addEventListener("CookiebotOnAccept", updateGoogleConsentFromCookiebot);
+  window.addEventListener("CookiebotOnDecline", updateGoogleConsentFromCookiebot);
 </script>
-
-<!-- Google Analytics -->
-<script
-  async
-  src="https://www.googletagmanager.com/gtag/js?id=G-WYXTKGJ9JS"
-></script>
-<script>
-  gtag("js", new Date());
-  gtag("config", "G-WYXTKGJ9JS");
-</script>
-
-<!-- Google AdSense -->
-<script
-  async
-  src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7308041122340160"
-  crossorigin="anonymous"
-></script>
-
-<!-- Vercel Speed Insights -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-WYXTKGJ9JS"></script>
+<script>gtag("js", new Date()); gtag("config", "G-WYXTKGJ9JS");</script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7308041122340160" crossorigin="anonymous"></script>
 <script src="assets/js/speed-insights-init.js" defer></script>
 <title>Industry — Xtradite Digital</title>
 <meta name="description" content="Explore how Xtradite Digital helps this industry.">
@@ -118,361 +69,23 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Industry — Xtradite Digital">
 <meta name="twitter:description" content="Explore how Xtradite Digital helps this industry.">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Organization", "name": "Xtradite Digital", "url": "https://www.xtradite-digital.co.uk/", "description": "UK digital consultancy helping ambitious retail, ecommerce and manufacturing businesses close operational and commercial gaps with hands-on delivery.", "areaServed": "GB", "knowsAbout": ["Digital Strategy", "AI & Automation", "eCommerce Growth", "Operational Excellence", "Fractional Leadership", "Project Delivery"]}</script>
-<!-- Vercel Web Analytics -->
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Xtradite Digital","url":"https://www.xtradite-digital.co.uk/","description":"UK digital consultancy helping ambitious retail, ecommerce and manufacturing businesses close operational and commercial gaps with hands-on delivery.","areaServed":"GB","knowsAbout":["Digital Strategy","AI & Automation","eCommerce Growth","Operational Excellence","Fractional Leadership","Project Delivery"]}</script>
 <script defer src="https://cdn.vercel-insights.com/v1/script.js"></script>
-
 <style>
-  .industry-ad {
-    width: 100%;
-  }
-
-  .industry-ad__label {
-    display: block;
-    margin-bottom: var(--space-8);
-    color: var(--color-text-muted, #8f8f8f);
-    font-size: var(--font-size-xs, 0.75rem);
-    line-height: 1;
-    letter-spacing: 0.05em;
-    text-align: center;
-    text-transform: uppercase;
-  }
-
-  .industry-ad--display {
-    max-width: 970px;
-    min-height: 250px;
-    margin: 0 auto var(--space-64);
-    padding-top: var(--space-16);
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-  }
-
-  .industry-ad--multiplex {
-    max-width: 1100px;
-    min-height: 280px;
-    margin: 0 auto var(--space-64);
-  }
-
-  @media (max-width: 767px) {
-    .industry-ad--display,
-    .industry-ad--multiplex {
-      margin-bottom: var(--space-48);
-    }
-
-    .industry-ad--display {
-      min-height: 200px;
-    }
-  }
+.industry-ad{width:100%}.industry-ad__label{display:block;margin-bottom:var(--space-8);color:var(--color-text-muted,#8f8f8f);font-size:var(--font-size-xs,.75rem);line-height:1;letter-spacing:.05em;text-align:center;text-transform:uppercase}.industry-ad--display{max-width:970px;min-height:250px;margin:0 auto var(--space-64);padding-top:var(--space-16);border-top:1px solid rgba(255,255,255,.08)}.industry-ad--multiplex{max-width:1100px;min-height:280px;margin:0 auto var(--space-64)}@media(max-width:767px){.industry-ad--display,.industry-ad--multiplex{margin-bottom:var(--space-48)}.industry-ad--display{min-height:200px}}
 </style>
-
 </head>
 <body>
-
-<header class="site-header" id="site-header">
-  <div class="container header-inner">
-    <a href="/" class="logo"><img src="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/wordmark-caps-light.png" alt="Xtradite Digital" class="logo-img"></a>
-    <nav class="site-nav" id="site-nav">
-      <a href="/">Home</a>
-      <a href="/services">Services</a>
-      <a href="/industries" class="active">Industries</a>
-      <a href="/case-studies">Case Studies</a>
-      <a href="/about">About</a>
-      <a href="/insights">Insights</a>
-      <a href="/contact">Contact</a>
-      <a href="/contact" class="btn btn-primary btn-sm header-cta-mobile">Book a Consultation</a>
-    </nav>
-    <a href="/contact" class="btn btn-primary btn-sm header-cta">Book a Consultation</a>
-    <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation"><span></span><span></span><span></span></button>
-  </div>
-</header>
-
+<header class="site-header" id="site-header"><div class="container header-inner"><a href="/" class="logo"><img src="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/wordmark-caps-light.png" alt="Xtradite Digital" class="logo-img"></a><nav class="site-nav" id="site-nav"><a href="/">Home</a><a href="/services">Services</a><a href="/industries" class="active">Industries</a><a href="/case-studies">Case Studies</a><a href="/about">About</a><a href="/insights">Insights</a><a href="/contact">Contact</a><a href="/contact" class="btn btn-primary btn-sm header-cta-mobile">Book a Consultation</a></nav><a href="/contact" class="btn btn-primary btn-sm header-cta">Book a Consultation</a><button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation"><span></span><span></span><span></span></button></div></header>
 <main>
-
-  <section class="section-tight">
-    <div class="container">
-      <nav class="breadcrumb"><a href="/">Home</a> / <a href="/industries">Industries</a> / <span id="breadcrumb-current"></span></nav>
-
-      <div id="not-found" class="not-found" hidden>
-        <h1>Industry not found</h1>
-        <p>We couldn't find an industry matching that link. Browse all industries instead.</p>
-        <a href="/industries" class="btn btn-primary">View All Industries</a>
-      </div>
-
-      <div id="industry-detail-root" hidden>
-        <span class="eyebrow">Industry</span>
-        <h1 id="industry-title" style="font-size: var(--font-size-display-sm); margin-bottom: var(--space-16);"></h1>
-        <p class="hero-sub" id="industry-summary" style="margin-bottom: var(--space-56);"></p>
-
-        <div class="grid-3" style="margin-bottom: var(--space-64);">
-          <div class="card">
-            <span class="eyebrow">The Challenge</span>
-            <div class="richtext" id="industry-challenge"></div>
-          </div>
-          <div class="card">
-            <span class="eyebrow">Our Solution</span>
-            <div class="richtext" id="industry-solution"></div>
-          </div>
-          <div class="card">
-            <span class="eyebrow">Outcomes</span>
-            <div class="richtext" id="industry-outcomes"></div>
-          </div>
-        </div>
-
-        <aside
-          class="industry-ad industry-ad--display"
-          id="industry-display-ad"
-          aria-label="Advertisement"
-          hidden
-        >
-          <span class="industry-ad__label">Advertisement</span>
-          <ins
-            class="adsbygoogle"
-            style="display:block"
-            data-ad-client="ca-pub-7308041122340160"
-            data-ad-slot="6205733112"
-            data-ad-format="auto"
-            data-full-width-responsive="true"
-          ></ins>
-        </aside>
-
-        <div hidden>
-          <div class="section-head left">
-            <span class="eyebrow">Related Services</span>
-            <h2>How we'd help.</h2>
-          </div>
-          <div class="grid-3" id="related-services"></div>
-        </div>
-      </div>
-    </div>
-  </section>
-  <section class="section-tight">
-    <div class="container">
-      <aside
-        class="industry-ad industry-ad--multiplex"
-        id="industry-multiplex-ad"
-        aria-label="Advertisement"
-        hidden
-      >
-        <span class="industry-ad__label">Advertisement</span>
-        <ins
-          class="adsbygoogle"
-          style="display:block"
-          data-ad-format="autorelaxed"
-          data-ad-client="ca-pub-7308041122340160"
-          data-ad-slot="2190466483"
-        ></ins>
-      </aside>
-    </div>
-  </section>
-
-  <section>
-    <div class="container">
-      <div class="cta-banner">
-        <h2>Ready to Accelerate Your Business?</h2>
-        <p>Transform your digital operations with practical consultancy built for measurable commercial results.</p>
-        <a href="/contact" class="btn btn-primary btn-lg">Book a Consultation <i data-lucide="arrow-right" class="btn-icon"></i></a>
-      </div>
-    </div>
-  </section>
-
+<section class="section-tight"><div class="container"><nav class="breadcrumb"><a href="/">Home</a> / <a href="/industries">Industries</a> / <span id="breadcrumb-current"></span></nav><div id="not-found" class="not-found" hidden><h1>Industry not found</h1><p>We couldn't find an industry matching that link. Browse all industries instead.</p><a href="/industries" class="btn btn-primary">View All Industries</a></div><div id="industry-detail-root" hidden><span class="eyebrow">Industry</span><h1 id="industry-title" style="font-size:var(--font-size-display-sm);margin-bottom:var(--space-16);"></h1><p class="hero-sub" id="industry-summary" style="margin-bottom:var(--space-56);"></p><div class="grid-3" style="margin-bottom:var(--space-64);"><div class="card"><span class="eyebrow">The Challenge</span><div class="richtext" id="industry-challenge"></div></div><div class="card"><span class="eyebrow">Our Solution</span><div class="richtext" id="industry-solution"></div></div><div class="card"><span class="eyebrow">Outcomes</span><div class="richtext" id="industry-outcomes"></div></div></div><aside class="industry-ad industry-ad--display" id="industry-display-ad" aria-label="Advertisement" hidden><span class="industry-ad__label">Advertisement</span><ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-7308041122340160" data-ad-slot="6205733112" data-ad-format="auto" data-full-width-responsive="true"></ins></aside><div hidden><div class="section-head left"><span class="eyebrow">Related Services</span><h2>How we'd help.</h2></div><div class="grid-3" id="related-services"></div></div></div></div></section>
+<section class="section-tight"><div class="container"><aside class="industry-ad industry-ad--multiplex" id="industry-multiplex-ad" aria-label="Advertisement" hidden><span class="industry-ad__label">Advertisement</span><ins class="adsbygoogle" style="display:block" data-ad-format="autorelaxed" data-ad-client="ca-pub-7308041122340160" data-ad-slot="2190466483"></ins></aside></div></section>
+<section><div class="container"><div class="cta-banner"><h2>Ready to Accelerate Your Business?</h2><p>Transform your digital operations with practical consultancy built for measurable commercial results.</p><a href="/contact" class="btn btn-primary btn-lg">Book a Consultation <i data-lucide="arrow-right" class="btn-icon"></i></a></div></div></section>
 </main>
-
-<footer class="site-footer">
-  <div class="container">
-    <div class="footer-inner">
-      <div class="footer-brand">
-        <a href="/" class="logo"><img src="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/wordmark-caps-light.png" alt="Xtradite Digital" class="logo-img"></a>
-        <p>Practical consultancy for retail, ecommerce and manufacturing businesses ready to accelerate digital-first growth.</p>
-      </div>
-      <div class="footer-col">
-        <h4>Services</h4>
-        <a href="/services/ai-automation">AI &amp; Automation</a>
-        <a href="/services/digital-strategy">Digital Strategy</a>
-        <a href="/services/ecommerce-growth">eCommerce Growth</a>
-        <a href="/services/operational-excellence">Operational Excellence</a>
-        <a href="/services/fractional-leadership">Fractional Leadership</a>
-        <a href="/services/project-delivery">Project Delivery</a>
-      </div>
-      <div class="footer-col">
-        <h4>Industries</h4>
-        <a href="/industry-detail?slug=retail">Retail</a>
-        <a href="/industry-detail?slug=ecommerce">eCommerce</a>
-        <a href="/industry-detail?slug=manufacturing">Manufacturing</a>
-        <a href="/industry-detail?slug=consumer-goods">Consumer Goods</a>
-        <a href="/industry-detail?slug=professional-services">Professional Services</a>
-        <a href="/industry-detail?slug=startups">Startups</a>
-      </div>
-      <div class="footer-col">
-        <h4>Company</h4>
-        <a href="/about">About</a>
-        <a href="/insights">Insights</a>
-        <a href="/case-studies">Case Studies</a>
-        <a href="/contact">Contact</a>
-      </div>
-      <div class="footer-col">
-        <h4>Legal</h4>
-        <a href="/legal/privacy">Privacy Policy</a>
-        <a href="/legal/cookies">Cookie Policy</a>
-        <a href="#" data-cookie-settings>Cookie Settings</a>
-        <a href="/legal/terms">Terms</a>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <span>&copy; 2026 Xtradite Digital. All rights reserved.</span>
-      <div class="footer-social">
-        <a href="#" aria-label="LinkedIn — add your company URL" title="Add your real LinkedIn URL here"><i data-lucide="linkedin"></i></a>
-      </div>
-    </div>
-  </div>
-</footer>
-
-<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js" defer></script>
-<script src="assets/js/site.js" defer></script>
-<script type="module" src="assets/js/pages/industry-detail.js"></script>
-
+<footer class="site-footer"><div class="container"><div class="footer-inner"><div class="footer-brand"><a href="/" class="logo"><img src="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/wordmark-caps-light.png" alt="Xtradite Digital" class="logo-img"></a><p>Practical consultancy for retail, ecommerce and manufacturing businesses ready to accelerate digital-first growth.</p></div><div class="footer-col"><h4>Services</h4><a href="/services/ai-automation">AI &amp; Automation</a><a href="/services/digital-strategy">Digital Strategy</a><a href="/services/ecommerce-growth">eCommerce Growth</a><a href="/services/operational-excellence">Operational Excellence</a><a href="/services/fractional-leadership">Fractional Leadership</a><a href="/services/project-delivery">Project Delivery</a></div><div class="footer-col"><h4>Industries</h4><a href="/industry-detail?slug=retail">Retail</a><a href="/industry-detail?slug=ecommerce">eCommerce</a><a href="/industry-detail?slug=manufacturing">Manufacturing</a><a href="/industry-detail?slug=consumer-goods">Consumer Goods</a><a href="/industry-detail?slug=professional-services">Professional Services</a><a href="/industry-detail?slug=startups">Startups</a></div><div class="footer-col"><h4>Company</h4><a href="/about">About</a><a href="/insights">Insights</a><a href="/case-studies">Case Studies</a><a href="/contact">Contact</a></div><div class="footer-col"><h4>Legal</h4><a href="/legal/privacy">Privacy Policy</a><a href="/legal/cookies">Cookie Policy</a><a href="#" data-cookie-settings>Cookie Settings</a><a href="/legal/terms">Terms</a></div></div><div class="footer-bottom"><span>&copy; 2026 Xtradite Digital. All rights reserved.</span><div class="footer-social"><a href="#" aria-label="LinkedIn — add your company URL" title="Add your real LinkedIn URL here"><i data-lucide="linkedin"></i></a></div></div></div></footer>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js" defer></script><script src="assets/js/site.js" defer></script><script type="module" src="assets/js/pages/industry-detail.js"></script>
 <script>
-  (() => {
-    let observer;
-    let loaderCheck;
-
-    function hasMarketingConsent() {
-      return Boolean(
-        window.Cookiebot &&
-        window.Cookiebot.consent &&
-        window.Cookiebot.consent.marketing
-      );
-    }
-
-    function adsenseIsAvailable() {
-      return Array.isArray(window.adsbygoogle);
-    }
-
-    function industryContentIsReady() {
-      const root = document.getElementById("industry-detail-root");
-      const title = document.getElementById("industry-title");
-      const challenge = document.getElementById("industry-challenge");
-      const solution = document.getElementById("industry-solution");
-      const outcomes = document.getElementById("industry-outcomes");
-
-      return Boolean(
-        root &&
-        !root.hidden &&
-        title &&
-        title.textContent.trim() &&
-        challenge &&
-        challenge.textContent.trim() &&
-        solution &&
-        solution.textContent.trim() &&
-        outcomes &&
-        outcomes.textContent.trim()
-      );
-    }
-
-    function initialiseAd(adElement) {
-      const wrapper = adElement.closest(".industry-ad");
-
-      if (!wrapper || wrapper.dataset.initialised === "true") {
-        return;
-      }
-
-      wrapper.hidden = false;
-
-      try {
-        (window.adsbygoogle = window.adsbygoogle || []).push({});
-        wrapper.dataset.initialised = "true";
-      } catch (error) {
-        wrapper.hidden = true;
-        console.warn("AdSense unit could not be initialised.", error);
-      }
-    }
-
-    function initialiseEligibleAds() {
-      if (
-        !hasMarketingConsent() ||
-        !adsenseIsAvailable() ||
-        !industryContentIsReady()
-      ) {
-        return;
-      }
-
-      document
-        .querySelectorAll(".industry-ad .adsbygoogle")
-        .forEach(initialiseAd);
-    }
-
-    function waitForAdSense() {
-      if (!hasMarketingConsent() || !industryContentIsReady()) {
-        return;
-      }
-
-      if (adsenseIsAvailable()) {
-        initialiseEligibleAds();
-        return;
-      }
-
-      if (loaderCheck) {
-        return;
-      }
-
-      let attempts = 0;
-
-      loaderCheck = window.setInterval(() => {
-        attempts += 1;
-
-        if (adsenseIsAvailable()) {
-          window.clearInterval(loaderCheck);
-          loaderCheck = null;
-          initialiseEligibleAds();
-        } else if (attempts >= 20) {
-          window.clearInterval(loaderCheck);
-          loaderCheck = null;
-        }
-      }, 500);
-    }
-
-    function watchIndustryContent() {
-      const root = document.getElementById("industry-detail-root");
-
-      if (!root) {
-        return;
-      }
-
-      observer = new MutationObserver(() => {
-        if (!industryContentIsReady()) {
-          return;
-        }
-
-        waitForAdSense();
-        observer.disconnect();
-      });
-
-      observer.observe(root, {
-        attributes: true,
-        attributeFilter: ["hidden"],
-        childList: true,
-        subtree: true,
-        characterData: true
-      });
-
-      if (industryContentIsReady()) {
-        waitForAdSense();
-        observer.disconnect();
-      }
-    }
-
-    window.addEventListener("CookiebotOnConsentReady", waitForAdSense);
-    window.addEventListener("CookiebotOnAccept", waitForAdSense);
-
-    window.addEventListener("CookiebotOnDecline", () => {
-      document.querySelectorAll(".industry-ad").forEach((ad) => {
-        if (ad.dataset.initialised !== "true") {
-          ad.hidden = true;
-        }
-      });
-    });
-
-    document.addEventListener("DOMContentLoaded", watchIndustryContent);
-  })();
+(()=>{let observer,loaderCheck;function hasMarketingConsent(){return Boolean(window.Cookiebot&&window.Cookiebot.hasResponse&&window.Cookiebot.consent&&window.Cookiebot.consent.marketing)}function adsenseIsAvailable(){return Array.isArray(window.adsbygoogle)}function industryContentIsReady(){const root=document.getElementById("industry-detail-root"),title=document.getElementById("industry-title"),challenge=document.getElementById("industry-challenge"),solution=document.getElementById("industry-solution"),outcomes=document.getElementById("industry-outcomes");return Boolean(root&&!root.hidden&&title&&title.textContent.trim()&&challenge&&challenge.textContent.trim()&&solution&&solution.textContent.trim()&&outcomes&&outcomes.textContent.trim())}function initialiseAd(adElement){const wrapper=adElement.closest(".industry-ad");if(!wrapper||wrapper.dataset.initialised==="true")return;wrapper.hidden=false;try{(window.adsbygoogle=window.adsbygoogle||[]).push({});wrapper.dataset.initialised="true"}catch(error){wrapper.hidden=true;console.warn("AdSense unit could not be initialised.",error)}}function initialiseEligibleAds(){if(!hasMarketingConsent()||!adsenseIsAvailable()||!industryContentIsReady())return;document.querySelectorAll(".industry-ad .adsbygoogle").forEach(initialiseAd)}function waitForAdSense(){if(!hasMarketingConsent()||!industryContentIsReady())return;if(adsenseIsAvailable()){initialiseEligibleAds();return}if(loaderCheck)return;let attempts=0;loaderCheck=window.setInterval(()=>{attempts+=1;if(adsenseIsAvailable()){window.clearInterval(loaderCheck);loaderCheck=null;initialiseEligibleAds()}else if(attempts>=20){window.clearInterval(loaderCheck);loaderCheck=null}},500)}function watchIndustryContent(){const root=document.getElementById("industry-detail-root");if(!root)return;observer=new MutationObserver(()=>{if(!industryContentIsReady())return;waitForAdSense();observer.disconnect()});observer.observe(root,{attributes:true,attributeFilter:["hidden"],childList:true,subtree:true,characterData:true});if(industryContentIsReady()){waitForAdSense();observer.disconnect()}}window.addEventListener("CookiebotOnConsentReady",waitForAdSense);window.addEventListener("CookiebotOnAccept",waitForAdSense);window.addEventListener("CookiebotOnDecline",()=>{document.querySelectorAll(".industry-ad").forEach(ad=>{if(ad.dataset.initialised!=="true")ad.hidden=true})});document.addEventListener("DOMContentLoaded",watchIndustryContent)})();
 </script>
-
 </body>
 </html>
