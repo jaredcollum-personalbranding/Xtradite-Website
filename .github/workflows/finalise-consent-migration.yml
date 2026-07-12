@@ -1,0 +1,133 @@
+name: Finalise consent migration
+
+on:
+  push:
+    branches:
+      - fix/cookiebot-consent-adsense-v2
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/cookiebot-consent-adsense-v2
+          fetch-depth: 0
+
+      - name: Rewrite consent and Google tag headers
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+
+          root = Path('frontend')
+          publisher = 'ca-pub-7308041122340160'
+          cbid = '07680bbc-6c7e-4a44-9d8b-a2ff6766646c'
+          ga4 = 'G-WYXTKGJ9JS'
+
+          block = f'''<meta name="google-adsense-account" content="{publisher}">
+          <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag() {{ dataLayer.push(arguments); }}
+            gtag("consent", "default", {{
+              ad_storage: "denied",
+              ad_user_data: "denied",
+              ad_personalization: "denied",
+              analytics_storage: "denied",
+              functionality_storage: "denied",
+              personalization_storage: "denied",
+              security_storage: "granted",
+              wait_for_update: 500
+            }});
+            gtag("set", "ads_data_redaction", true);
+            gtag("set", "url_passthrough", false);
+          </script>
+          <script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="{cbid}" data-blockingmode="auto" data-framework="IAB" type="text/javascript"></script>
+          <script>
+            function updateGoogleConsentFromCookiebot() {{
+              if (!window.Cookiebot || !Cookiebot.hasResponse) return;
+              const marketingGranted = Cookiebot.consent.marketing === true;
+              const statisticsGranted = Cookiebot.consent.statistics === true;
+              const preferencesGranted = Cookiebot.consent.preferences === true;
+              gtag("consent", "update", {{
+                ad_storage: marketingGranted ? "granted" : "denied",
+                ad_user_data: marketingGranted ? "granted" : "denied",
+                ad_personalization: marketingGranted ? "granted" : "denied",
+                analytics_storage: statisticsGranted ? "granted" : "denied",
+                functionality_storage: preferencesGranted ? "granted" : "denied",
+                personalization_storage: preferencesGranted ? "granted" : "denied",
+                security_storage: "granted"
+              }});
+              gtag("set", "ads_data_redaction", !marketingGranted);
+            }}
+            window.addEventListener("CookiebotOnConsentReady", updateGoogleConsentFromCookiebot);
+            window.addEventListener("CookiebotOnAccept", updateGoogleConsentFromCookiebot);
+            window.addEventListener("CookiebotOnDecline", updateGoogleConsentFromCookiebot);
+          </script>
+          <script async src="https://www.googletagmanager.com/gtag/js?id={ga4}"></script>
+          <script>gtag("js", new Date()); gtag("config", "{ga4}");</script>
+          <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={publisher}" crossorigin="anonymous"></script>
+          '''
+
+          region = re.compile(r'<meta\s+name=["\']google-adsense-account["\'][^>]*>.*?(?=<title>)', re.I | re.S)
+          speed = re.compile(r'<script\b[^>]*\bsrc=["\'][^"\']*speed-insights-init\.js["\'][^>]*>\s*</script>', re.I)
+          legacy_events = re.compile(r'^\s*(?:window\.)?dataLayer\.push\(\s*\{\s*event\s*:\s*["\']cookie_consent_(?:preferences|statistics|marketing|update)["\']\s*\}\s*\);?\s*$', re.I | re.M)
+
+          changed = 0
+          files = sorted(root.rglob('*.html'))
+          for path in files:
+            original = path.read_text(encoding='utf-8-sig')
+            speed_match = speed.search(original)
+            speed_tag = speed_match.group(0) if speed_match else '<script src="assets/js/speed-insights-init.js" defer></script>'
+            replacement = block + '<!-- Vercel Speed Insights -->\n' + speed_tag + '\n'
+            updated, count = region.subn(replacement, original, count=1)
+            if count != 1:
+              raise SystemExit(f'No replaceable consent region in {path}')
+            updated = legacy_events.sub('', updated)
+            matches = list(speed.finditer(updated))
+            if len(matches) > 1:
+              first = matches[0]
+              parts = [updated[:first.end()]]
+              cursor = first.end()
+              for duplicate in matches[1:]:
+                parts.append(updated[cursor:duplicate.start()])
+                cursor = duplicate.end()
+              parts.append(updated[cursor:])
+              updated = ''.join(parts)
+            if updated != original:
+              path.write_text(updated, encoding='utf-8')
+              changed += 1
+
+          failures = []
+          for path in files:
+            html = path.read_text(encoding='utf-8')
+            required = ['gtag("consent", "default"', 'data-blockingmode="auto"', 'data-framework="IAB"', 'Cookiebot.hasResponse', 'pagead2.googlesyndication.com/pagead/js/adsbygoogle.js']
+            forbidden = ['type="text/plain" data-cookieconsent="statistics"', 'type="text/plain" data-cookieconsent="marketing"', 'cookie_consent_preferences', 'cookie_consent_statistics', 'cookie_consent_marketing', 'cookie_consent_update']
+            for token in required:
+              if token not in html: failures.append(f'{path}: missing {token}')
+            for token in forbidden:
+              if token in html: failures.append(f'{path}: forbidden {token}')
+            positions = [html.find('gtag("consent", "default"'), html.find('id="Cookiebot"'), html.find('www.googletagmanager.com/gtag/js'), html.find('pagead2.googlesyndication.com/pagead/js/adsbygoogle.js')]
+            if not (0 <= positions[0] < positions[1] < positions[2] < positions[3]):
+              failures.append(f'{path}: incorrect tag order')
+
+          if failures:
+            raise SystemExit('\n'.join(failures))
+          print(f'Updated {changed} files and validated {len(files)} files.')
+
+      - name: Commit migrated templates
+        run: |
+          if git diff --quiet; then
+            echo "No changes required."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add frontend
+          git commit -m "Finalise Cookiebot consent and AdSense loading"
+          git push origin HEAD:fix/cookiebot-consent-adsense-v2
