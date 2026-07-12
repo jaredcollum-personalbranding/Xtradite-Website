@@ -63,7 +63,7 @@ static file server) and open `http://localhost:8000`.
   visitor's browser blocks `gtag.js`. **Requires a `GA_MP_API_SECRET` environment
   variable in the Vercel project settings** (the GA4 Measurement Protocol API secret) —
   without it the function no-ops silently.
-- **AdSense** — the `adsbygoogle.js` loader (`ca-pub-9395583799806156`) is in every
+- **AdSense** — the `adsbygoogle.js` loader (`ca-pub-7308041122340160`) is in every
   page's `<head>`; `ads.txt` at the site root declares the same publisher ID as Google
   requires.
 - **Sitemap** — `https://www.xtradite-digital.co.uk/sitemap.xml` is served by
