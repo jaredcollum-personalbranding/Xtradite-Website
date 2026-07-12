@@ -3,6 +3,11 @@ import { submitContactForm } from "../forms.js";
 const form = document.getElementById("contact-form");
 const status = document.getElementById("form-status");
 
+const topic = new URLSearchParams(window.location.search).get("topic");
+if (form && topic) {
+  form.message.value = `I'm interested in ${topic}.`;
+}
+
 if (form) {
   form.addEventListener("submit", async (e) => {
     e.preventDefault();

@@ -1,10 +1,86 @@
 import { getItemBySlug } from "../cms.js";
-import { escapeHtml, renderIcons, getSlugParam } from "../render-helpers.js";
-import { SERVICE_TO_CASE_STUDY } from "./shared-data.js";
+import { getPostBySlug } from "../blog.js";
+import {
+  escapeHtml,
+  renderIcons,
+  getSlugParam,
+  relatedPostCardHtml,
+  timelineHtml,
+  deliverableListHtml,
+  techLogoGridHtml,
+  faqListHtml,
+  wireFaqAccordion,
+} from "../render-helpers.js";
+import { SERVICE_TO_CASE_STUDY, SERVICE_TO_RELATED_POSTS } from "./shared-data.js";
 
 const root = document.getElementById("service-detail-root");
 const notFound = document.getElementById("not-found");
 const slug = getSlugParam();
+
+function setMetaByName(name, content) {
+  if (!content) return;
+  let el = document.querySelector(`meta[name="${name}"]`);
+  if (!el) {
+    el = document.createElement("meta");
+    el.setAttribute("name", name);
+    document.head.appendChild(el);
+  }
+  el.setAttribute("content", content);
+}
+
+function setMetaByProperty(property, content) {
+  if (!content) return;
+  let el = document.querySelector(`meta[property="${property}"]`);
+  if (!el) {
+    el = document.createElement("meta");
+    el.setAttribute("property", property);
+    document.head.appendChild(el);
+  }
+  el.setAttribute("content", content);
+}
+
+function setCanonical(href) {
+  let el = document.querySelector('link[rel="canonical"]');
+  if (!el) {
+    el = document.createElement("link");
+    el.setAttribute("rel", "canonical");
+    document.head.appendChild(el);
+  }
+  el.setAttribute("href", href);
+}
+
+function setJsonLd(item, title, description, url) {
+  const script = document.createElement("script");
+  script.type = "application/ld+json";
+  script.textContent = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: title,
+    description,
+    serviceType: item.category,
+    provider: { "@type": "Organization", name: "Xtradite Digital" },
+    url,
+  });
+  document.head.appendChild(script);
+}
+
+function applySeo(item) {
+  const title = `${item.seoTitle || item.title} — Xtradite Digital`;
+  const description = item.seoDescription || item.summary || "";
+  const url = `${window.location.origin}/services/${encodeURIComponent(item.slug)}`;
+
+  document.title = title;
+  setMetaByName("description", description);
+  setMetaByProperty("og:title", item.seoTitle || item.title);
+  setMetaByProperty("og:description", description);
+  setMetaByProperty("og:type", "website");
+  setMetaByProperty("og:url", url);
+  setMetaByName("twitter:card", "summary");
+  setMetaByName("twitter:title", item.seoTitle || item.title);
+  setMetaByName("twitter:description", description);
+  setCanonical(url);
+  setJsonLd(item, item.seoTitle || item.title, description, url);
+}
 
 async function load() {
   if (!slug) return showNotFound();
@@ -17,13 +93,46 @@ async function load() {
   }
   if (!item) return showNotFound();
 
-  document.title = `${item.title} — Xtradite Digital`;
+  applySeo(item);
+
   document.getElementById("breadcrumb-current").textContent = item.title;
   document.getElementById("service-icon").setAttribute("data-lucide", item.icon || "circle");
   document.getElementById("service-eyebrow").textContent = item.category || "Service";
   document.getElementById("service-title").textContent = item.title;
   document.getElementById("service-subheading").textContent = item.heroSubheading || item.summary || "";
   document.getElementById("service-description").innerHTML = item.description || `<p>${escapeHtml(item.summary || "")}</p>`;
+
+  const topicParam = `?topic=${encodeURIComponent(item.title)}`;
+  document.getElementById("hero-cta").href = `/contact${topicParam}`;
+  document.getElementById("banner-cta").href = `/contact${topicParam}`;
+
+  if (item.whoItsFor?.length || item.whatIncluded?.length) {
+    document.getElementById("service-who-its-for").innerHTML = `<ul>${(item.whoItsFor || []).map((b) => `<li>${escapeHtml(b)}</li>`).join("")}</ul>`;
+    document.getElementById("service-what-included").innerHTML = `<ul>${(item.whatIncluded || []).map((b) => `<li>${escapeHtml(b)}</li>`).join("")}</ul>`;
+    document.getElementById("who-what-section").hidden = false;
+  }
+
+  if (item.howItWorks?.length) {
+    document.getElementById("service-how-it-works").innerHTML = timelineHtml(item.howItWorks);
+    document.getElementById("how-it-works-section").hidden = false;
+  }
+
+  if (item.deliverables?.length) {
+    document.getElementById("service-deliverables").innerHTML = deliverableListHtml(item.deliverables);
+    document.getElementById("deliverables-section").hidden = false;
+  }
+
+  if (item.techCategories?.length) {
+    document.getElementById("service-tech-grid").innerHTML = techLogoGridHtml(item.techCategories);
+    document.getElementById("tech-section").hidden = false;
+  }
+
+  if (item.faqs?.length) {
+    const faqWrap = document.getElementById("service-faq");
+    faqWrap.innerHTML = faqListHtml(item.faqs);
+    wireFaqAccordion(faqWrap);
+    document.getElementById("faq-section").hidden = false;
+  }
 
   const relatedSlug = SERVICE_TO_CASE_STUDY[item.slug];
   if (relatedSlug) {
@@ -41,6 +150,19 @@ async function load() {
       }
     } catch (e) {
       console.error(e); // non-critical — related case study is a bonus, not core content
+    }
+  }
+
+  const relatedPostSlugs = SERVICE_TO_RELATED_POSTS[item.slug] || [];
+  if (relatedPostSlugs.length) {
+    try {
+      const posts = (await Promise.all(relatedPostSlugs.map(getPostBySlug))).filter(Boolean);
+      if (posts.length) {
+        document.getElementById("related-insights").innerHTML = posts.map(relatedPostCardHtml).join("");
+        document.getElementById("related-insights-section").hidden = false;
+      }
+    } catch (e) {
+      console.error(e); // non-critical — related insights are a bonus, not core content
     }
   }
 

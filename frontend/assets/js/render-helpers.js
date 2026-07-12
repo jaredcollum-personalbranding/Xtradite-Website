@@ -1,4 +1,5 @@
 /** Shared render helpers for turning live Wix CMS/Blog items into card HTML. */
+import { supabase } from "./supabase-client.js";
 
 export function escapeHtml(str) {
   return String(str ?? "")
@@ -9,7 +10,7 @@ export function escapeHtml(str) {
 
 export function serviceCardHtml(item) {
   return `
-    <a class="card service-card" href="/service-detail?slug=${encodeURIComponent(item.slug)}">
+    <a class="card service-card" href="/services/${encodeURIComponent(item.slug)}">
       <div class="card-icon"><i data-lucide="${escapeHtml(item.icon || "circle")}"></i></div>
       <span class="card-category">${escapeHtml(item.category || "")}</span>
       <h3>${escapeHtml(item.title)}</h3>
@@ -145,9 +146,106 @@ export function showSkeletons(container, count) {
 }
 
 export function getSlugParam() {
-  return new URLSearchParams(window.location.search).get("slug");
+  const fromQuery = new URLSearchParams(window.location.search).get("slug");
+  if (fromQuery) return fromQuery;
+  // /services/<slug> is a server-side rewrite (see vercel.json) — the browser's URL bar
+  // and window.location keep showing the pretty path with no query string, so the slug
+  // has to be parsed out of the pathname here instead.
+  const pathMatch = window.location.pathname.match(/^\/services\/([a-z0-9-]+)\/?$/);
+  return pathMatch ? pathMatch[1] : null;
 }
 
 export function getTagParam() {
   return new URLSearchParams(window.location.search).get("tag");
+}
+
+/** Public URL for a "Tech Stack Logos" Storage file, given its bare brand key (e.g. "aws",
+ * "postfresql", "c++") — matches the real uploaded filenames exactly, quirks included. */
+export function techLogoUrl(file) {
+  return supabase.storage.from("rich-media").getPublicUrl(`Tech Stack Logos/Brand=${file}, Style=Light.png`).data.publicUrl;
+}
+
+/** Renders a "Technology & Applications" logo grid grouped by category.
+ * @param {Array<{ category: string, items: Array<{ label: string, file: string }> }>} techCategories
+ */
+export function techLogoGridHtml(techCategories) {
+  if (!techCategories?.length) return "";
+  return techCategories
+    .map(
+      (group) => `
+      <div class="tech-logo-section">
+        <h4 class="tech-logo-category">${escapeHtml(group.category)}</h4>
+        <div class="tech-logo-grid">
+          ${group.items
+            .map(
+              (item) => `
+              <div class="tech-logo-item">
+                <img src="${escapeHtml(techLogoUrl(item.file))}" alt="${escapeHtml(item.label)}" loading="lazy" decoding="async">
+                <span>${escapeHtml(item.label)}</span>
+              </div>`
+            )
+            .join("")}
+        </div>
+      </div>`
+    )
+    .join("");
+}
+
+/** Renders a "What You'll Receive" deliverables checklist. */
+export function deliverableListHtml(deliverables) {
+  if (!deliverables?.length) return "";
+  return `
+    <div class="deliverable-list">
+      ${deliverables
+        .map(
+          (d) => `
+          <div class="deliverable-item"><i data-lucide="check-circle"></i><span>${escapeHtml(d)}</span></div>`
+        )
+        .join("")}
+    </div>`;
+}
+
+/** Renders a 5-phase "How It Works" timeline, reusing the homepage's .timeline markup. */
+export function timelineHtml(steps) {
+  if (!steps?.length) return "";
+  return `
+    <div class="timeline">
+      ${steps
+        .map(
+          (s, i) => `
+          <div class="timeline-step"><span class="step-num">${String(i + 1).padStart(2, "0")}</span><h4>${escapeHtml(s.title)}</h4><p>${escapeHtml(s.description)}</p></div>`
+        )
+        .join("")}
+    </div>`;
+}
+
+/** Renders an FAQ accordion, reusing the homepage's .faq-item markup. */
+export function faqListHtml(faqs) {
+  if (!faqs?.length) return "";
+  return `
+    <div class="faq-list">
+      ${faqs
+        .map(
+          (f) => `
+          <div class="faq-item">
+            <button class="faq-question">${escapeHtml(f.question)}<i data-lucide="plus"></i></button>
+            <div class="faq-answer"><p>${escapeHtml(f.answer)}</p></div>
+          </div>`
+        )
+        .join("")}
+    </div>`;
+}
+
+/** Wires open/close click behavior for FAQ items injected after site.js's initial load-time
+ * pass (dynamically-rendered content misses that pass, since it doesn't exist yet). */
+export function wireFaqAccordion(container) {
+  container.querySelectorAll(".faq-item").forEach((item) => {
+    const q = item.querySelector(".faq-question");
+    if (!q) return;
+    q.addEventListener("click", () => {
+      const wasOpen = item.classList.contains("open");
+      item.parentElement.querySelectorAll(".faq-item").forEach((i) => i.classList.remove("open"));
+      if (!wasOpen) item.classList.add("open");
+    });
+  });
 }
