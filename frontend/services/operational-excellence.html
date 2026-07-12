@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- GENERATED MIRROR of frontend/service-detail.html — Vercel rewrites are not honoring the custom /services/:slug rule on this project, so this physical file exists purely so cleanUrls can resolve /services/operational-excellence. If you edit service-detail.html, regenerate all 6 files in frontend/services/ with the same content. -->
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Service — Xtradite Digital</title>
+<meta name="description" content="Explore Xtradite Digital's services in detail.">
+<link rel="stylesheet" href="/assets/css/tokens.css">
+<link rel="stylesheet" href="/assets/css/main.css">
+</head>
+<body>
+
+<header class="site-header" id="site-header">
+  <div class="container header-inner">
+    <a href="/" class="logo">Xtradite <span class="accent">Digital</span></a>
+    <nav class="site-nav" id="site-nav">
+      <a href="/">Home</a>
+      <a href="/services" class="active">Services</a>
+      <a href="/industries">Industries</a>
+      <a href="/case-studies">Case Studies</a>
+      <a href="/about">About</a>
+      <a href="/insights">Insights</a>
+      <a href="/contact">Contact</a>
+      <a href="/contact" class="btn btn-primary btn-sm header-cta-mobile">Book a Consultation</a>
+    </nav>
+    <a href="/contact" class="btn btn-primary btn-sm header-cta">Book a Consultation</a>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<main>
+
+  <section class="section-tight">
+    <div class="container">
+      <nav class="breadcrumb"><a href="/">Home</a> / <a href="/services">Services</a> / <span id="breadcrumb-current"></span></nav>
+
+      <div id="not-found" class="not-found" hidden>
+        <h1>Service not found</h1>
+        <p>We couldn't find a service matching that link. It may have been renamed — browse all services instead.</p>
+        <a href="/services" class="btn btn-primary">View All Services</a>
+      </div>
+
+      <div id="service-detail-root" hidden>
+        <div class="detail-hero-grid">
+          <div>
+            <div class="card-icon" style="margin-bottom: var(--space-24);"><i id="service-icon" data-lucide="circle"></i></div>
+            <span class="eyebrow" id="service-eyebrow">Service</span>
+            <h1 id="service-title" style="font-size: var(--font-size-display-sm); margin-bottom: var(--space-16);"></h1>
+            <p class="hero-sub" id="service-subheading" style="margin-bottom: var(--space-32);"></p>
+            <div class="hero-ctas" style="justify-content: flex-start; margin-bottom: var(--space-56);">
+              <a href="/contact" id="hero-cta" class="btn btn-primary">Book a Consultation <i data-lucide="arrow-right" class="btn-icon"></i></a>
+              <a href="/case-studies" class="btn btn-secondary">Explore Case Studies</a>
+            </div>
+            <div class="richtext" id="service-description"></div>
+          </div>
+          <div class="glance-card">
+            <span class="eyebrow" style="margin-bottom: 0;">At a Glance</span>
+            <div class="glance-item"><span class="glance-num">6-12wk</span><span class="glance-label">Typical delivery window</span></div>
+            <div class="glance-item"><span class="glance-num">30%+</span><span class="glance-label">Average time saved on manual tasks</span></div>
+            <div class="glance-item"><span class="glance-num">1:1</span><span class="glance-label">Embedded with your team</span></div>
+          </div>
+        </div>
+
+        <div class="related-grid" id="who-what-section" style="margin-top: var(--space-64);" hidden>
+          <div class="card">
+            <span class="eyebrow">Who It's For</span>
+            <div class="richtext" id="service-who-its-for"></div>
+          </div>
+          <div class="card">
+            <span class="eyebrow">What's Included</span>
+            <div class="richtext" id="service-what-included"></div>
+          </div>
+        </div>
+
+        <div id="how-it-works-section" style="margin-top: var(--space-64);" hidden>
+          <div class="section-head left">
+            <span class="eyebrow">Process</span>
+            <h2>How It Works</h2>
+          </div>
+          <div id="service-how-it-works"></div>
+        </div>
+
+        <div id="deliverables-section" style="margin-top: var(--space-64);" hidden>
+          <div class="section-head left">
+            <span class="eyebrow">Outcomes</span>
+            <h2>What You'll Receive</h2>
+          </div>
+          <div id="service-deliverables"></div>
+        </div>
+
+        <div id="tech-section" style="margin-top: var(--space-64);" hidden>
+          <div class="section-head left">
+            <span class="eyebrow">Stack</span>
+            <h2>Technology &amp; Applications We Use</h2>
+          </div>
+          <div id="service-tech-grid"></div>
+        </div>
+
+        <div class="card" id="related-case-study" style="margin-top: var(--space-64);" hidden></div>
+
+        <div id="related-insights-section" style="margin-top: var(--space-64);" hidden>
+          <div class="section-head left">
+            <span class="eyebrow">Insights</span>
+            <h2>Related Reading</h2>
+          </div>
+          <div class="related-grid" id="related-insights"></div>
+        </div>
+
+        <div id="faq-section" style="margin-top: var(--space-64);" hidden>
+          <div class="section-head left">
+            <span class="eyebrow">FAQ</span>
+            <h2>Frequently Asked Questions</h2>
+          </div>
+          <div id="service-faq"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section>
+    <div class="container">
+      <div class="cta-banner">
+        <h2>Ready to Accelerate Your Business?</h2>
+        <p>Transform your digital operations with practical consultancy built for measurable commercial results.</p>
+        <a href="/contact" id="banner-cta" class="btn btn-primary btn-lg">Book a Consultation <i data-lucide="arrow-right" class="btn-icon"></i></a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a href="/" class="logo">Xtradite <span class="accent">Digital</span></a>
+        <p>Practical consultancy for retail, ecommerce and manufacturing businesses ready to accelerate digital-first growth.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Services</h4>
+        <a href="/services/ai-automation">AI &amp; Automation</a>
+        <a href="/services/digital-strategy">Digital Strategy</a>
+        <a href="/services/ecommerce-growth">eCommerce Growth</a>
+        <a href="/services/operational-excellence">Operational Excellence</a>
+        <a href="/services/fractional-leadership">Fractional Leadership</a>
+        <a href="/services/project-delivery">Project Delivery</a>
+      </div>
+      <div class="footer-col">
+        <h4>Industries</h4>
+        <a href="/industry-detail?slug=retail">Retail</a>
+        <a href="/industry-detail?slug=ecommerce">eCommerce</a>
+        <a href="/industry-detail?slug=manufacturing">Manufacturing</a>
+        <a href="/industry-detail?slug=consumer-goods">Consumer Goods</a>
+        <a href="/industry-detail?slug=professional-services">Professional Services</a>
+        <a href="/industry-detail?slug=startups">Startups</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="/about">About</a>
+        <a href="/insights">Insights</a>
+        <a href="/case-studies">Case Studies</a>
+        <a href="/contact">Contact</a>
+      </div>
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <a href="/legal/privacy">Privacy Policy</a>
+        <a href="/legal/cookies">Cookie Policy</a>
+        <a href="/legal/terms">Terms</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 Xtradite Digital. All rights reserved.</span>
+      <div class="footer-social">
+        <a href="#" aria-label="LinkedIn — add your company URL" title="Add your real LinkedIn URL here"><i data-lucide="linkedin"></i></a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js" defer></script>
+<script src="/assets/js/site.js" defer></script>
+<script type="module" src="/assets/js/pages/service-detail.js"></script>
+</body>
+</html>
