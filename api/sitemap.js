@@ -1,4 +1,4 @@
-// Auto-generated sitemap.xml — served at https://www.xtradite-digital.co.uk/sitemap.xml
+﻿// Auto-generated sitemap.xml â€” served at https://www.xtradite-digital.co.uk/sitemap.xml
 // via the rewrite in vercel.json. Queries Supabase at request time (cached at the edge
 // for an hour) so every new service/industry/case study/insights post is picked up
 // automatically without a manual rebuild.
@@ -23,7 +23,6 @@ async function fetchTable(table, select) {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?select=${select}`, {
     headers: {
       apikey: SUPABASE_ANON_KEY,
-      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
     },
   });
   if (!res.ok) return [];
@@ -77,3 +76,5 @@ module.exports = async (req, res) => {
   res.setHeader("Cache-Control", "public, max-age=0, s-maxage=3600, stale-while-revalidate=86400");
   res.status(200).send(xml);
 };
+
+
