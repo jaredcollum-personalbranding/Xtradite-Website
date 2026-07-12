@@ -6,6 +6,18 @@
 (function () {
   "use strict";
 
+  // ---- Shared mobile responsive stylesheet ---------------------------------
+  if (!document.querySelector('link[data-xtradite-mobile-css]')) {
+    const currentScript = document.currentScript;
+    const stylesheet = document.createElement("link");
+    stylesheet.rel = "stylesheet";
+    stylesheet.dataset.xtraditeMobileCss = "true";
+    stylesheet.href = currentScript && currentScript.src
+      ? new URL("../css/mobile.css", currentScript.src).href
+      : "/assets/css/mobile.css";
+    document.head.appendChild(stylesheet);
+  }
+
   // ---- Sticky header frosted-glass on scroll -----------------------------
   const header = document.getElementById("site-header");
   if (header) {
