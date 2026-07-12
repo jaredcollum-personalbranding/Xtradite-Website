@@ -34,20 +34,49 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="google-adsense-account" content="ca-pub-7308041122340160">
-
-<!-- Google tag (gtag.js) -->
-<script type="text/plain" data-cookieconsent="statistics" async src="https://www.googletagmanager.com/gtag/js?id=G-WYXTKGJ9JS"></script>
-<script type="text/plain" data-cookieconsent="statistics">
+<script>
   window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-WYXTKGJ9JS');
+  function gtag() { dataLayer.push(arguments); }
+  gtag("consent", "default", {
+    ad_storage: "denied",
+    ad_user_data: "denied",
+    ad_personalization: "denied",
+    analytics_storage: "denied",
+    functionality_storage: "denied",
+    personalization_storage: "denied",
+    security_storage: "granted",
+    wait_for_update: 500
+  });
+  gtag("set", "ads_data_redaction", true);
+  gtag("set", "url_passthrough", false);
 </script>
-<!-- Google AdSense -->
+<script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="07680bbc-6c7e-4a44-9d8b-a2ff6766646c" data-blockingmode="auto" data-framework="IAB" type="text/javascript"></script>
+<script>
+  function updateGoogleConsentFromCookiebot() {
+    if (!window.Cookiebot || !Cookiebot.hasResponse) return;
+    const marketingGranted = Cookiebot.consent.marketing === true;
+    const statisticsGranted = Cookiebot.consent.statistics === true;
+    const preferencesGranted = Cookiebot.consent.preferences === true;
+    gtag("consent", "update", {
+      ad_storage: marketingGranted ? "granted" : "denied",
+      ad_user_data: marketingGranted ? "granted" : "denied",
+      ad_personalization: marketingGranted ? "granted" : "denied",
+      analytics_storage: statisticsGranted ? "granted" : "denied",
+      functionality_storage: preferencesGranted ? "granted" : "denied",
+      personalization_storage: preferencesGranted ? "granted" : "denied",
+      security_storage: "granted"
+    });
+    gtag("set", "ads_data_redaction", !marketingGranted);
+  }
+  window.addEventListener("CookiebotOnConsentReady", updateGoogleConsentFromCookiebot);
+  window.addEventListener("CookiebotOnAccept", updateGoogleConsentFromCookiebot);
+  window.addEventListener("CookiebotOnDecline", updateGoogleConsentFromCookiebot);
+</script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-WYXTKGJ9JS"></script>
+<script>gtag("js", new Date()); gtag("config", "G-WYXTKGJ9JS");</script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7308041122340160" crossorigin="anonymous"></script>
 <!-- Vercel Speed Insights -->
 <script src="../assets/js/speed-insights-init.js" defer></script>
-<script type="text/plain" data-cookieconsent="marketing" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7308041122340160" crossorigin="anonymous"></script>
 <title>Privacy Policy — Xtradite Digital</title>
 <meta name="description" content="Privacy Policy for Xtradite Digital.">
 <link rel="stylesheet" href="../assets/css/tokens.css">
