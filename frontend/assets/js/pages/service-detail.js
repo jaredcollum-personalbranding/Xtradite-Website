@@ -12,6 +12,7 @@ import {
   wireFaqAccordion,
 } from "../render-helpers.js";
 import { SERVICE_TO_CASE_STUDY, SERVICE_TO_RELATED_POSTS } from "./shared-data.js";
+import { renderServiceLocationCoverage } from "./service-locations.js";
 
 const root = document.getElementById("service-detail-root");
 const notFound = document.getElementById("not-found");
@@ -134,6 +135,8 @@ async function load() {
     document.getElementById("faq-section").hidden = false;
   }
 
+  renderServiceLocationCoverage(item);
+
   const relatedSlug = SERVICE_TO_CASE_STUDY[item.slug];
   if (relatedSlug) {
     try {
@@ -149,7 +152,7 @@ async function load() {
         relatedWrap.hidden = false;
       }
     } catch (e) {
-      console.error(e); // non-critical — related case study is a bonus, not core content
+      console.error(e);
     }
   }
 
@@ -162,7 +165,7 @@ async function load() {
         document.getElementById("related-insights-section").hidden = false;
       }
     } catch (e) {
-      console.error(e); // non-critical — related insights are a bonus, not core content
+      console.error(e);
     }
   }
 
