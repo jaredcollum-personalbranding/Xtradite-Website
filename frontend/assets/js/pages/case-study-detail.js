@@ -55,14 +55,16 @@ function setJsonLd(item, title, description, url) {
     headline: title,
     description,
     about: item.industry,
-    url,
+    author: { "@type": "Organization", name: "Xtradite Digital" },
+    publisher: { "@type": "Organization", name: "Xtradite Digital" },
+    mainEntityOfPage: url,
   });
   document.head.appendChild(script);
 }
 
 function applySeo(item) {
-  const title = `${item.client} — Xtradite Digital`;
-  const description = item.headline || item.challenge || "";
+  const title = `${item.client} — Xtradite Digital Case Study`;
+  const description = item.headline || item.challenge || `How Xtradite Digital helped ${item.client}.`;
   const url = `${window.location.origin}/case-study-detail?slug=${encodeURIComponent(item.slug)}`;
 
   document.title = title;

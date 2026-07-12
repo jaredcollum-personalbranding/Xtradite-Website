@@ -1,0 +1,28 @@
+# Xtradite Digital
+
+> UK digital consultancy helping ambitious retail, ecommerce and manufacturing businesses close operational and commercial gaps with hands-on delivery — not just strategy decks.
+
+Xtradite Digital is a UK-based consultancy that delivers practical, hands-on digital transformation work across five phases: Discover, Assess, Design, Deliver, Optimise. It works with retail, ecommerce, manufacturing, consumer goods, professional services and startup businesses.
+
+## Services
+
+- [AI & Automation](https://www.xtradite-digital.co.uk/services/ai-automation): Practical AI and workflow automation that removes manual bottlenecks from operations.
+- [Digital Strategy](https://www.xtradite-digital.co.uk/services/digital-strategy): A clear, commercially-grounded roadmap for digital-first growth.
+- [eCommerce Growth](https://www.xtradite-digital.co.uk/services/ecommerce-growth): Hands-on delivery to grow online revenue and conversion.
+- [Operational Excellence](https://www.xtradite-digital.co.uk/services/operational-excellence): Closing the operational gaps holding commercial performance back.
+- [Fractional Leadership](https://www.xtradite-digital.co.uk/services/fractional-leadership): Senior ecommerce and digital leadership embedded part-time or interim.
+- [Project Delivery](https://www.xtradite-digital.co.uk/services/project-delivery): Implementation support that carries strategy through to go-live.
+
+## Company
+
+- [About](https://www.xtradite-digital.co.uk/about): Who Xtradite Digital is and how the consultancy works.
+- [Industries](https://www.xtradite-digital.co.uk/industries): Retail, eCommerce, Manufacturing, Consumer Goods, Professional Services, Startups.
+- [Case Studies](https://www.xtradite-digital.co.uk/case-studies): Documented client results.
+- [Insights](https://www.xtradite-digital.co.uk/insights): Articles on operations, growth and leadership.
+- [Contact](https://www.xtradite-digital.co.uk/contact): Book a consultation.
+
+## Optional
+
+- [Sitemap](https://www.xtradite-digital.co.uk/sitemap.xml): Full, auto-generated list of every page on the site, including case studies, industries and insights posts.
+- [Privacy Policy](https://www.xtradite-digital.co.uk/legal/privacy)
+- [Terms](https://www.xtradite-digital.co.uk/legal/terms)
