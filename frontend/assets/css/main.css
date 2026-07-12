@@ -393,6 +393,24 @@ section { padding: var(--space-96) 0; }
 .card-link svg { width: 14px; height: 14px; transition: transform var(--transition-fast); }
 .card:hover .card-link svg { transform: translateX(3px); }
 
+.card-featured {
+  border-color: var(--color-primary);
+  background: color-mix(in oklab, var(--color-primary) 6%, var(--color-bg-secondary));
+}
+.card-category-accent { color: var(--color-primary-active); }
+
+.track-record-subhead {
+  font-size: var(--font-size-heading-sm);
+  margin-bottom: var(--space-12);
+}
+.track-record-subhead-spaced { margin-top: var(--space-56); }
+.track-record-note {
+  color: var(--color-text-tertiary);
+  font-size: var(--font-size-body-sm);
+  max-width: 640px;
+  margin-bottom: var(--space-24);
+}
+
 .case-card .card-image {
   aspect-ratio: 16/9;
   border-radius: var(--radius-lg);
