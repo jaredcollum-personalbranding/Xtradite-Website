@@ -24,6 +24,16 @@
     });
   }
 
+  // ---- Cookie settings -------------------------------------------------------
+  document.querySelectorAll("[data-cookie-settings]").forEach((link) => {
+    link.addEventListener("click", (event) => {
+      event.preventDefault();
+      if (window.CookieConsent && typeof window.CookieConsent.renew === "function") {
+        window.CookieConsent.renew();
+      }
+    });
+  });
+
   // ---- Testimonial slider(s) ------------------------------------------------
   document.querySelectorAll(".testimonial-slider").forEach((slider) => {
     const slides = Array.from(slider.querySelectorAll(".testimonial-slide"));
