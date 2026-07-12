@@ -68,46 +68,65 @@ function addAreaServedSchema(item) {
   document.head.appendChild(script);
 }
 
-function wirePrimaryTabs(section) {
-  const tabs = Array.from(section.querySelectorAll("[data-coverage-tab]"));
-  const panels = Array.from(section.querySelectorAll("[data-coverage-panel]"));
+function wireTabs(tabs, panels) {
+  const activate = (index, moveFocus = false) => {
+    tabs.forEach((button, buttonIndex) => {
+      const selected = index === buttonIndex;
+      button.setAttribute("aria-selected", String(selected));
+      button.tabIndex = selected ? 0 : -1;
+      if (panels[buttonIndex]) panels[buttonIndex].hidden = !selected;
+    });
+
+    if (moveFocus) tabs[index]?.focus();
+  };
+
   tabs.forEach((tab, index) => {
-    tab.addEventListener("click", () => {
-      tabs.forEach((button, buttonIndex) => {
-        const selected = index === buttonIndex;
-        button.setAttribute("aria-selected", String(selected));
-        button.tabIndex = selected ? 0 : -1;
-        panels[buttonIndex].hidden = !selected;
-      });
+    tab.addEventListener("click", () => activate(index));
+    tab.addEventListener("keydown", (event) => {
+      let nextIndex = index;
+
+      if (event.key === "ArrowRight" || event.key === "ArrowDown") nextIndex = (index + 1) % tabs.length;
+      else if (event.key === "ArrowLeft" || event.key === "ArrowUp") nextIndex = (index - 1 + tabs.length) % tabs.length;
+      else if (event.key === "Home") nextIndex = 0;
+      else if (event.key === "End") nextIndex = tabs.length - 1;
+      else return;
+
+      event.preventDefault();
+      activate(nextIndex, true);
+      tabs[nextIndex].scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
     });
   });
 }
 
+function wirePrimaryTabs(section) {
+  const tabs = Array.from(section.querySelectorAll("[data-coverage-tab]"));
+  const panels = Array.from(section.querySelectorAll("[data-coverage-panel]"));
+  wireTabs(tabs, panels);
+}
+
 function wireRegionTabs(section) {
   const tabs = Array.from(section.querySelectorAll("[data-region-tab]"));
-  tabs.forEach((tab, index) => {
-    tab.addEventListener("click", () => {
-      tabs.forEach((button, buttonIndex) => {
-        const selected = index === buttonIndex;
-        button.setAttribute("aria-selected", String(selected));
-        section.querySelector(`#service-location-region-${buttonIndex}`).hidden = !selected;
-      });
-    });
-  });
+  const panels = tabs.map((_, index) => section.querySelector(`#service-location-region-${index}`));
+  wireTabs(tabs, panels);
 }
 
 function wireEmbeddedForm(section, item) {
   const form = section.querySelector("#service-location-enquiry-form");
   const status = section.querySelector("#service-location-enquiry-status");
   if (!form || !status) return;
-  form.message.value = `I'm interested in ${item.title} support in my area.`;
+
+  const defaultMessage = `I'm interested in ${item.title} support in my area.`;
+  form.message.value = defaultMessage;
+
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
     if (!form.reportValidity()) return;
+
     const button = form.querySelector('button[type="submit"]');
     button.disabled = true;
     status.className = "form-status loading";
     status.textContent = "Sending…";
+
     try {
       await submitContactForm({
         name: form.name.value.trim(),
@@ -118,6 +137,7 @@ function wireEmbeddedForm(section, item) {
       status.className = "form-status success";
       status.textContent = "Thanks — your enquiry has been sent.";
       form.reset();
+      form.message.value = defaultMessage;
       if (typeof window.gtag === "function") window.gtag("event", "generate_lead", { form_location: "service_coverage" });
     } catch (error) {
       console.error(error);
@@ -146,10 +166,10 @@ export function renderServiceLocationCoverage(item) {
       <p>Work with Xtradite remotely across the UK, with on-site workshops available where the scope benefits from face-to-face collaboration.</p>
     </div>
     <div class="service-coverage-tabs" role="tablist" aria-label="UK coverage options">
-      ${["Coverage", "Locations", "Enquire"].map((label, index) => `<button type="button" role="tab" data-coverage-tab aria-selected="${index === 0}" aria-controls="service-coverage-panel-${index}" id="service-coverage-tab-${index}" tabindex="${index === 0 ? 0 : -1}"><span>${String(index + 1).padStart(2, "0")}</span>${label}</button>`).join("")}
+      ${["Coverage", "Locations", "Enquire"].map((label, index) => `<button type="button" role="tab" data-coverage-tab aria-selected="${index === 0}" aria-controls="service-coverage-panel-${index}" id="service-coverage-tab-${index}" tabindex="${index === 0 ? 0 : -1}"><span class="service-coverage-tab-number" aria-hidden="true">${String(index + 1).padStart(2, "0")}</span><span class="service-coverage-tab-label">${label}</span></button>`).join("")}
     </div>
     <div class="service-coverage-shell">
-      <div id="service-coverage-panel-0" data-coverage-panel role="tabpanel" aria-labelledby="service-coverage-tab-0">
+      <div id="service-coverage-panel-0" data-coverage-panel role="tabpanel" aria-labelledby="service-coverage-tab-0" tabindex="0">
         <div class="service-coverage-overview">
           <div class="service-location-map service-location-map--compact">
             <iframe title="Xtradite Digital UK service coverage map" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q=United%20Kingdom&z=5&output=embed"></iframe>
@@ -162,13 +182,13 @@ export function renderServiceLocationCoverage(item) {
           </div>
         </div>
       </div>
-      <div id="service-coverage-panel-1" data-coverage-panel role="tabpanel" aria-labelledby="service-coverage-tab-1" hidden>
+      <div id="service-coverage-panel-1" data-coverage-panel role="tabpanel" aria-labelledby="service-coverage-tab-1" tabindex="0" hidden>
         <div class="service-location-tabs" role="tablist" aria-label="UK service regions">
-          ${regionNames.map((name, index) => `<button class="service-location-tab" type="button" role="tab" data-region-tab aria-selected="${index === 0}" aria-controls="service-location-region-${index}">${escapeHtml(name)}</button>`).join("")}
+          ${regionNames.map((name, index) => `<button class="service-location-tab" type="button" role="tab" data-region-tab aria-selected="${index === 0}" aria-controls="service-location-region-${index}" tabindex="${index === 0 ? 0 : -1}">${escapeHtml(name)}</button>`).join("")}
         </div>
-        ${regionNames.map((name, index) => `<div class="service-location-panel" id="service-location-region-${index}" role="tabpanel" ${index ? "hidden" : ""}><div class="service-location-links">${REGIONS[name].map((city) => cityLink(city, item.slug)).join("")}</div></div>`).join("")}
+        ${regionNames.map((name, index) => `<div class="service-location-panel" id="service-location-region-${index}" role="tabpanel" tabindex="0" ${index ? "hidden" : ""}><div class="service-location-links">${REGIONS[name].map((city) => cityLink(city, item.slug)).join("")}</div></div>`).join("")}
       </div>
-      <div id="service-coverage-panel-2" data-coverage-panel role="tabpanel" aria-labelledby="service-coverage-tab-2" hidden>
+      <div id="service-coverage-panel-2" data-coverage-panel role="tabpanel" aria-labelledby="service-coverage-tab-2" tabindex="0" hidden>
         <div class="service-coverage-enquiry">
           <div>
             <span class="service-coverage-kicker">Local question?</span>
@@ -183,7 +203,7 @@ export function renderServiceLocationCoverage(item) {
             <div class="form-field"><label for="service-enquiry-company">Company <span class="optional-tag">(optional)</span></label><input id="service-enquiry-company" name="company" autocomplete="organization"></div>
             <div class="form-field"><label for="service-enquiry-message">What would you like help with?</label><textarea id="service-enquiry-message" name="message" rows="4" required></textarea></div>
             <button class="btn btn-primary" type="submit">Send enquiry <i data-lucide="arrow-right" class="btn-icon"></i></button>
-            <div id="service-location-enquiry-status" class="form-status" role="status"></div>
+            <div id="service-location-enquiry-status" class="form-status" role="status" aria-live="polite"></div>
           </form>
         </div>
       </div>
