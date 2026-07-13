@@ -1,8 +1,6 @@
-const { locations, services, slugify } = require("../data/uk-locations");
+const { loadLocationCatalogue } = require("./lib/location-catalogue");
 
 const SITE_URL = "https://www.xtradite-digital.co.uk";
-const SUPABASE_URL = "https://bmhkdyshluiloorgnwoy.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_Aj9nCJLFY9aMycZeQ3buTQ_-n-Q7SFK";
 const LOGO_URL = "https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/icon-tile-light.png";
 
 const esc = (value = "") => String(value)
@@ -11,26 +9,12 @@ const esc = (value = "") => String(value)
 const stripHtml = (value = "") => String(value).replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
 const unique = (items) => [...new Set(items)];
 
-async function fetchService(slug) {
-  try {
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/services?slug=eq.${encodeURIComponent(slug)}&select=*`, {
-      headers: { apikey: SUPABASE_ANON_KEY }
-    });
-    if (!response.ok) return null;
-    const rows = await response.json();
-    return rows[0] || null;
-  } catch (error) {
-    console.error("location router: service lookup failed", error);
-    return null;
-  }
-}
-
 function pathFor(location, serviceSlug) {
   const base = `/uk/${location.nationSlug}/${location.regionSlug}/${location.countySlug}/${location.slug}`;
   return serviceSlug ? `${base}/services/${serviceSlug}` : base;
 }
 
-function resolvePath(rawPath) {
+function resolvePath(rawPath, locations, servicesByLocation) {
   const parts = String(rawPath || "").split("/").filter(Boolean).map(decodeURIComponent);
   if (!parts.length || parts[0] === "locations") return { level: "root", parts: [] };
   const [nationSlug, regionSlug, countySlug, citySlug, servicesSegment, serviceSlug] = parts;
@@ -46,8 +30,9 @@ function resolvePath(rawPath) {
   const location = matches.find((l) => l.slug === citySlug);
   if (!location) return null;
   if (!servicesSegment) return { level: "city", matches, location, parts };
-  if (servicesSegment !== "services" || !serviceSlug || !services.some((s) => s.slug === serviceSlug)) return null;
-  return { level: "service", matches, location, serviceSlug, parts };
+  const service = servicesByLocation.get(location.id)?.find((item) => item.slug === serviceSlug);
+  if (servicesSegment !== "services" || !serviceSlug || !service) return null;
+  return { level: "service", matches, location, service, serviceSlug, parts };
 }
 
 function breadcrumbsFor(route, service) {
@@ -69,7 +54,7 @@ function breadcrumbsFor(route, service) {
 function breadcrumbHtml(crumbs) {
   return crumbs.map((crumb, index) => index === crumbs.length - 1
     ? `<span aria-current="page">${esc(crumb.name)}</span>`
-    : `<a href="${esc(crumb.url)}">${esc(crumb.name)}</a><span aria-hidden="true">›</span>`).join("");
+    : `<a href="${esc(crumb.url)}">${esc(crumb.name)}</a><span aria-hidden="true">â€º</span>`).join("");
 }
 
 function organisationSchema() {
@@ -90,7 +75,7 @@ function organisationSchema() {
   };
 }
 
-function schemas(route, crumbs, service) {
+function schemas(route, crumbs, service, locationServices) {
   const graph = [organisationSchema(), {
     "@type": "BreadcrumbList",
     itemListElement: crumbs.map((crumb, index) => ({
@@ -118,7 +103,7 @@ function schemas(route, crumbs, service) {
     graph.push({
       "@type": "ItemList",
       name: `Services available in ${location.name}`,
-      itemListElement: services.map((item, index) => ({
+      itemListElement: locationServices.map((item, index) => ({
         "@type": "ListItem", position: index + 1, name: item.title,
         url: `${SITE_URL}${pathFor(location, item.slug)}`
       }))
@@ -127,11 +112,11 @@ function schemas(route, crumbs, service) {
   return JSON.stringify({ "@context": "https://schema.org", "@graph": graph }).replace(/</g, "\\u003c");
 }
 
-function serviceLinks(location) {
-  return services.map((item) => `<a class="location-link" href="${pathFor(location, item.slug)}"><span>${esc(item.title)}<small>${esc(item.searchLabel)} for ${esc(location.name)}</small></span><span>→</span></a>`).join("");
+function serviceLinks(location, locationServices) {
+  return locationServices.map((item) => `<a class="location-link" href="${pathFor(location, item.slug)}"><span>${esc(item.title)}<small>${esc(item.searchLabel)} for ${esc(location.name)}</small></span><span>â†’</span></a>`).join("");
 }
 
-function nearbyLocations(location) {
+function nearbyLocations(location, locations) {
   return locations
     .filter((item) => item.slug !== location.slug && (item.countySlug === location.countySlug || item.regionSlug === location.regionSlug))
     .slice(0, 12);
@@ -144,16 +129,18 @@ function directoryLinks(items, level) {
     else if (level === "region") url = `/uk/${item.nationSlug}/${item.regionSlug}`;
     else if (level === "county") url = `/uk/${item.nationSlug}/${item.regionSlug}/${item.countySlug}`;
     else url = pathFor(item);
-    return `<a class="location-link" href="${url}"><span>${esc(item.label || item.name)}${item.meta ? `<small>${esc(item.meta)}</small>` : ""}</span><span>→</span></a>`;
+    return `<a class="location-link" href="${url}"><span>${esc(item.label || item.name)}${item.meta ? `<small>${esc(item.meta)}</small>` : ""}</span><span>â†’</span></a>`;
   }).join("");
 }
 
 function introFor(route, service) {
   if (route.level === "service") {
     const l = route.location;
+    if (service.localIntro) return service.localIntro;
     return `<p>Xtradite Digital provides ${esc(service.searchLabel)} for businesses in ${esc(l.name)} and across ${esc(l.county)}. Engagements are delivered remotely throughout the UK, with on-site working available by arrangement when the programme benefits from direct collaboration with leadership, commercial or delivery teams.</p><p>Our work connects strategy to implementation. For organisations in ${esc(l.name)}, that can include diagnosing operational constraints, improving ecommerce and customer journeys, introducing practical automation, strengthening measurement, or providing senior fractional leadership. The scope is shaped around the commercial outcome rather than a fixed agency package.</p><p>${esc(l.name)} sits within ${esc(l.region)}, giving businesses access to a broad regional customer and talent market. This page provides a local route into the same UK-wide consultancy capability, with clear links to nearby areas and related services. Xtradite does not claim a permanent office in ${esc(l.name)}; the location is an area served.</p>`;
   }
   const sample = route.location || route.matches?.[0];
+  if (route.level === "city" && sample.localIntro) return sample.localIntro;
   const area = route.level === "root" ? "the United Kingdom" : route.level === "nation" ? sample.nation : route.level === "region" ? sample.region : route.level === "county" ? sample.county : sample.name;
   return `<p>Xtradite Digital supports ambitious retail, ecommerce, manufacturing and professional-services organisations across ${esc(area)}. Work is delivered remotely throughout the United Kingdom, with on-site sessions available by arrangement where they add value to discovery, stakeholder alignment or implementation.</p><p>The directory below connects businesses to locally relevant pages for digital strategy, ecommerce growth, AI and automation, operational excellence, fractional leadership and project delivery. Each page explains how the service is applied in context, while linking vertically through the UK, nation, region, county and city hierarchy.</p><p>Location pages describe areas served rather than physical branch offices. This keeps the information accurate while making it easier for organisations in ${esc(area)} to find the most relevant service route, nearby locations and enquiry options.</p>`;
 }
@@ -184,22 +171,27 @@ function directoryFor(route) {
 }
 
 function pageChrome(title, description, canonical, schema, body) {
-  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)} — Xtradite Digital</title><meta name="description" content="${esc(description)}"><link rel="canonical" href="${esc(canonical)}"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(description)}"><meta property="og:type" content="website"><meta property="og:url" content="${esc(canonical)}"><link rel="stylesheet" href="/assets/css/tokens.css"><link rel="stylesheet" href="/assets/css/main.css"><link rel="stylesheet" href="/assets/css/locations.css"><script type="application/ld+json">${schema}</script></head><body><header class="site-header" id="site-header"><div class="container header-inner"><a href="/" class="logo"><img src="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/wordmark-caps-light.png" alt="Xtradite Digital" class="logo-img"></a><nav class="site-nav" id="site-nav"><a href="/">Home</a><a href="/services">Services</a><a href="/locations" class="active">Locations</a><a href="/case-studies">Case Studies</a><a href="/insights">Insights</a><a href="/contact">Contact</a><a href="/contact" class="btn btn-primary btn-sm header-cta-mobile">Book a Consultation</a></nav><a href="/contact" class="btn btn-primary btn-sm header-cta">Book a Consultation</a><button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation"><span></span><span></span><span></span></button></div></header>${body}<footer class="site-footer"><div class="container"><div class="footer-bottom"><span>&copy; 2026 Xtradite Digital. All rights reserved.</span><div class="footer-legal"><a href="/services">Services</a><a href="/locations">Locations</a><a href="/legal/privacy">Privacy</a><a href="/contact">Contact</a></div></div></div></footer><script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js" defer></script><script src="/assets/js/site.js" defer></script><script>document.addEventListener('click',e=>{const tab=e.target.closest('[role=tab]');if(!tab)return;const wrap=tab.closest('.location-tabs');wrap.querySelectorAll('[role=tab]').forEach(x=>x.setAttribute('aria-selected','false'));wrap.querySelectorAll('[role=tabpanel]').forEach(x=>x.hidden=true);tab.setAttribute('aria-selected','true');wrap.querySelector('#'+tab.getAttribute('aria-controls')).hidden=false;});</script></body></html>`;
+  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)} â€” Xtradite Digital</title><meta name="description" content="${esc(description)}"><link rel="canonical" href="${esc(canonical)}"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(description)}"><meta property="og:type" content="website"><meta property="og:url" content="${esc(canonical)}"><link rel="stylesheet" href="/assets/css/tokens.css"><link rel="stylesheet" href="/assets/css/main.css"><link rel="stylesheet" href="/assets/css/locations.css"><script type="application/ld+json">${schema}</script></head><body><header class="site-header" id="site-header"><div class="container header-inner"><a href="/" class="logo"><img src="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/wordmark-caps-light.png" alt="Xtradite Digital" class="logo-img"></a><nav class="site-nav" id="site-nav"><a href="/">Home</a><a href="/services">Services</a><a href="/locations" class="active">Locations</a><a href="/case-studies">Case Studies</a><a href="/insights">Insights</a><a href="/contact">Contact</a><a href="/contact" class="btn btn-primary btn-sm header-cta-mobile">Book a Consultation</a></nav><a href="/contact" class="btn btn-primary btn-sm header-cta">Book a Consultation</a><button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation"><span></span><span></span><span></span></button></div></header>${body}<footer class="site-footer"><div class="container"><div class="footer-bottom"><span>&copy; 2026 Xtradite Digital. All rights reserved.</span><div class="footer-legal"><a href="/services">Services</a><a href="/locations">Locations</a><a href="/legal/privacy">Privacy</a><a href="/contact">Contact</a></div></div></div></footer><script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js" defer></script><script src="/assets/js/site.js" defer></script><script>document.addEventListener('click',e=>{const tab=e.target.closest('[role=tab]');if(!tab)return;const wrap=tab.closest('.location-tabs');wrap.querySelectorAll('[role=tab]').forEach(x=>x.setAttribute('aria-selected','false'));wrap.querySelectorAll('[role=tabpanel]').forEach(x=>x.hidden=true);tab.setAttribute('aria-selected','true');wrap.querySelector('#'+tab.getAttribute('aria-controls')).hidden=false;});</script></body></html>`;
 }
 
 module.exports = async (req, res) => {
-  const route = resolvePath(req.query.path);
-  if (!route) return res.status(404).send("Location page not found");
-  let service = null;
-  if (route.level === "service") {
-    const fallback = services.find((s) => s.slug === route.serviceSlug);
-    const cms = await fetchService(route.serviceSlug);
-    service = { ...fallback, ...(cms || {}), title: cms?.title || fallback.title };
+  let catalogue;
+  try {
+    catalogue = await loadLocationCatalogue();
+  } catch (error) {
+    console.error("location router: catalogue lookup failed", error);
+    res.setHeader("Retry-After", "60");
+    return res.status(503).send("Location directory temporarily unavailable");
   }
-  const title = titleFor(route, service);
-  const description = route.level === "service"
+
+  const { locations, services, servicesByLocation } = catalogue;
+  const route = resolvePath(req.query.path, locations, servicesByLocation);
+  if (!route) return res.status(404).send("Location page not found");
+  const service = route.level === "service" ? route.service : null;
+  const title = service?.seoTitle || route.location?.seoTitle || titleFor(route, service);
+  const description = service?.seoDescription || route.location?.seoDescription || (route.level === "service"
     ? `${service.title} for organisations in ${route.location.name}, ${route.location.county}. UK-wide delivery with local and on-site support by arrangement.`
-    : `${title}. Browse Xtradite Digital services and locations across the UK.`;
+    : `${title}. Browse Xtradite Digital services and locations across the UK.`);
   const crumbs = breadcrumbsFor(route, service);
   const canonicalPath = route.level === "root" ? "/locations" : route.level === "service" ? pathFor(route.location, service.slug) : route.level === "city" ? pathFor(route.location) : `/${["uk", ...route.parts].join("/")}`;
   const canonical = `${SITE_URL}${canonicalPath}`;
@@ -207,14 +199,17 @@ module.exports = async (req, res) => {
   let content;
   if (route.level === "city" || route.level === "service") {
     const l = route.location;
-    const nearby = nearbyLocations(l);
-    content = `<main><section class="location-hero"><div class="location-shell"><nav class="location-breadcrumbs" aria-label="Breadcrumb">${breadcrumbHtml(crumbs)}</nav><span class="eyebrow">${route.level === "service" ? esc(service.title) : "UK Service Area"}</span><h1>${esc(title)}</h1><p>${esc(description)}</p></div></section><section class="location-section"><div class="location-shell"><div class="location-grid"><article class="location-card location-copy">${route.level === "service" ? `<div class="location-service-intro"><strong>${esc(service.title)}</strong><p>${esc(stripHtml(service.summary || service.heroSubheading || service.searchLabel))}</p></div>` : ""}${intro}<div class="location-actions"><a class="btn btn-primary" href="/contact?topic=${encodeURIComponent(title)}">Discuss a project in ${esc(l.name)}</a><a class="btn btn-secondary" href="/services">View core services</a></div><p class="location-note">Area served: ${esc(l.name)}, ${esc(l.county)}, ${esc(l.region)}. No local office is implied.</p></article><aside class="location-card location-map"><iframe loading="lazy" title="Map of ${esc(l.name)}" src="https://www.google.com/maps?q=${l.latitude},${l.longitude}&z=11&output=embed" referrerpolicy="no-referrer-when-downgrade"></iframe><div class="location-map-caption">City-centre reference: ${l.latitude.toFixed(4)}, ${l.longitude.toFixed(4)}</div></aside></div><div class="location-tabs"><div class="location-tab-list" role="tablist"><button class="location-tab" role="tab" aria-selected="true" aria-controls="services-panel">Services</button><button class="location-tab" role="tab" aria-selected="false" aria-controls="nearby-panel">Nearby locations</button><button class="location-tab" role="tab" aria-selected="false" aria-controls="region-panel">Regional directory</button></div><div id="services-panel" class="location-tab-panel" role="tabpanel"><div class="location-directory">${serviceLinks(l)}</div></div><div id="nearby-panel" class="location-tab-panel" role="tabpanel" hidden><div class="location-directory">${directoryLinks(nearby.map(x=>({...x,label:x.name,meta:x.county})),"city") || '<p class="location-empty">No nearby locations are currently listed.</p>'}</div></div><div id="region-panel" class="location-tab-panel" role="tabpanel" hidden><div class="location-directory">${directoryLinks(locations.filter(x=>x.regionSlug===l.regionSlug).slice(0,30).map(x=>({...x,label:x.name,meta:x.county})),"city")}</div></div></div></div></section></main>`;
+    const locationServices = servicesByLocation.get(l.id) || [];
+    const nearby = nearbyLocations(l, locations);
+    content = `<main><section class="location-hero"><div class="location-shell"><nav class="location-breadcrumbs" aria-label="Breadcrumb">${breadcrumbHtml(crumbs)}</nav><span class="eyebrow">${route.level === "service" ? esc(service.title) : "UK Service Area"}</span><h1>${esc(title)}</h1><p>${esc(description)}</p></div></section><section class="location-section"><div class="location-shell"><div class="location-grid"><article class="location-card location-copy">${route.level === "service" ? `<div class="location-service-intro"><strong>${esc(service.title)}</strong><p>${esc(stripHtml(service.summary || service.heroSubheading || service.searchLabel))}</p></div>` : ""}${intro}<div class="location-actions"><a class="btn btn-primary" href="/contact?topic=${encodeURIComponent(title)}">Discuss a project in ${esc(l.name)}</a><a class="btn btn-secondary" href="/services">View core services</a></div><p class="location-note">Area served: ${esc(l.name)}, ${esc(l.county)}, ${esc(l.region)}. No local office is implied.</p></article><aside class="location-card location-map"><iframe loading="lazy" title="Map of ${esc(l.name)}" src="https://www.google.com/maps?q=${l.latitude},${l.longitude}&z=11&output=embed" referrerpolicy="no-referrer-when-downgrade"></iframe><div class="location-map-caption">City-centre reference: ${l.latitude.toFixed(4)}, ${l.longitude.toFixed(4)}</div></aside></div><div class="location-tabs"><div class="location-tab-list" role="tablist"><button class="location-tab" role="tab" aria-selected="true" aria-controls="services-panel">Services</button><button class="location-tab" role="tab" aria-selected="false" aria-controls="nearby-panel">Nearby locations</button><button class="location-tab" role="tab" aria-selected="false" aria-controls="region-panel">Regional directory</button></div><div id="services-panel" class="location-tab-panel" role="tabpanel"><div class="location-directory">${serviceLinks(l, locationServices)}</div></div><div id="nearby-panel" class="location-tab-panel" role="tabpanel" hidden><div class="location-directory">${directoryLinks(nearby.map(x=>({...x,label:x.name,meta:x.county})),"city") || '<p class="location-empty">No nearby locations are currently listed.</p>'}</div></div><div id="region-panel" class="location-tab-panel" role="tabpanel" hidden><div class="location-directory">${directoryLinks(locations.filter(x=>x.regionSlug===l.regionSlug).slice(0,30).map(x=>({...x,label:x.name,meta:x.county})),"city")}</div></div></div></div></section></main>`;
   } else {
     const directory = directoryFor(route);
     const nextLevel = route.level === "root" ? "nation" : route.level === "nation" ? "region" : route.level === "region" ? "county" : "city";
-    content = `<main><section class="location-hero"><div class="location-shell"><nav class="location-breadcrumbs" aria-label="Breadcrumb">${breadcrumbHtml(crumbs)}</nav><span class="eyebrow">UK Locations</span><h1>${esc(title)}</h1><p>${esc(description)}</p></div></section><section class="location-section"><div class="location-shell"><article class="location-card location-copy">${intro}</article><div class="location-tabs"><div class="location-tab-list" role="tablist"><button class="location-tab" role="tab" aria-selected="true" aria-controls="directory-panel">Location directory</button><button class="location-tab" role="tab" aria-selected="false" aria-controls="service-panel">Services</button></div><div id="directory-panel" class="location-tab-panel" role="tabpanel"><div class="location-directory">${directoryLinks(directory,nextLevel)}</div></div><div id="service-panel" class="location-tab-panel" role="tabpanel" hidden><div class="location-directory">${services.map(s=>`<a class="location-link" href="/services/${s.slug}"><span>${esc(s.title)}<small>${esc(s.searchLabel)}</small></span><span>→</span></a>`).join("")}</div></div></div></div></section></main>`;
+    content = `<main><section class="location-hero"><div class="location-shell"><nav class="location-breadcrumbs" aria-label="Breadcrumb">${breadcrumbHtml(crumbs)}</nav><span class="eyebrow">UK Locations</span><h1>${esc(title)}</h1><p>${esc(description)}</p></div></section><section class="location-section"><div class="location-shell"><article class="location-card location-copy">${intro}</article><div class="location-tabs"><div class="location-tab-list" role="tablist"><button class="location-tab" role="tab" aria-selected="true" aria-controls="directory-panel">Location directory</button><button class="location-tab" role="tab" aria-selected="false" aria-controls="service-panel">Services</button></div><div id="directory-panel" class="location-tab-panel" role="tabpanel"><div class="location-directory">${directoryLinks(directory,nextLevel)}</div></div><div id="service-panel" class="location-tab-panel" role="tabpanel" hidden><div class="location-directory">${services.map(s=>`<a class="location-link" href="/services/${s.slug}"><span>${esc(s.title)}<small>${esc(s.searchLabel)}</small></span><span>â†’</span></a>`).join("")}</div></div></div></div></section></main>`;
   }
   res.setHeader("Content-Type", "text/html; charset=utf-8");
   res.setHeader("Cache-Control", "public, max-age=0, s-maxage=3600, stale-while-revalidate=86400");
-  res.status(200).send(pageChrome(title, description, canonical, schemas(route, crumbs, service), content));
+  const schemaServices = route.location ? (servicesByLocation.get(route.location.id) || []) : services;
+  res.status(200).send(pageChrome(title, description, canonical, schemas(route, crumbs, service, schemaServices), content));
 };
+
