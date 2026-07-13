@@ -1,6 +1,6 @@
 import { escapeHtml } from "../render-helpers.js";
 
-const STYLE_HREF = "/assets/css/service-template-v3.css?v=20260713";
+const STYLE_HREF = "/assets/css/service-template-v3.css?v=20260714";
 
 function ensureStyles() {
   if (document.querySelector("link[data-service-template-v3-css]")) return;
@@ -18,7 +18,10 @@ function wireVerticalTabs(tablist, panels) {
       const active = tabIndex === index;
       tab.setAttribute("aria-selected", String(active));
       tab.tabIndex = active ? 0 : -1;
-      if (panels[tabIndex]) panels[tabIndex].hidden = !active;
+      if (panels[tabIndex]) {
+        panels[tabIndex].hidden = !active;
+        panels[tabIndex].classList.toggle("is-active", active);
+      }
     });
     if (moveFocus) tabs[index]?.focus();
   };
@@ -36,6 +39,8 @@ function wireVerticalTabs(tablist, panels) {
       activate(next, true);
     });
   });
+
+  activate(0);
 }
 
 function rebuildEngagementNavigator() {
@@ -56,19 +61,19 @@ function rebuildEngagementNavigator() {
   const definitions = [
     {
       label: "Who it’s for",
-      note: "The teams, trading conditions and growth constraints this service is designed around.",
+      note: "Teams, trading conditions and constraints this work is designed around.",
       icon: "users",
       node: audienceCard,
     },
     {
       label: "What’s included",
-      note: "The activities, workstreams and practical support covered within the engagement.",
+      note: "Activities, workstreams and practical support covered by the engagement.",
       icon: "list-checks",
       node: includedCard,
     },
     {
       label: "What you’ll receive",
-      note: "The tangible outputs, decisions and operating assets handed back to your team.",
+      note: "Decisions, operating assets and tangible outputs handed back to your team.",
       icon: "package-check",
       node: deliverables,
     },
@@ -80,7 +85,7 @@ function rebuildEngagementNavigator() {
     <div class="section-head left service-v3-engagement-heading">
       <span class="eyebrow">Engagement detail</span>
       <h2>What the engagement covers</h2>
-      <p>Move between the audience, delivery scope and outputs without losing the wider service narrative.</p>
+      <p>Choose a view to understand the audience, delivery scope or tangible outputs without repeating the full service narrative.</p>
     </div>
     <div class="service-v3-engagement-shell">
       <div class="service-v3-engagement-tabs" role="tablist" aria-orientation="vertical" aria-label="Service engagement information"></div>
@@ -146,9 +151,13 @@ function integrateTechnologyWithDelivery(techSource) {
       const title = techHeading.querySelector("h2");
       if (title) title.textContent = "Technology in the delivery environment";
       if (!techHeading.querySelector("p")) {
-        techHeading.insertAdjacentHTML("beforeend", "<p>Platforms are selected around the operating model, existing estate and commercial priorities—not added as a generic software list.</p>");
+        techHeading.insertAdjacentHTML("beforeend", "<p>Platforms are selected around the operating model, existing estate and commercial priorities—not presented as a generic software list.</p>");
       }
     }
+    techSource.querySelectorAll(".tech-logo-item").forEach((item) => {
+      const label = item.querySelector("span")?.textContent?.trim();
+      if (label) item.setAttribute("aria-label", label);
+    });
     layout.appendChild(techSource);
   }
 
@@ -163,32 +172,33 @@ function refineRoiModel(item) {
 
   card.innerHTML = `
     <div class="service-v3-roi-head">
-      <div><span class="eyebrow">Indicative engagement model</span><h3>Compare input with operational leverage</h3></div>
-      <span class="service-v3-model-status"><i></i>Interactive planning model</span>
+      <div><span class="eyebrow">Indicative engagement model</span><h3>Compare consultancy input with capacity released</h3></div>
+      <span class="service-v3-model-status"><i aria-hidden="true"></i>Planning estimate</span>
     </div>
-    <p class="service-v3-roi-intro">Use the controls to compare estimated consultancy time invested with the internal capacity that a ${escapeHtml(item.title.toLowerCase())} engagement could release. These are planning ranges, not a revenue forecast.</p>
-    <div class="service-v3-roi-kpis" aria-live="polite">
+    <p class="service-v3-roi-intro" id="v3-roi-intro">Adjust duration and scope to compare estimated consultancy time with internal capacity that a ${escapeHtml(item.title.toLowerCase())} engagement could release. The figures are illustrative planning ranges, not a guaranteed financial return.</p>
+    <div class="service-v3-roi-kpis" aria-live="polite" aria-atomic="true">
       <article><span>Estimated input</span><strong id="v3-roi-input">10</strong><small>consultancy hours / month</small></article>
       <article><span>Capacity released</span><strong id="v3-roi-release">22</strong><small>internal hours / month</small></article>
       <article><span>Indicative leverage</span><strong id="v3-roi-leverage">2.2×</strong><small>released for each hour invested</small></article>
     </div>
     <div class="service-v3-roi-controls">
       <div class="service-v3-roi-control">
-        <div><label for="v3-roi-duration">Project duration</label><output id="v3-roi-duration-output">12 weeks</output></div>
-        <input id="v3-roi-duration" type="range" min="4" max="24" step="2" value="12">
-        <small>Longer engagements allow more implementation, adoption and optimisation—not simply more analysis.</small>
+        <div><label for="v3-roi-duration">Project duration</label><output id="v3-roi-duration-output" for="v3-roi-duration">12 weeks</output></div>
+        <input id="v3-roi-duration" type="range" min="4" max="24" step="2" value="12" aria-describedby="v3-roi-duration-help v3-roi-intro">
+        <small id="v3-roi-duration-help">Longer engagements allow more implementation, adoption and optimisation—not simply more analysis.</small>
       </div>
       <div class="service-v3-roi-control">
-        <div><label for="v3-roi-scope">Delivery scope</label><output id="v3-roi-scope-output">Focused</output></div>
-        <input id="v3-roi-scope" type="range" min="1" max="3" step="1" value="2">
+        <div><label for="v3-roi-scope">Delivery scope</label><output id="v3-roi-scope-output" for="v3-roi-scope">Focused</output></div>
+        <input id="v3-roi-scope" type="range" min="1" max="3" step="1" value="2" aria-describedby="v3-roi-scope-help v3-roi-intro">
+        <small id="v3-roi-scope-help">Choose the closest delivery pattern below. The selected option also updates the range control.</small>
       </div>
     </div>
-    <div class="service-v3-scope-guide" aria-label="Delivery scope definitions">
-      <button type="button" data-scope="1"><strong>Targeted</strong><span>One defined problem, journey or workstream with a clear handover.</span></button>
-      <button type="button" data-scope="2" class="is-active"><strong>Focused</strong><span>Connected improvement around one commercial outcome and the teams that influence it.</span></button>
-      <button type="button" data-scope="3"><strong>Embedded</strong><span>Ongoing leadership and delivery across multiple dependent workstreams.</span></button>
+    <div class="service-v3-scope-guide" role="group" aria-label="Delivery scope definitions">
+      <button type="button" data-scope="1" aria-pressed="false"><strong>Targeted</strong><span>One defined problem, journey or workstream with a clear handover.</span></button>
+      <button type="button" data-scope="2" class="is-active" aria-pressed="true"><strong>Focused</strong><span>Connected improvement around one commercial outcome and the teams that influence it.</span></button>
+      <button type="button" data-scope="3" aria-pressed="false"><strong>Embedded</strong><span>Ongoing leadership and delivery across multiple dependent workstreams.</span></button>
     </div>
-    <p class="service-v3-roi-note">The model assumes suitable access, stakeholder participation and adoption. Actual outcomes depend on baseline maturity, implementation scope and the value of the work being released.</p>`;
+    <p class="service-v3-roi-note">Assumptions include suitable access, stakeholder participation and adoption. Outcomes depend on baseline maturity, implementation scope and the value of the work being released.</p>`;
 
   const duration = card.querySelector("#v3-roi-duration");
   const scope = card.querySelector("#v3-roi-scope");
@@ -203,20 +213,37 @@ function refineRoiModel(item) {
     const input = Math.round(inputBase[scopeValue - 1] * (0.88 + weeks / 100));
     const leverage = leverageBase[scopeValue - 1] * durationFactor;
     const released = Math.round(input * leverage);
+    const selectedLabel = labels[scopeValue - 1];
+
     card.querySelector("#v3-roi-duration-output").textContent = `${weeks} weeks`;
-    card.querySelector("#v3-roi-scope-output").textContent = labels[scopeValue - 1];
+    card.querySelector("#v3-roi-scope-output").textContent = selectedLabel;
     card.querySelector("#v3-roi-input").textContent = String(input);
     card.querySelector("#v3-roi-release").textContent = String(released);
     card.querySelector("#v3-roi-leverage").textContent = `${leverage.toFixed(1)}×`;
-    card.querySelectorAll("[data-scope]").forEach((button) => button.classList.toggle("is-active", Number(button.dataset.scope) === scopeValue));
+    duration.setAttribute("aria-valuetext", `${weeks} weeks`);
+    scope.setAttribute("aria-valuetext", selectedLabel);
+
+    card.querySelectorAll("[data-scope]").forEach((button) => {
+      const active = Number(button.dataset.scope) === scopeValue;
+      button.classList.toggle("is-active", active);
+      button.setAttribute("aria-pressed", String(active));
+    });
   };
 
   duration.addEventListener("input", update);
   scope.addEventListener("input", update);
+  scope.addEventListener("keydown", (event) => {
+    if (event.key === "Home") scope.value = "1";
+    else if (event.key === "End") scope.value = "3";
+    else return;
+    event.preventDefault();
+    update();
+  });
   card.querySelectorAll("[data-scope]").forEach((button) => {
     button.addEventListener("click", () => {
       scope.value = button.dataset.scope;
       update();
+      scope.focus({ preventScroll: true });
     });
   });
   update();
@@ -231,9 +258,9 @@ function refineCoverage() {
   section.classList.add("service-v3-coverage");
 
   const descriptions = [
-    "Delivery model, workshop options and UK-wide support.",
-    "Regional routes and city-specific service pages.",
-    "A direct route into the existing enquiry workflow.",
+    "Delivery model and UK-wide support.",
+    "Regional and city service routes.",
+    "Start a scoped conversation.",
   ];
   tabs.querySelectorAll("button").forEach((button, index) => {
     const label = button.querySelector(".service-coverage-tab-label");
