@@ -1,0 +1,48 @@
+/* Xtradite Digital square logo system */
+.logo {
+  min-width: 48px;
+  min-height: 48px;
+  line-height: 0;
+}
+
+.logo-img {
+  display: block;
+  width: 48px;
+  height: 48px;
+  max-width: none;
+  object-fit: contain;
+  aspect-ratio: 1 / 1;
+}
+
+.site-header .logo-img {
+  width: 48px;
+  height: 48px;
+}
+
+.footer-brand .logo-img {
+  width: 64px;
+  height: 64px;
+}
+
+.site-footer .logo {
+  min-width: 64px;
+  min-height: 64px;
+}
+
+@media (max-width: 640px) {
+  .logo,
+  .site-header .logo-img {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    min-height: 42px;
+  }
+
+  .footer-brand .logo-img,
+  .site-footer .logo {
+    width: 54px;
+    height: 54px;
+    min-width: 54px;
+    min-height: 54px;
+  }
+}
