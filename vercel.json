@@ -5,6 +5,7 @@
   "cleanUrls": true,
   "rewrites": [
     { "source": "/sitemap.xml", "destination": "/api/sitemap" },
+    { "source": "/services/shopify-migration", "destination": "/service-detail?slug=shopify-migration" },
     { "source": "/locations", "destination": "/api/location-with-jam?path=locations" },
     { "source": "/uk", "destination": "/api/location-with-jam?path=" },
     { "source": "/uk/:path*", "destination": "/api/location-with-jam?path=:path*" }
