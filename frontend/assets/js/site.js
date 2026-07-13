@@ -86,6 +86,15 @@
     document.head.appendChild(stylesheet);
   }
 
+  // ---- Shared compact tabs stylesheet --------------------------------------
+  if (!document.querySelector('link[data-xtradite-tabs-css]')) {
+    const stylesheet = document.createElement("link");
+    stylesheet.rel = "stylesheet";
+    stylesheet.dataset.xtraditeTabsCss = "true";
+    stylesheet.href = new URL("../css/tabs.css?v=20260713-1", scriptBase).href;
+    document.head.appendChild(stylesheet);
+  }
+
   // ---- Site-wide enquiry form distribution ---------------------------------
   if (!document.querySelector('link[data-xtradite-enquiry-css]')) {
     const stylesheet = document.createElement("link");

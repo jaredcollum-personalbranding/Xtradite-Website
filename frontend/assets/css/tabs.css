@@ -1,0 +1,160 @@
+/* ========================================================================== 
+   Shared compact tab system
+   Matches the restrained pill treatment used on location router pages while
+   preserving each component's existing horizontal, grid or vertical layout.
+   ========================================================================== */
+
+[role="tablist"] {
+  --site-tab-gap: 8px;
+  gap: var(--site-tab-gap) !important;
+  margin-bottom: 20px !important;
+  padding: 0 0 12px !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--color-border) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+[role="tablist"] > [role="tab"] {
+  appearance: none;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px !important;
+  min-width: 0;
+  min-height: 44px !important;
+  padding: 10px 16px !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: var(--radius-full) !important;
+  background: var(--color-bg-secondary) !important;
+  color: var(--color-text-secondary) !important;
+  box-shadow: none !important;
+  font-family: var(--font-body) !important;
+  font-size: .86rem !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+  text-align: left;
+  white-space: normal;
+  cursor: pointer;
+  transition:
+    transform var(--transition-fast),
+    border-color var(--transition-fast),
+    background var(--transition-fast),
+    color var(--transition-fast),
+    box-shadow var(--transition-fast) !important;
+}
+
+[role="tablist"] > [role="tab"]:hover {
+  transform: translateY(-1px) !important;
+  border-color: var(--color-border-hover) !important;
+  background: var(--color-bg) !important;
+  color: var(--color-text-primary) !important;
+}
+
+[role="tablist"] > [role="tab"][aria-selected="true"],
+[role="tablist"] > [role="tab"].is-active {
+  border-color: transparent !important;
+  background: var(--gradient-sunset) !important;
+  color: #fff !important;
+  box-shadow: none !important;
+}
+
+[role="tablist"] > [role="tab"][aria-selected="true"]:hover,
+[role="tablist"] > [role="tab"].is-active:hover {
+  color: #fff !important;
+  box-shadow: var(--shadow-glow) !important;
+}
+
+[role="tablist"] > [role="tab"]:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--color-primary) 28%, transparent) !important;
+  outline-offset: 2px !important;
+}
+
+/* Keep icons and numbered markers compact inside the shared pill size. */
+[role="tab"] .service-content-tab-icon,
+[role="tab"] .service-coverage-tab-number,
+[role="tab"] .service-v3-tab-icon,
+[role="tab"] > .cs-timeline-tab-number,
+.cs-timeline-tab > span:first-child {
+  display: grid !important;
+  place-items: center;
+  flex: 0 0 28px !important;
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: 50% !important;
+  font-size: .67rem !important;
+  line-height: 1 !important;
+}
+
+[role="tablist"] > [role="tab"][aria-selected="true"] .service-content-tab-icon,
+[role="tablist"] > [role="tab"][aria-selected="true"] .service-coverage-tab-number,
+[role="tablist"] > [role="tab"][aria-selected="true"] .service-v3-tab-icon,
+[role="tablist"] > [role="tab"].is-active > span:first-child {
+  background: rgba(255, 255, 255, .16) !important;
+  color: #fff !important;
+}
+
+[role="tab"] .service-content-tab-icon svg,
+[role="tab"] .service-v3-tab-icon svg {
+  width: 15px !important;
+  height: 15px !important;
+}
+
+/* Remove legacy active underlines from links/buttons used as tabs. */
+[role="tablist"] > [role="tab"]::after {
+  display: none !important;
+}
+
+/* Existing grid and vertical navigators retain their layout but use tighter rows. */
+.service-content-tablist,
+.service-coverage-tabs,
+.cs-timeline-track,
+.service-v3-tablist {
+  align-items: stretch;
+}
+
+.service-content-tablist > [role="tab"],
+.service-coverage-tabs > [role="tab"],
+.cs-timeline-track > [role="tab"],
+.service-v3-tablist > [role="tab"] {
+  width: 100%;
+}
+
+/* The local-region secondary selector uses the same control sizing. */
+.service-location-tabs[role="tablist"] {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 767px) {
+  [role="tablist"] {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    margin-inline: -18px !important;
+    padding: 0 18px 12px !important;
+    scrollbar-width: none;
+  }
+
+  [role="tablist"]::-webkit-scrollbar {
+    display: none;
+  }
+
+  [role="tablist"] > [role="tab"] {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    max-width: min(82vw, 320px);
+    min-height: 42px !important;
+    padding: 9px 14px !important;
+    scroll-snap-align: start;
+    font-size: .82rem !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [role="tablist"] > [role="tab"] {
+    transition: none !important;
+  }
+}
