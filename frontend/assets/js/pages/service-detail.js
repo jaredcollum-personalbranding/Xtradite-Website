@@ -15,18 +15,26 @@ import { SERVICE_TO_CASE_STUDY, SERVICE_TO_RELATED_POSTS } from "./shared-data.j
 import { renderServiceLocationCoverage } from "./service-locations.js";
 import { enhanceServiceExperience } from "./service-experience.js";
 import { organiseServiceContentTabs, renderDetailedDeliveryTimeline } from "./service-content-architecture.js";
+import { watchDeliveryTimeline } from "./service-delivery-timeline.js";
 
 const root = document.getElementById("service-detail-root");
 const notFound = document.getElementById("not-found");
 const slug = getSlugParam();
 
 function ensureContentArchitectureStyles() {
-  if (document.querySelector('link[data-service-content-architecture-css]')) return;
-  const link = document.createElement("link");
-  link.rel = "stylesheet";
-  link.dataset.serviceContentArchitectureCss = "true";
-  link.href = "/assets/css/service-content-architecture.css";
-  document.head.appendChild(link);
+  const styles = [
+    ["serviceContentArchitectureCss", "/assets/css/service-content-architecture.css"],
+    ["serviceDeliveryTimelineCss", "/assets/css/service-delivery-timeline-v2.css"],
+  ];
+
+  styles.forEach(([datasetKey, href]) => {
+    if (document.querySelector(`link[data-${datasetKey.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)}]`)) return;
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.dataset[datasetKey] = "true";
+    link.href = href;
+    document.head.appendChild(link);
+  });
 }
 
 function setMetaByName(name, content) {
@@ -149,6 +157,7 @@ async function load() {
 
   organiseServiceContentTabs(item);
   renderDetailedDeliveryTimeline(item);
+  watchDeliveryTimeline();
   renderServiceLocationCoverage(item);
   enhanceServiceExperience(item);
 
