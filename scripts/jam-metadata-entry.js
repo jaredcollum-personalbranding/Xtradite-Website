@@ -7,6 +7,7 @@ function pageType() {
   if (/^\/uk\/.+\/services\//.test(path)) return "local-service";
   if (/^\/uk\//.test(path) || path === "/locations") return "location-router";
   if (/^\/services\//.test(path)) return "service";
+  if (path === "/services") return "service-index";
   if (path === "/service-detail") return "service-detail";
   if (path === "/case-study-detail") return "case-study";
   if (path === "/case-studies") return "case-study-index";
@@ -26,7 +27,8 @@ function contentSlug() {
   if (querySlug) return safeText(querySlug, 100);
 
   const parts = window.location.pathname.split("/").filter(Boolean);
-  if (parts.includes("services")) return safeText(parts.at(-1), 100);
+  const serviceIndex = parts.lastIndexOf("services");
+  if (serviceIndex >= 0 && parts[serviceIndex + 1]) return safeText(parts[serviceIndex + 1], 100);
   return null;
 }
 
