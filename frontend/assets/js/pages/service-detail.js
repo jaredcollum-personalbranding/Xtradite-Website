@@ -14,6 +14,7 @@ import { renderServiceLocationCoverage } from "./service-locations.js";
 import { enhanceServiceExperience } from "./service-experience.js";
 import { organiseServiceContentTabs, renderDetailedDeliveryTimeline } from "./service-content-architecture.js";
 import { watchDeliveryTimeline } from "./service-delivery-timeline.js";
+import { refineServiceTemplate } from "./service-template-v3.js";
 
 const root = document.getElementById("service-detail-root");
 const notFound = document.getElementById("not-found");
@@ -158,6 +159,7 @@ async function load() {
   watchDeliveryTimeline();
   renderServiceLocationCoverage(item);
   enhanceServiceExperience(item);
+  refineServiceTemplate(item);
 
   const relatedCaseStudy = item.relatedCaseStudies?.[0];
   const relatedSlug = relatedCaseStudy?.slug;
