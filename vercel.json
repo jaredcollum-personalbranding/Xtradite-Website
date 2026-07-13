@@ -1,12 +1,13 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "npm run build",
   "outputDirectory": "frontend",
   "cleanUrls": true,
   "rewrites": [
     { "source": "/sitemap.xml", "destination": "/api/sitemap" },
-    { "source": "/locations", "destination": "/api/location?path=locations" },
-    { "source": "/uk", "destination": "/api/location?path=" },
-    { "source": "/uk/:path*", "destination": "/api/location?path=:path*" }
+    { "source": "/locations", "destination": "/api/location-with-jam?path=locations" },
+    { "source": "/uk", "destination": "/api/location-with-jam?path=" },
+    { "source": "/uk/:path*", "destination": "/api/location-with-jam?path=:path*" }
   ],
   "headers": [
     {
