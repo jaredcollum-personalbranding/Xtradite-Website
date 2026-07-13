@@ -11,6 +11,71 @@
     ? new URL(".", currentScript.src)
     : new URL("/assets/js/", window.location.origin);
 
+  const BRAND_LOGOS = {
+    dark: "https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/XD-logo-dark.png",
+    light: "https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/XD-logo-light.png",
+    transparent: "https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/XD-logo-nbg.png",
+  };
+
+  if (!document.querySelector('link[data-xtradite-brand-logo-css]')) {
+    const stylesheet = document.createElement("link");
+    stylesheet.rel = "stylesheet";
+    stylesheet.dataset.xtraditeBrandLogoCss = "true";
+    stylesheet.href = new URL("../css/brand-logo.css", scriptBase).href;
+    document.head.appendChild(stylesheet);
+  }
+
+  function applyBrandLogos(root = document) {
+    root.querySelectorAll("img.logo-img").forEach((image) => {
+      const inFooter = Boolean(image.closest(".site-footer"));
+      const inHeader = Boolean(image.closest(".site-header"));
+      image.src = inFooter
+        ? BRAND_LOGOS.light
+        : inHeader
+          ? BRAND_LOGOS.dark
+          : BRAND_LOGOS.transparent;
+      image.alt = "Xtradite Digital";
+      image.width = inFooter ? 64 : 48;
+      image.height = inFooter ? 64 : 48;
+      image.decoding = "async";
+    });
+
+    root.querySelectorAll('script[type="application/ld+json"]').forEach((script) => {
+      try {
+        const data = JSON.parse(script.textContent || "{}");
+        const records = Array.isArray(data) ? data : [data];
+        let changed = false;
+        records.forEach((record) => {
+          if (record && ["Organization", "LocalBusiness", "ProfessionalService"].includes(record["@type"])) {
+            record.logo = BRAND_LOGOS.transparent;
+            changed = true;
+          }
+          if (record?.provider?.["@type"] === "Organization") {
+            record.provider.logo = BRAND_LOGOS.transparent;
+            changed = true;
+          }
+        });
+        if (changed) script.textContent = JSON.stringify(Array.isArray(data) ? records : records[0]);
+      } catch (_) {
+        // Ignore malformed or non-object JSON-LD blocks.
+      }
+    });
+  }
+
+  applyBrandLogos();
+
+  const logoObserver = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      mutation.addedNodes.forEach((node) => {
+        if (!(node instanceof Element)) return;
+        if (node.matches("img.logo-img") || node.querySelector("img.logo-img")) {
+          applyBrandLogos(node.matches("img.logo-img") ? node.parentElement : node);
+        }
+      });
+    });
+  });
+  logoObserver.observe(document.documentElement, { childList: true, subtree: true });
+
   // ---- Shared mobile responsive stylesheet ---------------------------------
   if (!document.querySelector('link[data-xtradite-mobile-css]')) {
     const stylesheet = document.createElement("link");
