@@ -14,10 +14,20 @@ import {
 import { SERVICE_TO_CASE_STUDY, SERVICE_TO_RELATED_POSTS } from "./shared-data.js";
 import { renderServiceLocationCoverage } from "./service-locations.js";
 import { enhanceServiceExperience } from "./service-experience.js";
+import { organiseServiceContentTabs, renderDetailedDeliveryTimeline } from "./service-content-architecture.js";
 
 const root = document.getElementById("service-detail-root");
 const notFound = document.getElementById("not-found");
 const slug = getSlugParam();
+
+function ensureContentArchitectureStyles() {
+  if (document.querySelector('link[data-service-content-architecture-css]')) return;
+  const link = document.createElement("link");
+  link.rel = "stylesheet";
+  link.dataset.serviceContentArchitectureCss = "true";
+  link.href = "/assets/css/service-content-architecture.css";
+  document.head.appendChild(link);
+}
 
 function setMetaByName(name, content) {
   if (!content) return;
@@ -96,6 +106,7 @@ async function load() {
   if (!item) return showNotFound();
 
   applySeo(item);
+  ensureContentArchitectureStyles();
 
   document.getElementById("breadcrumb-current").textContent = item.title;
   document.getElementById("service-icon").setAttribute("data-lucide", item.icon || "circle");
@@ -136,6 +147,8 @@ async function load() {
     document.getElementById("faq-section").hidden = false;
   }
 
+  organiseServiceContentTabs(item);
+  renderDetailedDeliveryTimeline(item);
   renderServiceLocationCoverage(item);
   enhanceServiceExperience(item);
 
@@ -145,12 +158,7 @@ async function load() {
       const cs = await getItemBySlug("case_studies", "slug", relatedSlug);
       const relatedWrap = document.getElementById("related-case-study");
       if (cs && relatedWrap) {
-        relatedWrap.innerHTML = `
-          <span class="eyebrow">Related Case Study</span>
-          <h3>${escapeHtml(cs.client)}</h3>
-          <p class="card-desc">${escapeHtml(cs.challenge || "")}</p>
-          <span class="metric">${escapeHtml(cs.metric || "")}</span>
-          <a class="card-link" href="/case-study-detail?slug=${encodeURIComponent(cs.slug)}">View Case Study <i data-lucide="arrow-right"></i></a>`;
+        relatedWrap.innerHTML = `<span class="eyebrow">Related Case Study</span><h3>${escapeHtml(cs.client)}</h3><p class="card-desc">${escapeHtml(cs.challenge || "")}</p><span class="metric">${escapeHtml(cs.metric || "")}</span><a class="card-link" href="/case-study-detail?slug=${encodeURIComponent(cs.slug)}">View Case Study <i data-lucide="arrow-right"></i></a>`;
         relatedWrap.hidden = false;
       }
     } catch (e) {
