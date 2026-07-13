@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Xtradite Digital</title>
+  <desc id="desc">Practical digital consultancy for measurable growth.</desc>
+  <rect width="1200" height="630" fill="#0D0D0D"/>
+  <circle cx="1090" cy="-20" r="350" fill="#FFD84C" opacity="0.12"/>
+  <circle cx="105" cy="650" r="310" fill="#FFD84C" opacity="0.08"/>
+  <rect x="72" y="72" width="92" height="92" rx="18" fill="#FFD84C"/>
+  <path d="M98 99h18l14 20 14-20h18l-23 31 25 35h-18l-16-23-16 23H96l25-35z" fill="#0D0D0D"/>
+  <text x="72" y="285" fill="#FFFFFF" font-family="Arial, Helvetica, sans-serif" font-size="78" font-weight="700" letter-spacing="-3">Xtradite Digital</text>
+  <text x="72" y="365" fill="#FFD84C" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="700">Practical consultancy. Measurable growth.</text>
+  <text x="72" y="455" fill="#D7D7D7" font-family="Arial, Helvetica, sans-serif" font-size="27">Digital strategy · Ecommerce · CRM · Analytics · AI automation</text>
+  <text x="72" y="545" fill="#FFFFFF" opacity="0.72" font-family="Arial, Helvetica, sans-serif" font-size="24">xtradite-digital.co.uk</text>
+</svg>
