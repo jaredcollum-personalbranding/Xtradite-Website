@@ -35,6 +35,7 @@
           ? BRAND_LOGOS.dark
           : BRAND_LOGOS.transparent;
       image.alt = "Xtradite Digital";
+      // Intrinsic dimensions match the largest desktop presentation. CSS handles responsive scaling.
       image.width = inFooter ? 112 : 80;
       image.height = inFooter ? 112 : 80;
       image.decoding = "async";
