@@ -3,7 +3,13 @@
   "version": "1.0.0",
   "description": "Xtradite Digital Website",
   "private": true,
+  "scripts": {
+    "build:jam": "esbuild scripts/jam-metadata-entry.js --bundle --format=esm --platform=browser --target=es2020 --outfile=frontend/assets/js/jam-metadata.js",
+    "build": "npm run build:jam && node scripts/inject-jam.js"
+  },
   "dependencies": {
-    "@vercel/speed-insights": "^1.0.12"
+    "@jam.dev/sdk": "^1.0.1",
+    "@vercel/speed-insights": "^1.0.12",
+    "esbuild": "^0.25.0"
   }
 }
