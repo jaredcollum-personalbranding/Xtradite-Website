@@ -138,15 +138,22 @@ export function renderEvidenceExperience(item, metrics = []) {
   const section = document.getElementById("cs-evidence-section");
   if (!wrap || !metrics.length) return;
 
+  const cadence = extractCadence(item);
+  let cadenceRendered = false;
   const cards = metrics.map((metric, index) => {
+    const metricText = `${metric.label || ""} ${metric.value || ""}`;
+    if (/\b(?:tests?|experiments?|experimentation)\b[\s\S]*\bmonth\b/i.test(metricText) && cadence) {
+      cadenceRendered = true;
+      return cadenceCardHtml(cadence.testsPerMonth, cadence.months);
+    }
     const pair = parseBeforeAfter(metric.value);
     if (pair) return slopeChartHtml(metric, pair);
     const change = parsePercentageChange(metric.value);
     if (change) return upliftChartHtml(metric, change, index);
     return genericMetricHtml(metric, index);
   });
-  const cadence = extractCadence(item);
-  if (cadence) cards.push(cadenceCardHtml(cadence.testsPerMonth, cadence.months));
+
+  if (cadence && !cadenceRendered) cards.push(cadenceCardHtml(cadence.testsPerMonth, cadence.months));
   wrap.innerHTML = `<div class="cs-evidence-dashboard${cards.length >= 4 ? " has-four" : ""}">${cards.join("")}</div>`;
   observeEvidence(section);
 }
