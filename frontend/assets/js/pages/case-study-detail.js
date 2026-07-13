@@ -37,7 +37,7 @@ function mediaFor(item, role) {
 function applySeo(item) {
   const title = item.seoTitle || `${item.client} — Xtradite Digital Case Study`;
   const description = item.seoDescription || item.cardSummary || item.headline || item.challenge || `How Xtradite Digital helped ${item.client}.`;
-  const url = `${window.location.origin}/case-study-detail?slug=${encodeURIComponent(item.slug)}`;
+  const url = `${window.location.origin}/case-studies/${encodeURIComponent(item.slug)}`;
   const hero = mediaFor(item, "og") || mediaFor(item, "hero");
   const heroUrl = hero?.publicUrl || hero?.url || hero?.src;
 
@@ -53,6 +53,7 @@ function applySeo(item) {
   setMeta('meta[name="twitter:description"]', "content", description);
   setCanonical(url);
 
+  if (document.getElementById("seo-jsonld")) return;
   const script = document.createElement("script");
   script.type = "application/ld+json";
   script.textContent = JSON.stringify({
@@ -118,7 +119,7 @@ function renderApproach(steps) {
 }
 
 function relatedCaseHtml(item) {
-  return `<a class="cs-related-case" href="/case-study-detail?slug=${encodeURIComponent(item.slug)}">
+  return `<a class="cs-related-case" href="/case-studies/${encodeURIComponent(item.slug)}">
     <span class="eyebrow">${escapeHtml(item.industry || "Case study")}</span>
     <h3>${escapeHtml(item.headline || item.client)}</h3>
     <div><span>${escapeHtml(item.client)}</span><strong>${escapeHtml(item.metric || "Read the story")}</strong></div>

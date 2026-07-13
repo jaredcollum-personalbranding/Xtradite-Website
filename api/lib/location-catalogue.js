@@ -88,4 +88,3 @@ async function loadLocationCatalogue() {
 }
 
 module.exports = { fetchAll, loadLocationCatalogue };
-

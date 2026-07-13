@@ -2,13 +2,56 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "outputDirectory": "frontend",
   "cleanUrls": true,
+  "functions": {
+    "api/content.js": {
+      "includeFiles": "frontend/**/*.html"
+    }
+  },
+  "redirects": [
+    {
+      "source": "/service-detail",
+      "has": [{ "type": "query", "key": "slug", "value": "(?<slug>[a-z0-9-]+)" }],
+      "destination": "/services/:slug",
+      "permanent": true
+    },
+    {
+      "source": "/industry-detail",
+      "has": [{ "type": "query", "key": "slug", "value": "(?<slug>[a-z0-9-]+)" }],
+      "destination": "/industries/:slug",
+      "permanent": true
+    },
+    {
+      "source": "/case-study-detail",
+      "has": [{ "type": "query", "key": "slug", "value": "(?<slug>[a-z0-9-]+)" }],
+      "destination": "/case-studies/:slug",
+      "permanent": true
+    },
+    {
+      "source": "/insights-post",
+      "has": [{ "type": "query", "key": "slug", "value": "(?<slug>[a-z0-9-]+)" }],
+      "destination": "/insights/:slug",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     { "source": "/sitemap.xml", "destination": "/api/sitemap" },
+    { "source": "/services/:slug", "destination": "/api/content?type=service&slug=:slug" },
+    { "source": "/industries/:slug", "destination": "/api/content?type=industry&slug=:slug" },
+    { "source": "/case-studies/:slug", "destination": "/api/content?type=case-study&slug=:slug" },
+    { "source": "/insights/:slug", "destination": "/api/content?type=insight&slug=:slug" },
     { "source": "/locations", "destination": "/api/location?path=locations" },
     { "source": "/uk", "destination": "/api/location?path=" },
     { "source": "/uk/:path*", "destination": "/api/location?path=:path*" }
   ],
   "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" }
+      ]
+    },
     {
       "source": "/ads.txt",
       "headers": [

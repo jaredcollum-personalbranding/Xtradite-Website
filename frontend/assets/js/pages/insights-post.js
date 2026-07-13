@@ -44,6 +44,7 @@ function setCanonical(href) {
 }
 
 function setJsonLd(post, title, description) {
+  if (document.getElementById("seo-jsonld")) return;
   const script = document.createElement("script");
   script.type = "application/ld+json";
   script.textContent = JSON.stringify({
@@ -64,7 +65,7 @@ function setJsonLd(post, title, description) {
 function applySeo(post) {
   const title = `${post.seoTitle || post.title} — Xtradite Digital Insights`;
   const description = post.seoDescription || post.excerpt || "";
-  const url = `${window.location.origin}${window.location.pathname}?slug=${encodeURIComponent(post.slug)}`;
+  const url = `${window.location.origin}/insights/${encodeURIComponent(post.slug)}`;
 
   document.title = title;
   setMetaByName("description", description);

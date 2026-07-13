@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "Xtradite Digital Website",
   "private": true,
+  "scripts": {
+    "seo:static": "node scripts/upgrade-static-seo.js",
+    "seo:verify": "node scripts/verify-seo.js"
+  },
   "dependencies": {
     "@vercel/speed-insights": "^1.0.12"
   }

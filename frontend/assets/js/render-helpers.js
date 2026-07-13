@@ -21,7 +21,7 @@ export function serviceCardHtml(item) {
 
 export function industryCardHtml(item) {
   return `
-    <a class="card" href="/industry-detail?slug=${encodeURIComponent(item.slug)}">
+    <a class="card" href="/industries/${encodeURIComponent(item.slug)}">
       <h3>${escapeHtml(item.title)}</h3>
       <p class="card-desc">${escapeHtml(item.summary)}</p>
       <span class="card-link">Explore <i data-lucide="arrow-right"></i></span>
@@ -38,7 +38,7 @@ export function caseStudyCardHtml(item) {
     ? `<img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(image.altText || image.alt || `${item.client} case study`)}" loading="lazy" decoding="async">`
     : `<span>Case study</span>`;
   return `
-    <a class="card case-card" href="/case-study-detail?slug=${encodeURIComponent(item.slug)}">
+    <a class="card case-card" href="/case-studies/${encodeURIComponent(item.slug)}">
       <div class="card-image${imageUrl ? " has-media" : ""}">${imageHtml}</div>
       <span class="tag">${escapeHtml(item.industry || "")}</span>
       <h3>${escapeHtml(item.client)}</h3>
@@ -84,7 +84,7 @@ export function blogCoverHtml(post) {
 export function blogCardHtml(post) {
   const date = post.firstPublishedDate ? new Date(post.firstPublishedDate).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "";
   return `
-    <a class="card blog-card" href="/insights-post?slug=${encodeURIComponent(post.slug)}" data-tags="${escapeHtml((post.tags || []).join("|"))}">
+    <a class="card blog-card" href="/insights/${encodeURIComponent(post.slug)}" data-tags="${escapeHtml((post.tags || []).join("|"))}">
       ${blogCoverHtml(post)}
       <span class="card-category">${escapeHtml(date)}${post.minutesToRead ? ` &middot; ${post.minutesToRead} min read` : ""}</span>
       <h3>${escapeHtml(post.title)}</h3>
@@ -97,7 +97,7 @@ export function blogCardHtml(post) {
 export function relatedPostCardHtml(post) {
   const date = post.firstPublishedDate ? new Date(post.firstPublishedDate).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "";
   return `
-    <a class="card related-post-card" href="/insights-post?slug=${encodeURIComponent(post.slug)}">
+    <a class="card related-post-card" href="/insights/${encodeURIComponent(post.slug)}">
       <div class="blog-card-cover blog-card-cover-sm${post.coverImageUrl ? "" : " blog-card-cover-placeholder"}">
         ${post.coverImageUrl ? `<img src="${escapeHtml(post.coverImageUrl)}" alt="" loading="lazy" decoding="async">` : `<i data-lucide="pen-tool"></i>`}
       </div>
@@ -159,7 +159,7 @@ export function getSlugParam() {
   // /services/<slug> is a server-side rewrite (see vercel.json) — the browser's URL bar
   // and window.location keep showing the pretty path with no query string, so the slug
   // has to be parsed out of the pathname here instead.
-  const pathMatch = window.location.pathname.match(/^\/services\/([a-z0-9-]+)\/?$/);
+  const pathMatch = window.location.pathname.match(/^\/(?:services|industries|case-studies|insights)\/([a-z0-9-]+)\/?$/);
   return pathMatch ? pathMatch[1] : null;
 }
 

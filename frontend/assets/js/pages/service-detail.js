@@ -68,6 +68,7 @@ function setCanonical(href) {
 }
 
 function setJsonLd(item, title, description, url) {
+  if (document.getElementById("seo-jsonld")) return;
   const script = document.createElement("script");
   script.type = "application/ld+json";
   script.textContent = JSON.stringify({
@@ -166,7 +167,7 @@ async function load() {
       const cs = relatedCaseStudy;
       const relatedWrap = document.getElementById("related-case-study");
       if (cs && relatedWrap) {
-        relatedWrap.innerHTML = `<span class="eyebrow">Related Case Study</span><h3>${escapeHtml(cs.client)}</h3><p class="card-desc">${escapeHtml(cs.challenge || "")}</p><span class="metric">${escapeHtml(cs.metric || "")}</span><a class="card-link" href="/case-study-detail?slug=${encodeURIComponent(cs.slug)}">View Case Study <i data-lucide="arrow-right"></i></a>`;
+        relatedWrap.innerHTML = `<span class="eyebrow">Related Case Study</span><h3>${escapeHtml(cs.client)}</h3><p class="card-desc">${escapeHtml(cs.challenge || "")}</p><span class="metric">${escapeHtml(cs.metric || "")}</span><a class="card-link" href="/case-studies/${encodeURIComponent(cs.slug)}">View Case Study <i data-lucide="arrow-right"></i></a>`;
         relatedWrap.hidden = false;
       }
     } catch (e) {

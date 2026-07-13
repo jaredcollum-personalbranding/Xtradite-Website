@@ -96,9 +96,9 @@ module.exports = async (req, res) => {
     ...locationEntries(catalogue.locations, catalogue.servicesByLocation)
       .map((item) => urlEntry(item.path, item.lastmod, item.priority)),
     ...services.map((item) => urlEntry(`/services/${item.slug}`, toDate(item.updated_at), "0.8")),
-    ...industries.map((item) => urlEntry(`/industry-detail?slug=${item.slug}`, toDate(item.updated_at), "0.6")),
-    ...caseStudies.map((item) => urlEntry(`/case-study-detail?slug=${item.slug}`, toDate(item.updated_at), "0.6")),
-    ...posts.map((item) => urlEntry(`/insights-post?slug=${item.slug}`, toDate(item.updated_at || item.first_published_at), "0.6")),
+    ...industries.map((item) => urlEntry(`/industries/${item.slug}`, toDate(item.updated_at), "0.6")),
+    ...caseStudies.map((item) => urlEntry(`/case-studies/${item.slug}`, toDate(item.updated_at), "0.6")),
+    ...posts.map((item) => urlEntry(`/insights/${item.slug}`, toDate(item.updated_at || item.first_published_at), "0.6")),
   ];
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${entries.join("\n")}\n</urlset>\n`;
@@ -106,4 +106,3 @@ module.exports = async (req, res) => {
   res.setHeader("Cache-Control", "public, max-age=0, s-maxage=3600, stale-while-revalidate=86400");
   res.status(200).send(xml);
 };
-

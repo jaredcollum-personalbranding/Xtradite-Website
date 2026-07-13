@@ -4,6 +4,15 @@
 
 Xtradite Digital is a UK-based consultancy that delivers practical, hands-on digital transformation work across five phases: Discover, Assess, Design, Deliver, Optimise. It works with retail, ecommerce, manufacturing, consumer goods, professional services and startup businesses.
 
+## Canonical facts
+
+- Organisation: Xtradite Digital
+- Primary market: United Kingdom
+- Delivery model: Remote delivery throughout the UK, with on-site sessions by arrangement
+- Core expertise: digital strategy, AI and automation, ecommerce growth, operational excellence, fractional leadership and project delivery
+- Location pages describe areas served; they do not claim a permanent office in every listed city
+- Primary website: https://www.xtradite-digital.co.uk/
+
 ## Services
 
 - [AI & Automation](https://www.xtradite-digital.co.uk/services/ai-automation): Practical AI and workflow automation that removes manual bottlenecks from operations.
@@ -20,6 +29,7 @@ Xtradite Digital is a UK-based consultancy that delivers practical, hands-on dig
 - [Case Studies](https://www.xtradite-digital.co.uk/case-studies): Documented client results.
 - [Insights](https://www.xtradite-digital.co.uk/insights): Articles on operations, growth and leadership.
 - [Contact](https://www.xtradite-digital.co.uk/contact): Book a consultation.
+- [UK Locations](https://www.xtradite-digital.co.uk/locations): Browse published service areas and locally relevant service routes.
 
 ## Optional
 

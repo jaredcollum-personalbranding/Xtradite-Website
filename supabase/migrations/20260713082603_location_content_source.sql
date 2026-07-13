@@ -379,4 +379,3 @@ from public.locations l
 cross join public.services s
 where l.status = 'published' and s.status = 'published'
 on conflict (location_id, service_id) do update set sort_order = excluded.sort_order;
-
