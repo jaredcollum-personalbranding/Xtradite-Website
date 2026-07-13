@@ -21,7 +21,7 @@
     const stylesheet = document.createElement("link");
     stylesheet.rel = "stylesheet";
     stylesheet.dataset.xtraditeBrandLogoCss = "true";
-    stylesheet.href = new URL("../css/brand-logo.css?v=20260713-2", scriptBase).href;
+    stylesheet.href = new URL("../css/brand-logo.css?v=20260713-4", scriptBase).href;
     document.head.appendChild(stylesheet);
   }
 
@@ -36,8 +36,8 @@
           : BRAND_LOGOS.transparent;
       image.alt = "Xtradite Digital";
       // Intrinsic dimensions match the largest desktop presentation. CSS handles responsive scaling.
-      image.width = inFooter ? 112 : 80;
-      image.height = inFooter ? 112 : 80;
+      image.width = inFooter ? 132 : 120;
+      image.height = inFooter ? 132 : 120;
       image.decoding = "async";
     });
 
