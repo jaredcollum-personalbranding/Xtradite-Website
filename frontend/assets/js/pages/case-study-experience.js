@@ -1,7 +1,7 @@
 import { escapeHtml } from "../render-helpers.js";
 
 const STYLE_ID = "caseStudyExperienceCss";
-const STYLE_HREF = "/assets/css/case-study-experience.css?v=20260713";
+const STYLE_HREF = "/assets/css/case-study-experience.css?v=20260714";
 
 function ensureStyles() {
   if (document.querySelector(`link[data-${STYLE_ID.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)}]`)) return;
@@ -182,7 +182,7 @@ export function renderApproachExperience(steps = []) {
   const section = document.getElementById("cs-approach-section");
   if (!panelsWrap || !navWrap || !section || !steps.length) return;
 
-  panelsWrap.innerHTML = `<div class="cs-timeline-panels">${steps.map(stagePanelHtml).join("")}</div>`;
+  panelsWrap.innerHTML = `<div class="cs-timeline-panels">${steps.map((step, index) => stagePanelHtml(step, index, steps.length)).join("")}</div>`;
   navWrap.innerHTML = `
     <div class="cs-timeline-track" style="--timeline-columns:${Math.min(steps.length, 4)}" role="tablist" aria-label="Delivery approach">
       ${steps.map((step, index) => `<button type="button" class="cs-timeline-tab${index === 0 ? " is-active" : ""}" id="cs-stage-tab-${index}" role="tab" aria-selected="${index === 0}" aria-controls="cs-stage-panel-${index}" tabindex="${index === 0 ? 0 : -1}" data-stage="${index}">
@@ -197,17 +197,28 @@ export function renderApproachExperience(steps = []) {
   const progress = navWrap.querySelector(".cs-timeline-progress i");
   let activeIndex = 0;
   let timer = null;
-  let paused = false;
+  let temporarilyPaused = false;
+  let userInteracted = false;
 
-  const stop = () => { if (timer) window.clearInterval(timer); timer = null; };
+  const stop = () => {
+    if (timer) window.clearInterval(timer);
+    timer = null;
+  };
+
   const start = () => {
     stop();
-    if (paused || steps.length < 2 || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (temporarilyPaused || userInteracted || steps.length < 2 || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     timer = window.setInterval(() => activate(activeIndex + 1), 5600);
   };
-  const restart = () => { stop(); window.setTimeout(start, 900); };
+
   const activate = (nextIndex, { focus = false, userInitiated = false } = {}) => {
     activeIndex = (nextIndex + steps.length) % steps.length;
+    if (userInitiated) {
+      userInteracted = true;
+      stop();
+      section.dataset.autoRotation = "paused-by-user";
+    }
+
     tabs.forEach((tab, index) => {
       const active = index === activeIndex;
       tab.classList.toggle("is-active", active);
@@ -221,7 +232,6 @@ export function renderApproachExperience(steps = []) {
     });
     if (progress) progress.style.setProperty("--timeline-progress", `${((activeIndex + 1) / steps.length) * 100}%`);
     if (focus) tabs[activeIndex].focus();
-    if (userInitiated) restart();
   };
 
   tabs.forEach((tab, index) => {
@@ -235,12 +245,21 @@ export function renderApproachExperience(steps = []) {
     });
   });
 
-  section.addEventListener("pointerenter", () => { paused = true; stop(); });
-  section.addEventListener("pointerleave", () => { paused = false; start(); });
-  section.addEventListener("focusin", () => { paused = true; stop(); });
+  section.addEventListener("pointerenter", () => {
+    temporarilyPaused = true;
+    stop();
+  });
+  section.addEventListener("pointerleave", () => {
+    temporarilyPaused = false;
+    start();
+  });
+  section.addEventListener("focusin", () => {
+    temporarilyPaused = true;
+    stop();
+  });
   section.addEventListener("focusout", (event) => {
     if (section.contains(event.relatedTarget)) return;
-    paused = false;
+    temporarilyPaused = false;
     start();
   });
 
