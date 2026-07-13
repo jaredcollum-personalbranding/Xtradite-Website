@@ -4,19 +4,19 @@
   align-items: center;
   justify-content: flex-start;
   flex: 0 0 auto;
-  min-width: 48px;
-  min-height: 48px;
+  min-width: 76px;
+  min-height: 76px;
   line-height: 0;
   overflow: visible;
 }
 
 .logo-img {
   display: block;
-  width: 48px;
-  height: 48px;
-  max-width: 48px;
+  width: 76px;
+  height: 76px;
+  max-width: 76px;
   object-fit: contain;
-  object-position: left centre;
+  object-position: left center;
   aspect-ratio: 1 / 1;
 }
 
@@ -26,12 +26,18 @@
 }
 
 .site-header .header-inner {
-  min-height: 88px;
+  min-height: 96px;
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 
+.site-header .logo,
 .site-header .logo-img {
-  width: 48px;
-  height: 48px;
+  width: 76px;
+  height: 76px;
+  min-width: 76px;
+  min-height: 76px;
+  max-width: 76px;
 }
 
 .site-footer {
@@ -50,42 +56,59 @@
 
 .footer-brand .logo-img,
 .site-footer .logo-img {
-  width: 64px;
-  height: 64px;
-  max-width: 64px;
+  width: 84px;
+  height: 84px;
+  max-width: 84px;
 }
 
 .site-footer .logo {
-  min-width: 64px;
-  min-height: 64px;
+  min-width: 84px;
+  min-height: 84px;
 }
 
 .logo-img[data-image-error="true"] {
   visibility: hidden;
 }
 
+@media (max-width: 1150px) {
+  .site-header .header-inner {
+    min-height: 84px;
+  }
+
+  .site-header .logo,
+  .site-header .logo-img {
+    width: 62px;
+    height: 62px;
+    min-width: 62px;
+    min-height: 62px;
+    max-width: 62px;
+  }
+}
+
 @media (max-width: 640px) {
   .site-header .header-inner {
-    min-height: 72px;
+    min-height: 74px;
+    padding-top: 8px;
+    padding-bottom: 8px;
   }
 
   .logo,
   .site-header .logo-img {
-    width: 42px;
-    height: 42px;
-    min-width: 42px;
-    min-height: 42px;
-    max-width: 42px;
+    width: 56px;
+    height: 56px;
+    min-width: 56px;
+    min-height: 56px;
+    max-width: 56px;
   }
 
   .footer-brand .logo-img,
   .site-footer .logo,
   .site-footer .logo-img {
-    width: 54px;
-    height: 54px;
-    min-width: 54px;
-    min-height: 54px;
-    max-width: 54px;
+    width: 68px;
+    height: 68px;
+    min-width: 68px;
+    min-height: 68px;
+    max-width: 68px;
   }
 }
 
