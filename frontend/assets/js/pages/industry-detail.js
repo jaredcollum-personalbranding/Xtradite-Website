@@ -1,6 +1,5 @@
 import { getItemBySlug } from "../cms.js";
 import { escapeHtml, renderIcons, getSlugParam } from "../render-helpers.js";
-import { INDUSTRY_TO_SERVICES } from "./shared-data.js";
 
 const root = document.getElementById("industry-detail-root");
 const notFound = document.getElementById("not-found");
@@ -73,7 +72,7 @@ async function load() {
   if (!slug) return showNotFound();
   let item;
   try {
-    item = await getItemBySlug("industries", "slug", slug);
+    item = await getItemBySlug("industries_delivery", "slug", slug);
   } catch (e) {
     console.error(e);
     return showNotFound("Couldn't load this page", "We couldn't reach the live content service. Please refresh, or try again in a moment.");
@@ -88,11 +87,11 @@ async function load() {
   document.getElementById("industry-solution").innerHTML = item.solution || "";
   document.getElementById("industry-outcomes").innerHTML = item.outcomes || "";
 
-  const serviceSlugs = INDUSTRY_TO_SERVICES[item.slug] || [];
+  const serviceSlugs = item.relatedServices || [];
   const relatedWrap = document.getElementById("related-services");
   if (serviceSlugs.length && relatedWrap) {
     try {
-      const services = (await Promise.all(serviceSlugs.map((s) => getItemBySlug("services", "slug", s)))).filter(Boolean);
+      const services = serviceSlugs;
       if (services.length) {
         relatedWrap.innerHTML = services
           .map(

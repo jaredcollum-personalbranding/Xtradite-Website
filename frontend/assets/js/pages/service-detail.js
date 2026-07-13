@@ -1,5 +1,4 @@
 import { getItemBySlug } from "../cms.js";
-import { getPostBySlug } from "../blog.js";
 import {
   escapeHtml,
   renderIcons,
@@ -11,7 +10,6 @@ import {
   faqListHtml,
   wireFaqAccordion,
 } from "../render-helpers.js";
-import { SERVICE_TO_CASE_STUDY, SERVICE_TO_RELATED_POSTS } from "./shared-data.js";
 
 const root = document.getElementById("service-detail-root");
 const notFound = document.getElementById("not-found");
@@ -86,7 +84,7 @@ async function load() {
   if (!slug) return showNotFound();
   let item;
   try {
-    item = await getItemBySlug("services", "slug", slug);
+    item = await getItemBySlug("services_delivery", "slug", slug);
   } catch (e) {
     console.error(e);
     return showNotFound("Couldn't load this page", "We couldn't reach the live content service. Please refresh, or try again in a moment.");
@@ -134,10 +132,11 @@ async function load() {
     document.getElementById("faq-section").hidden = false;
   }
 
-  const relatedSlug = SERVICE_TO_CASE_STUDY[item.slug];
+  const relatedCaseStudy = item.relatedCaseStudies?.[0];
+  const relatedSlug = relatedCaseStudy?.slug;
   if (relatedSlug) {
     try {
-      const cs = await getItemBySlug("case_studies", "slug", relatedSlug);
+      const cs = relatedCaseStudy;
       const relatedWrap = document.getElementById("related-case-study");
       if (cs && relatedWrap) {
         relatedWrap.innerHTML = `
@@ -153,10 +152,10 @@ async function load() {
     }
   }
 
-  const relatedPostSlugs = SERVICE_TO_RELATED_POSTS[item.slug] || [];
+  const relatedPostSlugs = item.relatedBlogPosts || [];
   if (relatedPostSlugs.length) {
     try {
-      const posts = (await Promise.all(relatedPostSlugs.map(getPostBySlug))).filter(Boolean);
+      const posts = relatedPostSlugs;
       if (posts.length) {
         document.getElementById("related-insights").innerHTML = posts.map(relatedPostCardHtml).join("");
         document.getElementById("related-insights-section").hidden = false;

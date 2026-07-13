@@ -56,7 +56,7 @@ async function loadCaseStudies() {
   if (!grid) return;
   showSkeletons(grid, 6);
   try {
-    const { items } = await queryItems("case_studies", { sort: [{ fieldName: "sort_order", order: "ASC" }] });
+    const { items } = await queryItems("case_studies_delivery", { sort: [{ fieldName: "sort_order", order: "ASC" }] });
     if (!items.length) return showEmpty(grid, "Case studies are managed in Supabase — add rows to the case_studies table to show them here.");
     allCaseStudies = items;
     renderFilterBar(uniqueIndustries(items), getIndustryParam());

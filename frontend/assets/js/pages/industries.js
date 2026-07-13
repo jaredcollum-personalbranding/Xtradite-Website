@@ -6,7 +6,7 @@ async function loadIndustries() {
   if (!grid) return;
   showSkeletons(grid, 6);
   try {
-    const { items } = await queryItems("industries", { sort: [{ fieldName: "sort_order", order: "ASC" }] });
+    const { items } = await queryItems("industries_delivery", { sort: [{ fieldName: "sort_order", order: "ASC" }] });
     if (!items.length) return showEmpty(grid, "Industries are managed in Supabase — add rows to the industries table to show them here.");
     grid.innerHTML = items.map(industryCardHtml).join("");
     renderIcons();

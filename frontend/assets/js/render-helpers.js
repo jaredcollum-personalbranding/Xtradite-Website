@@ -29,12 +29,20 @@ export function industryCardHtml(item) {
 }
 
 export function caseStudyCardHtml(item) {
+  const media = [...(item.media || item.mediaAssets || [])]
+    .filter((asset) => ["card", "hero"].includes(asset.role) && (asset.url || asset.publicUrl || asset.src) && !String(asset.mimeType || "").startsWith("video/"))
+    .sort((a, b) => Number(b.isPrimary) - Number(a.isPrimary) || (a.sortOrder || 0) - (b.sortOrder || 0));
+  const image = media.find((asset) => asset.role === "card") || media.find((asset) => asset.role === "hero");
+  const imageUrl = image?.url || image?.publicUrl || image?.src;
+  const imageHtml = imageUrl
+    ? `<img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(image.altText || image.alt || `${item.client} case study`)}" loading="lazy" decoding="async">`
+    : `<span>Case study</span>`;
   return `
     <a class="card case-card" href="/case-study-detail?slug=${encodeURIComponent(item.slug)}">
-      <div class="card-image">Case Study Photography</div>
+      <div class="card-image${imageUrl ? " has-media" : ""}">${imageHtml}</div>
       <span class="tag">${escapeHtml(item.industry || "")}</span>
       <h3>${escapeHtml(item.client)}</h3>
-      <p class="card-desc">${escapeHtml(item.challenge || "")}</p>
+      <p class="card-desc">${escapeHtml(item.cardSummary || item.challenge || "")}</p>
       <span class="metric">${escapeHtml(item.metric || "")}</span>
       <span class="card-link">View Case Study <i data-lucide="arrow-right"></i></span>
     </a>`;
@@ -165,7 +173,8 @@ export function getIndustryParam() {
 
 /** Public URL for a "Tech Stack Logos" Storage file, given its bare brand key (e.g. "aws",
  * "postfresql", "c++") — matches the real uploaded filenames exactly, quirks included. */
-export function techLogoUrl(file) {
+export function techLogoUrl(file, publicUrl) {
+  if (publicUrl) return publicUrl;
   return supabase.storage.from("rich-media").getPublicUrl(`Tech Stack Logos/Brand=${file}, Style=Light.png`).data.publicUrl;
 }
 
@@ -184,7 +193,7 @@ export function techLogoGridHtml(techCategories) {
             .map(
               (item) => `
               <div class="tech-logo-item">
-                <img src="${escapeHtml(techLogoUrl(item.file))}" alt="${escapeHtml(item.label)}" loading="lazy" decoding="async">
+                <img src="${escapeHtml(techLogoUrl(item.file, item.url))}" alt="${escapeHtml(item.label)}" loading="lazy" decoding="async">
                 <span>${escapeHtml(item.label)}</span>
               </div>`
             )
@@ -235,10 +244,11 @@ export function metricsStripHtml(metrics) {
   return `
     <div class="stats-strip" style="--strip-cols: ${cols};">
       ${metrics
-        .map(
-          (m) => `
-          <div class="stat-item"><span class="stat-number"${m.animate ? ` data-count-to="${escapeHtml(m.value)}"` : ""}>${m.animate ? "0" : escapeHtml(m.value)}</span><span class="stat-label">${escapeHtml(m.label)}</span></div>`
-        )
+        .map((m) => {
+          const canAnimate = Boolean(m.animate) && !/[→←↔<>]|\b(vs\.?|versus|to)\b/i.test(String(m.value ?? ""));
+          return `
+          <div class="stat-item"><span class="stat-number"${canAnimate ? ` data-count-to="${escapeHtml(m.value)}"` : ""}>${canAnimate ? "0" : escapeHtml(m.value)}</span><span class="stat-label">${escapeHtml(m.label)}</span></div>`;
+        })
         .join("")}
     </div>`;
 }

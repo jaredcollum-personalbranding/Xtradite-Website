@@ -1,60 +1,69 @@
 import { getItemBySlug, queryItems } from "../cms.js";
-import {
-  escapeHtml,
-  caseStudyCardHtml,
-  renderIcons,
-  getSlugParam,
-  metricsStripHtml,
-  wireMetricsCounters,
-  timelineHtml,
-} from "../render-helpers.js";
-import { CASE_STUDY_TO_SERVICE } from "./shared-data.js";
+import { escapeHtml, renderIcons, getSlugParam, metricsStripHtml, wireMetricsCounters } from "../render-helpers.js";
 
 const root = document.getElementById("case-study-detail-root");
 const notFound = document.getElementById("not-found");
 const slug = getSlugParam();
 
-function setMetaByName(name, content) {
+function setMeta(selector, attribute, content) {
   if (!content) return;
-  let el = document.querySelector(`meta[name="${name}"]`);
-  if (!el) {
-    el = document.createElement("meta");
-    el.setAttribute("name", name);
-    document.head.appendChild(el);
+  let element = document.querySelector(selector);
+  if (!element) {
+    element = document.createElement("meta");
+    const [, key, value] = selector.match(/meta\[([^=]+)="([^"]+)"\]/) || [];
+    if (key && value) element.setAttribute(key, value);
+    document.head.appendChild(element);
   }
-  el.setAttribute("content", content);
-}
-
-function setMetaByProperty(property, content) {
-  if (!content) return;
-  let el = document.querySelector(`meta[property="${property}"]`);
-  if (!el) {
-    el = document.createElement("meta");
-    el.setAttribute("property", property);
-    document.head.appendChild(el);
-  }
-  el.setAttribute("content", content);
+  element.setAttribute(attribute, content);
 }
 
 function setCanonical(href) {
-  let el = document.querySelector('link[rel="canonical"]');
-  if (!el) {
-    el = document.createElement("link");
-    el.setAttribute("rel", "canonical");
-    document.head.appendChild(el);
+  let element = document.querySelector('link[rel="canonical"]');
+  if (!element) {
+    element = document.createElement("link");
+    element.rel = "canonical";
+    document.head.appendChild(element);
   }
-  el.setAttribute("href", href);
+  element.href = href;
 }
 
-function setJsonLd(item, title, description, url) {
+function mediaFor(item, role) {
+  const media = item.media || item.mediaAssets || [];
+  return media
+    .filter((asset) => asset.role === role && (asset.publicUrl || asset.url || asset.src))
+    .sort((a, b) => Number(b.isPrimary) - Number(a.isPrimary) || (a.sortOrder || 0) - (b.sortOrder || 0))[0];
+}
+
+function applySeo(item) {
+  const title = item.seoTitle || `${item.client} — Xtradite Digital Case Study`;
+  const description = item.seoDescription || item.cardSummary || item.headline || item.challenge || `How Xtradite Digital helped ${item.client}.`;
+  const url = `${window.location.origin}/case-study-detail?slug=${encodeURIComponent(item.slug)}`;
+  const hero = mediaFor(item, "og") || mediaFor(item, "hero");
+  const heroUrl = hero?.publicUrl || hero?.url || hero?.src;
+
+  document.title = title;
+  setMeta('meta[name="description"]', "content", description);
+  setMeta('meta[property="og:title"]', "content", title);
+  setMeta('meta[property="og:description"]', "content", description);
+  setMeta('meta[property="og:type"]', "content", "article");
+  setMeta('meta[property="og:url"]', "content", url);
+  setMeta('meta[property="og:image"]', "content", heroUrl);
+  setMeta('meta[name="twitter:card"]', "content", heroUrl ? "summary_large_image" : "summary");
+  setMeta('meta[name="twitter:title"]', "content", title);
+  setMeta('meta[name="twitter:description"]', "content", description);
+  setCanonical(url);
+
   const script = document.createElement("script");
   script.type = "application/ld+json";
   script.textContent = JSON.stringify({
     "@context": "https://schema.org",
     "@type": "Article",
-    headline: title,
+    headline: item.headline || item.client,
     description,
     about: item.industry,
+    datePublished: item.publishedAt || undefined,
+    dateModified: item.updatedAt || undefined,
+    image: heroUrl || undefined,
     author: { "@type": "Organization", name: "Xtradite Digital" },
     publisher: { "@type": "Organization", name: "Xtradite Digital" },
     mainEntityOfPage: url,
@@ -62,105 +71,175 @@ function setJsonLd(item, title, description, url) {
   document.head.appendChild(script);
 }
 
-function applySeo(item) {
-  const title = `${item.client} — Xtradite Digital Case Study`;
-  const description = item.headline || item.challenge || `How Xtradite Digital helped ${item.client}.`;
-  const url = `${window.location.origin}/case-study-detail?slug=${encodeURIComponent(item.slug)}`;
+function renderRichText(element, value) {
+  if (!element || !value) return false;
+  const text = String(value).trim();
+  element.innerHTML = /<\/?[a-z][\s\S]*>/i.test(text) ? text : `<p>${escapeHtml(text)}</p>`;
+  return true;
+}
 
-  document.title = title;
-  setMetaByName("description", description);
-  setMetaByProperty("og:title", item.headline || item.client);
-  setMetaByProperty("og:description", description);
-  setMetaByProperty("og:type", "article");
-  setMetaByProperty("og:url", url);
-  setMetaByName("twitter:card", "summary");
-  setMetaByName("twitter:title", item.headline || item.client);
-  setMetaByName("twitter:description", description);
-  setCanonical(url);
-  setJsonLd(item, title, description, url);
+function isTargetMetric(metric) {
+  return /\b(target|goal|forecast|projected|projection)\b/i.test(`${metric.label || ""} ${metric.value || ""}`);
+}
+
+function renderResultsGraphic(metrics) {
+  const wrap = document.getElementById("cs-results-graphic");
+  const selected = (metrics || []).slice(0, 3);
+  if (!selected.length) {
+    wrap.hidden = true;
+    return;
+  }
+  wrap.innerHTML = `
+    <div class="cs-results-graphic-head"><span>Outcome record</span><span>Delivered / target</span></div>
+    ${selected.map((metric, index) => {
+      const target = isTargetMetric(metric);
+      return `<div class="cs-result-row">
+        <span class="cs-result-index">0${index + 1}</span>
+        <div><strong>${escapeHtml(metric.value)}</strong><span>${escapeHtml(metric.label)}</span></div>
+        <em class="${target ? "is-target" : "is-delivered"}">${target ? "Target" : "Delivered"}</em>
+      </div>`;
+    }).join("")}`;
+}
+
+function renderApproach(steps) {
+  const wrap = document.getElementById("cs-approach");
+  wrap.innerHTML = `<ol class="cs-approach-steps" style="--approach-cols: ${Math.min(steps.length, 4)}">
+    ${steps.map((step, index) => `<li>
+      <span class="cs-step-number">${String(index + 1).padStart(2, "0")}</span>
+      <div><h3>${escapeHtml(step.title)}</h3><p>${escapeHtml(step.description)}</p></div>
+    </li>`).join("")}
+  </ol>`;
+
+  document.getElementById("cs-process-visual").innerHTML = steps.map((step, index) => `
+    <span class="cs-process-node"><i>${index + 1}</i><b>${escapeHtml(step.title)}</b></span>
+    ${index < steps.length - 1 ? '<span class="cs-process-link"><i></i></span>' : ""}
+  `).join("");
+  document.getElementById("cs-approach-section").hidden = false;
+}
+
+function relatedCaseHtml(item) {
+  return `<a class="cs-related-case" href="/case-study-detail?slug=${encodeURIComponent(item.slug)}">
+    <span class="eyebrow">${escapeHtml(item.industry || "Case study")}</span>
+    <h3>${escapeHtml(item.headline || item.client)}</h3>
+    <div><span>${escapeHtml(item.client)}</span><strong>${escapeHtml(item.metric || "Read the story")}</strong></div>
+    <span class="card-link">View case study <i data-lucide="arrow-right"></i></span>
+  </a>`;
+}
+
+function renderHeroMedia(item) {
+  const media = mediaFor(item, "hero");
+  const video = mediaFor(item, "video");
+  if (!media && !video) return;
+  const visual = document.getElementById("cs-hero-visual");
+  visual.classList.add("has-media");
+  const imageUrl = media?.publicUrl || media?.url || media?.src;
+  if (imageUrl) {
+    visual.style.backgroundImage = `linear-gradient(180deg, transparent 35%, rgba(23, 19, 34, .72)), url("${String(imageUrl).replace(/"/g, "%22")}")`;
+  }
+  if (video && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    const videoUrl = video.publicUrl || video.url || video.src;
+    const element = document.createElement("video");
+    element.className = "cs-hero-video";
+    element.muted = true;
+    element.loop = true;
+    element.autoplay = true;
+    element.playsInline = true;
+    element.preload = "metadata";
+    if (imageUrl) element.poster = imageUrl;
+    element.innerHTML = `<source src="${escapeHtml(videoUrl)}" type="${escapeHtml(video.mimeType || "video/mp4")}">`;
+    visual.prepend(element);
+  }
+  visual.setAttribute("aria-label", media?.altText || media?.alt || video?.altText || "Case study editorial media");
+  visual.removeAttribute("aria-hidden");
+}
+
+async function renderRelated(item) {
+  let hasRelated = false;
+  const service = item.relatedServices?.[0];
+  const serviceWrap = document.getElementById("related-service");
+  if (service?.slug && serviceWrap) {
+    serviceWrap.href = `/services/${encodeURIComponent(service.slug)}`;
+    serviceWrap.innerHTML = `
+      <span class="eyebrow">Related service</span>
+      <div class="cs-service-icon"><i data-lucide="${escapeHtml(service.icon || "arrow-up-right")}"></i></div>
+      <h3>${escapeHtml(service.title)}</h3>
+      <p>${escapeHtml(service.summary || "Explore the capability behind this engagement.")}</p>
+      <span class="card-link">Explore this service <i data-lucide="arrow-right"></i></span>`;
+    serviceWrap.hidden = false;
+    hasRelated = true;
+  }
+
+  try {
+    const { items } = await queryItems("case_studies_delivery", { sort: [{ fieldName: "sort_order", order: "ASC" }] });
+    const others = items
+      .filter((candidate) => candidate.slug !== item.slug)
+      .sort((a, b) => Number(b.industry === item.industry) - Number(a.industry === item.industry))
+      .slice(0, 2);
+    if (others.length) {
+      document.getElementById("related-case-studies").innerHTML = others.map(relatedCaseHtml).join("");
+      hasRelated = true;
+    }
+  } catch (error) {
+    console.error(error);
+  }
+  document.getElementById("cs-related-section").hidden = !hasRelated;
 }
 
 async function load() {
   if (!slug) return showNotFound();
   let item;
   try {
-    item = await getItemBySlug("case_studies", "slug", slug);
-  } catch (e) {
-    console.error(e);
+    item = await getItemBySlug("case_studies_delivery", "slug", slug);
+  } catch (error) {
+    console.error(error);
     return showNotFound("Couldn't load this page", "We couldn't reach the live content service. Please refresh, or try again in a moment.");
   }
   if (!item) return showNotFound();
 
   applySeo(item);
-
   document.getElementById("breadcrumb-current").textContent = item.client;
-  document.getElementById("cs-tag").textContent = item.industry || "";
+  document.getElementById("cs-tag").textContent = item.industry || "Case study";
   document.getElementById("cs-headline").textContent = item.headline || item.client;
   document.getElementById("cs-client").textContent = item.client;
   document.getElementById("cs-primary-metric").textContent = item.metric || "";
-  document.getElementById("cs-challenge").textContent = item.challenge || "";
-  document.getElementById("cs-results").innerHTML = item.resultsDetail || "";
+  document.getElementById("cs-visual-metric").textContent = item.metric || item.industry || "Impact";
+  document.getElementById("cs-primary-proof").hidden = !item.metric;
 
-  if (item.metrics?.length) {
+  if (item.cardSummary) {
+    document.getElementById("cs-summary").textContent = item.cardSummary;
+    document.getElementById("cs-summary").hidden = false;
+  }
+  if (item.confidentialityNote) {
+    document.getElementById("cs-confidentiality").textContent = item.confidentialityNote;
+    document.getElementById("cs-confidentiality").hidden = false;
+  }
+  renderHeroMedia(item);
+
+  const metrics = item.metrics || [];
+  if (metrics.length) {
     const metricsWrap = document.getElementById("cs-metrics");
-    metricsWrap.innerHTML = metricsStripHtml(item.metrics);
+    metricsWrap.innerHTML = metricsStripHtml(metrics);
     wireMetricsCounters(metricsWrap);
+    document.getElementById("cs-evidence-section").hidden = false;
   }
 
-  if (item.approach?.length) {
-    document.getElementById("cs-approach").innerHTML = timelineHtml(
-      item.approach.map((step) => ({ title: step.title, description: step.description }))
-    );
-    document.getElementById("cs-approach-section").hidden = false;
+  if (renderRichText(document.getElementById("cs-description"), item.description)) {
+    document.getElementById("cs-engagement-section").hidden = false;
   }
+  renderRichText(document.getElementById("cs-challenge"), item.challenge);
+  if (item.approach?.length) renderApproach(item.approach);
+  const hasResultsCopy = renderRichText(document.getElementById("cs-results"), item.resultsDetail);
+  renderResultsGraphic(metrics);
+  document.getElementById("cs-results-section").hidden = !hasResultsCopy && !metrics.length;
 
-  const relatedServiceSlug = CASE_STUDY_TO_SERVICE[item.slug];
-  if (relatedServiceSlug) {
-    try {
-      const service = await getItemBySlug("services", "slug", relatedServiceSlug);
-      const relatedWrap = document.getElementById("related-service");
-      if (service && relatedWrap) {
-        relatedWrap.href = `/services/${encodeURIComponent(service.slug)}`;
-        relatedWrap.innerHTML = `
-          <span class="eyebrow">Related Service</span>
-          <h3>${escapeHtml(service.title)}</h3>
-          <p class="card-desc">${escapeHtml(service.summary || "")}</p>
-          <span class="card-link">Learn More <i data-lucide="arrow-right"></i></span>`;
-        relatedWrap.hidden = false;
-      }
-    } catch (e) {
-      console.error(e); // non-critical — related service is a bonus, not core content
-    }
-  }
-
-  // Never fabricate a testimonial: only render this block for a real, signed-off quote,
-  // or (for the one case flagged in Supabase as pending) a clearly-marked placeholder note.
-  const testimonialSection = document.getElementById("cs-testimonial-section");
-  const testWrap = document.getElementById("cs-testimonial");
   if (item.testimonialQuote) {
-    testWrap.innerHTML = `
-      <blockquote>&ldquo;${escapeHtml(item.testimonialQuote)}&rdquo;</blockquote>
-      ${item.testimonialAuthor ? `<cite><strong>${escapeHtml(item.testimonialAuthor)}</strong></cite>` : ""}`;
-    testimonialSection.hidden = false;
-  } else if (item.testimonialPending) {
-    testWrap.innerHTML = `<p class="placeholder-flag">A client testimonial for this engagement is pending sign-off.</p>`;
-    testimonialSection.hidden = false;
+    document.getElementById("cs-testimonial").innerHTML = `
+      <p>“${escapeHtml(item.testimonialQuote)}”</p>
+      ${item.testimonialAuthor ? `<cite>${escapeHtml(item.testimonialAuthor)}</cite>` : ""}`;
+    document.getElementById("cs-testimonial-section").hidden = false;
   }
 
-  const relatedWrap = document.getElementById("related-case-studies");
-  if (relatedWrap) {
-    try {
-      const { items } = await queryItems("case_studies", { sort: [{ fieldName: "sort_order", order: "ASC" }] });
-      const others = items.filter((c) => c.slug !== item.slug);
-      if (others.length) {
-        relatedWrap.innerHTML = others.map(caseStudyCardHtml).join("");
-        document.getElementById("related-case-studies-section").hidden = false;
-      }
-    } catch (e) {
-      console.error(e); // non-critical — related case studies are a bonus, not core content
-    }
-  }
-
+  await renderRelated(item);
   root.hidden = false;
   renderIcons();
 }

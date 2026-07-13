@@ -33,7 +33,7 @@ function mapPost(row) {
 export async function queryPosts({ limit = 100, cursor } = {}) {
   const offset = cursor ? Number(cursor) : 0;
   const { data, error, count } = await supabase
-    .from("blog_posts")
+    .from("blog_posts_delivery")
     .select("*", { count: "exact" })
     .order("first_published_at", { ascending: false })
     .range(offset, offset + limit - 1);
@@ -51,7 +51,7 @@ export async function queryPosts({ limit = 100, cursor } = {}) {
  * @returns {Promise<object|null>}
  */
 export async function getPostBySlug(slug) {
-  const { data, error } = await supabase.from("blog_posts").select("*").eq("slug", slug).limit(1).maybeSingle();
+  const { data, error } = await supabase.from("blog_posts_delivery").select("*").eq("slug", slug).limit(1).maybeSingle();
   if (error) return null;
   return data ? mapPost(data) : null;
 }
@@ -61,7 +61,7 @@ export async function getPostBySlug(slug) {
  * @returns {Promise<number>}
  */
 export async function getTotalPosts() {
-  const { count, error } = await supabase.from("blog_posts").select("*", { count: "exact", head: true });
+  const { count, error } = await supabase.from("blog_posts_delivery").select("*", { count: "exact", head: true });
   if (error) return 0;
   return count ?? 0;
 }

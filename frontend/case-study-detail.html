@@ -22,7 +22,8 @@
 <title>Case Study — Xtradite Digital</title>
 <meta name="description" content="Read how Xtradite Digital delivered measurable results for this client.">
 <link rel="stylesheet" href="assets/css/tokens.css">
-<link rel="stylesheet" href="assets/css/main.css">
+<link rel="stylesheet" href="assets/css/main.css?v=20260713">
+<link rel="stylesheet" href="assets/css/case-study-detail.css?v=20260713">
 <link rel="icon" href="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/favicon-dark.ico" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/favicon-light.ico" media="(prefers-color-scheme: light)">
 <link rel="icon" href="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/favicon-light.ico">
@@ -67,9 +68,9 @@
 
 <main>
 
-  <section class="section-tight">
+  <section class="cs-page section-tight">
     <div class="container">
-      <nav class="breadcrumb"><a href="/">Home</a> / <a href="/case-studies">Case Studies</a> / <span id="breadcrumb-current"></span></nav>
+      <nav class="breadcrumb cs-breadcrumb" aria-label="Breadcrumb"><a href="/case-studies">Case Studies</a><span aria-hidden="true">/</span><span id="breadcrumb-current"></span></nav>
 
       <div id="not-found" class="not-found" hidden>
         <h1>Case study not found</h1>
@@ -77,72 +78,96 @@
         <a href="/case-studies" class="btn btn-primary">View All Case Studies</a>
       </div>
 
-      <div id="case-study-detail-root" hidden>
-
-        <!-- 1. Hero -->
-        <span class="tag" id="cs-tag" style="font-size: var(--font-size-body-xxs);"></span>
-        <h1 id="cs-headline" style="font-size: var(--font-size-display-sm); margin: var(--space-16) 0 var(--space-12);"></h1>
-        <p class="card-category" id="cs-client" style="margin-bottom: var(--space-24);"></p>
-        <span class="metric" id="cs-primary-metric" style="margin-bottom: var(--space-32); display: block;"></span>
-        <div class="hero-ctas" style="justify-content: flex-start; margin-bottom: var(--space-56);">
-          <a href="/contact" class="btn btn-primary">Book a Consultation <i data-lucide="arrow-right" class="btn-icon"></i></a>
-        </div>
-
-        <!-- 2. Metrics strip -->
-        <div id="cs-metrics" style="margin-bottom: var(--space-64);"></div>
-
-        <!-- 3. The Challenge -->
-        <div style="max-width: 760px; margin-bottom: var(--space-64);">
-          <div class="section-head left">
-            <span class="eyebrow">The Challenge</span>
+      <article id="case-study-detail-root" hidden>
+        <header class="cs-hero">
+          <div class="cs-hero-copy">
+            <div class="cs-hero-labels">
+              <span class="eyebrow" id="cs-tag"></span>
+              <span class="cs-confidentiality" id="cs-confidentiality" hidden></span>
+            </div>
+            <h1 id="cs-headline"></h1>
+            <p class="cs-standfirst" id="cs-summary" hidden></p>
+            <div class="cs-client-row">
+              <span>Client</span>
+              <strong id="cs-client"></strong>
+            </div>
+            <div class="cs-hero-proof" id="cs-primary-proof">
+              <span class="cs-proof-value" id="cs-primary-metric"></span>
+              <span class="cs-proof-label">Headline outcome</span>
+            </div>
           </div>
-          <p class="card-desc" id="cs-challenge" style="font-size: var(--font-size-body-md);"></p>
-        </div>
+          <div class="cs-hero-visual" id="cs-hero-visual" aria-hidden="true">
+            <div class="cs-visual-grid"></div>
+            <div class="cs-visual-orbit cs-visual-orbit-one"></div>
+            <div class="cs-visual-orbit cs-visual-orbit-two"></div>
+            <div class="cs-visual-mark"><span id="cs-visual-metric"></span><small>measurable change</small></div>
+            <span class="cs-visual-index">01 / CASE STUDY</span>
+          </div>
+        </header>
 
-        <!-- 4. Our Approach -->
-        <div id="cs-approach-section" style="margin-bottom: var(--space-64);" hidden>
-          <div class="section-head left">
-            <span class="eyebrow">Approach</span>
-            <h2>Our Approach</h2>
+        <section class="cs-evidence" id="cs-evidence-section" hidden aria-labelledby="evidence-title">
+          <div class="cs-section-kicker" id="evidence-title">Evidence at a glance</div>
+          <div id="cs-metrics"></div>
+        </section>
+
+        <section class="cs-story cs-engagement" id="cs-engagement-section" hidden>
+          <div class="cs-story-heading"><span>01</span><div><span class="eyebrow">Overview</span><h2>The engagement</h2></div></div>
+          <div class="richtext cs-story-copy" id="cs-description"></div>
+        </section>
+
+        <section class="cs-story cs-challenge">
+          <div class="cs-story-heading"><span>02</span><div><span class="eyebrow">Context</span><h2>The challenge</h2></div></div>
+          <div class="cs-challenge-layout">
+            <div class="richtext cs-story-copy" id="cs-challenge"></div>
+            <div class="cs-context-visual" aria-hidden="true">
+              <span class="cs-context-label">Operational ceiling</span>
+              <div class="cs-context-line"><i></i><i></i><i></i><i></i><i></i></div>
+              <span class="cs-context-axis">Complexity</span><span class="cs-context-axis">Capacity</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="cs-approach" id="cs-approach-section" hidden>
+          <div class="cs-section-intro">
+            <div><span class="eyebrow">03 / Delivery</span><h2>Our approach</h2></div>
+            <p>A focused sequence from diagnosis to embedded change.</p>
           </div>
           <div id="cs-approach"></div>
-        </div>
+          <div class="cs-process-visual" id="cs-process-visual" aria-label="Approach process"></div>
+        </section>
 
-        <!-- 5. The Results -->
-        <div style="max-width: 760px; margin-bottom: var(--space-64);">
-          <div class="section-head left">
-            <span class="eyebrow">Outcome</span>
-            <h2>The Results</h2>
+        <section class="cs-results" id="cs-results-section">
+          <div class="cs-results-copy">
+            <span class="eyebrow">04 / Outcome</span>
+            <h2>The results</h2>
+            <div class="richtext" id="cs-results"></div>
           </div>
-          <div class="richtext" id="cs-results"></div>
-        </div>
+          <div class="cs-results-graphic" id="cs-results-graphic" aria-label="Key results"></div>
+        </section>
 
-        <!-- 6. Related service cross-link -->
-        <a class="card" id="related-service" style="margin-bottom: var(--space-64); display: block;" hidden></a>
+        <section class="cs-testimonial" id="cs-testimonial-section" hidden>
+          <span class="eyebrow">Client voice</span>
+          <blockquote id="cs-testimonial"></blockquote>
+        </section>
 
-        <!-- 7. Testimonial -->
-        <div id="cs-testimonial-section" style="margin-bottom: var(--space-64);" hidden>
-          <div class="section-head left">
-            <span class="eyebrow">In Their Words</span>
+        <section class="cs-related" id="cs-related-section" hidden>
+          <div class="cs-section-intro">
+            <div><span class="eyebrow">Continue exploring</span><h2>Related expertise and engagements</h2></div>
           </div>
-          <blockquote class="card" id="cs-testimonial" style="border-left: 3px solid var(--color-primary); max-width: 640px;"></blockquote>
-        </div>
-
-        <div style="margin-top: var(--space-64);" id="related-case-studies-section" hidden>
-          <div class="section-head left">
-            <span class="eyebrow">More Case Studies</span>
-            <h2>Other engagements.</h2>
+          <div class="cs-related-layout">
+            <a class="cs-service-card" id="related-service" hidden></a>
+            <div class="cs-related-cases" id="related-case-studies"></div>
           </div>
-          <div class="grid-3" id="related-case-studies"></div>
-        </div>
-      </div>
+        </section>
+      </article>
     </div>
   </section>
-  <section>
+  <section class="cs-cta-section">
     <div class="container">
       <div class="cta-banner">
-        <h2>Ready to Accelerate Your Business?</h2>
-        <p>Transform your digital operations with practical consultancy built for measurable commercial results.</p>
+        <span class="eyebrow">Start a conversation</span>
+        <h2 id="cs-cta-heading">Facing a similar operational ceiling?</h2>
+        <p>Let’s identify the practical moves that turn pressure into measurable progress.</p>
         <a href="/contact" class="btn btn-primary btn-lg">Book a Consultation <i data-lucide="arrow-right" class="btn-icon"></i></a>
       </div>
     </div>
