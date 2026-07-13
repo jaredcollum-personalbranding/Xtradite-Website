@@ -1,55 +1,257 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="google-adsense-account" content="ca-pub-7308041122340160">
-<script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="07680bbc-6c7e-4a44-9d8b-a2ff6766646c" type="text/javascript"></script>
-<script data-cookieconsent="ignore"> window.dataLayer = window.dataLayer || []; function gtag() { dataLayer.push(arguments); } gtag("consent", "default", { ad_personalization: "denied", ad_storage: "denied", ad_user_data: "denied", analytics_storage: "denied", functionality_storage: "denied", personalization_storage: "denied", security_storage: "granted", wait_for_update: 500, }); gtag("set", "ads_data_redaction", true); gtag("set", "url_passthrough", false);</script>
-<!-- Google tag (gtag.js) -->
-<script type="text/plain" data-cookieconsent="statistics" async src="https://www.googletagmanager.com/gtag/js?id=G-WYXTKGJ9JS"></script>
-<script type="text/plain" data-cookieconsent="statistics">
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
 
-  gtag('config', 'G-WYXTKGJ9JS');
+<!-- Google Consent Mode defaults: must run before Cookiebot and Google tags -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+
+  function gtag() {
+    dataLayer.push(arguments);
+  }
+
+  gtag("consent", "default", {
+    ad_storage: "denied",
+    ad_user_data: "denied",
+    ad_personalization: "denied",
+    analytics_storage: "denied",
+    functionality_storage: "denied",
+    personalization_storage: "denied",
+    security_storage: "granted",
+    wait_for_update: 500
+  });
+
+  gtag("set", "ads_data_redaction", true);
+  gtag("set", "url_passthrough", false);
 </script>
-<!-- Google AdSense -->
+
+<!-- Cookiebot CMP -->
+<script
+  id="Cookiebot"
+  src="https://consent.cookiebot.com/uc.js"
+  data-cbid="07680bbc-6c7e-4a44-9d8b-a2ff6766646c"
+  data-blockingmode="auto"
+  data-framework="IAB"
+  type="text/javascript"
+></script>
+
+<!-- Synchronise genuine Cookiebot choices with Google Consent Mode -->
+<script>
+  function loadAdSenseAfterConsent() {
+    if (
+      !window.Cookiebot ||
+      !Cookiebot.hasResponse ||
+      !Cookiebot.consent.marketing ||
+      document.getElementById("adsense-loader")
+    ) {
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.id = "adsense-loader";
+    script.async = true;
+    script.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7308041122340160";
+    script.crossOrigin = "anonymous";
+    document.head.appendChild(script);
+  }
+
+  function updateGoogleConsentFromCookiebot() {
+    if (!window.Cookiebot || !Cookiebot.hasResponse) {
+      return;
+    }
+
+    const marketingGranted = Cookiebot.consent.marketing === true;
+    const statisticsGranted = Cookiebot.consent.statistics === true;
+    const preferencesGranted = Cookiebot.consent.preferences === true;
+
+    gtag("consent", "update", {
+      ad_storage: marketingGranted ? "granted" : "denied",
+      ad_user_data: marketingGranted ? "granted" : "denied",
+      ad_personalization: marketingGranted ? "granted" : "denied",
+      analytics_storage: statisticsGranted ? "granted" : "denied",
+      functionality_storage: preferencesGranted ? "granted" : "denied",
+      personalization_storage: preferencesGranted ? "granted" : "denied",
+      security_storage: "granted"
+    });
+
+    gtag("set", "ads_data_redaction", !marketingGranted);
+
+    if (marketingGranted) {
+      loadAdSenseAfterConsent();
+    }
+  }
+
+  window.addEventListener("CookiebotOnConsentReady", updateGoogleConsentFromCookiebot);
+  window.addEventListener("CookiebotOnAccept", updateGoogleConsentFromCookiebot);
+  window.addEventListener("CookiebotOnDecline", updateGoogleConsentFromCookiebot);
+</script>
+
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-WYXTKGJ9JS"></script>
+<script>
+  gtag("js", new Date());
+  gtag("config", "G-WYXTKGJ9JS");
+</script>
+
 <!-- Vercel Speed Insights -->
 <script src="assets/js/speed-insights-init.js" defer></script>
-<script type="text/plain" data-cookieconsent="marketing" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7308041122340160" crossorigin="anonymous"></script>
 <title>Industries — Xtradite Digital</title>
-<meta name="description" content="Retail, eCommerce, Manufacturing, Consumer Goods, Professional Services and Startups — industries Xtradite Digital serves.">
+<meta
+  name="description"
+  content="Retail, eCommerce, Manufacturing, Consumer Goods, Professional Services and Startups — industries Xtradite Digital serves."
+>
+
 <link rel="stylesheet" href="assets/css/tokens.css">
 <link rel="stylesheet" href="assets/css/main.css">
-<link rel="icon" href="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/favicon-dark.ico" media="(prefers-color-scheme: dark)">
-<link rel="icon" href="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/favicon-light.ico" media="(prefers-color-scheme: light)">
-<link rel="icon" href="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/favicon-light.ico">
-<link rel="icon" type="image/png" sizes="32x32" href="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/favicon-32-dark.png" media="(prefers-color-scheme: dark)">
-<link rel="icon" type="image/png" sizes="32x32" href="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/favicon-32-light.png" media="(prefers-color-scheme: light)">
-<link rel="icon" type="image/png" sizes="16x16" href="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/favicon-16-dark.png" media="(prefers-color-scheme: dark)">
-<link rel="icon" type="image/png" sizes="16x16" href="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/favicon-16-light.png" media="(prefers-color-scheme: light)">
-<link rel="apple-touch-icon" href="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/icon-tile-light.png">
+<link rel="stylesheet" href="assets/css/adsense.css">
+
+<link
+  rel="icon"
+  href="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/favicon-dark.ico"
+  media="(prefers-color-scheme: dark)"
+>
+<link
+  rel="icon"
+  href="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/favicon-light.ico"
+  media="(prefers-color-scheme: light)"
+>
+<link
+  rel="icon"
+  href="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/favicon-light.ico"
+>
+<link
+  rel="icon"
+  type="image/png"
+  sizes="32x32"
+  href="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/favicon-32-dark.png"
+  media="(prefers-color-scheme: dark)"
+>
+<link
+  rel="icon"
+  type="image/png"
+  sizes="32x32"
+  href="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/favicon-32-light.png"
+  media="(prefers-color-scheme: light)"
+>
+<link
+  rel="icon"
+  type="image/png"
+  sizes="16x16"
+  href="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/favicon-16-dark.png"
+  media="(prefers-color-scheme: dark)"
+>
+<link
+  rel="icon"
+  type="image/png"
+  sizes="16x16"
+  href="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/favicon-16-light.png"
+  media="(prefers-color-scheme: light)"
+>
+<link
+  rel="apple-touch-icon"
+  href="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/icon-tile-light.png"
+>
+
 <link rel="canonical" href="https://www.xtradite-digital.co.uk/industries">
+
 <meta property="og:site_name" content="Xtradite Digital">
 <meta property="og:locale" content="en_GB">
-<meta property="og:title" content="Industries â€” Xtradite Digital">
-<meta property="og:description" content="Retail, eCommerce, Manufacturing, Consumer Goods, Professional Services and Startups â€” industries Xtradite Digital serves.">
+<meta property="og:title" content="Industries — Xtradite Digital">
+<meta
+  property="og:description"
+  content="Retail, eCommerce, Manufacturing, Consumer Goods, Professional Services and Startups — industries Xtradite Digital serves."
+>
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://www.xtradite-digital.co.uk/industries">
+
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Industries â€” Xtradite Digital">
-<meta name="twitter:description" content="Retail, eCommerce, Manufacturing, Consumer Goods, Professional Services and Startups â€” industries Xtradite Digital serves.">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Organization", "name": "Xtradite Digital", "url": "https://www.xtradite-digital.co.uk/", "description": "UK digital consultancy helping ambitious retail, ecommerce and manufacturing businesses close operational and commercial gaps with hands-on delivery.", "areaServed": "GB", "knowsAbout": ["Digital Strategy", "AI & Automation", "eCommerce Growth", "Operational Excellence", "Fractional Leadership", "Project Delivery"]}</script>
+<meta name="twitter:title" content="Industries — Xtradite Digital">
+<meta
+  name="twitter:description"
+  content="Retail, eCommerce, Manufacturing, Consumer Goods, Professional Services and Startups — industries Xtradite Digital serves."
+>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Xtradite Digital",
+  "url": "https://www.xtradite-digital.co.uk/",
+  "description": "UK digital consultancy helping ambitious retail, ecommerce and manufacturing businesses close operational and commercial gaps with hands-on delivery.",
+  "areaServed": "GB",
+  "knowsAbout": [
+    "Digital Strategy",
+    "AI & Automation",
+    "eCommerce Growth",
+    "Operational Excellence",
+    "Fractional Leadership",
+    "Project Delivery"
+  ]
+}
+</script>
+
 <!-- Vercel Web Analytics -->
 <script defer src="https://cdn.vercel-insights.com/v1/script.js"></script>
+
+<style>
+  .listing-ad {
+    width: 100%;
+  }
+
+  .listing-ad__label {
+    display: block;
+    margin-bottom: var(--space-8);
+    color: var(--color-text-muted, #8f8f8f);
+    font-size: var(--font-size-xs, 0.75rem);
+    line-height: 1;
+    letter-spacing: 0.05em;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  .listing-ad--feed {
+    grid-column: 1 / -1;
+    margin: var(--space-24) 0;
+    padding: var(--space-20) 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .listing-ad--display {
+    max-width: 970px;
+    min-height: 250px;
+    margin: 0 auto var(--space-64);
+  }
+
+  @media (max-width: 767px) {
+    .listing-ad--feed {
+      margin: var(--space-16) 0;
+      padding: var(--space-16) 0;
+    }
+
+    .listing-ad--display {
+      min-height: 200px;
+      margin-bottom: var(--space-48);
+    }
+  }
+</style>
 </head>
+
 <body>
 
 <header class="site-header" id="site-header">
   <div class="container header-inner">
-    <a href="/" class="logo"><img src="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/wordmark-caps-light.png" alt="Xtradite Digital" class="logo-img"></a>
+    <a href="/" class="logo">
+      <img
+        src="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/wordmark-caps-light.png"
+        alt="Xtradite Digital"
+        class="logo-img"
+      >
+    </a>
+
     <nav class="site-nav" id="site-nav">
       <a href="/">Home</a>
       <a href="/services">Services</a>
@@ -58,10 +260,24 @@
       <a href="/about">About</a>
       <a href="/insights">Insights</a>
       <a href="/contact">Contact</a>
-      <a href="/contact" class="btn btn-primary btn-sm header-cta-mobile">Book a Consultation</a>
+      <a href="/contact" class="btn btn-primary btn-sm header-cta-mobile">
+        Book a Consultation
+      </a>
     </nav>
-    <a href="/contact" class="btn btn-primary btn-sm header-cta">Book a Consultation</a>
-    <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation"><span></span><span></span><span></span></button>
+
+    <a href="/contact" class="btn btn-primary btn-sm header-cta">
+      Book a Consultation
+    </a>
+
+    <button
+      class="nav-toggle"
+      id="nav-toggle"
+      aria-label="Toggle navigation"
+    >
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
   </div>
 </header>
 
@@ -71,20 +287,50 @@
     <div class="container">
       <span class="eyebrow">Who We Help</span>
       <h1>Industries we serve.</h1>
-      <p class="hero-sub">We partner with ambitious businesses across retail, ecommerce, manufacturing and professional services to unlock commercial and operational potential.</p>
+      <p class="hero-sub">
+        We partner with ambitious businesses across retail, ecommerce,
+        manufacturing and professional services to unlock commercial and
+        operational potential.
+      </p>
     </div>
   </section>
+
   <section class="section-tight">
     <div class="container">
       <div class="grid-3" id="industries-grid"></div>
     </div>
   </section>
-  <section>
+
+  <section class="section-tight">
     <div class="container">
+      <aside
+        class="listing-ad listing-ad--display"
+        id="industries-display-ad"
+        aria-label="Advertisement"
+        hidden
+      >
+        <span class="listing-ad__label">Advertisement</span>
+
+        <ins
+          class="adsbygoogle"
+          style="display:block"
+          data-ad-client="ca-pub-7308041122340160"
+          data-ad-slot="6205733112"
+          data-ad-format="auto"
+          data-full-width-responsive="true"
+        ></ins>
+      </aside>
+
       <div class="cta-banner">
         <h2>Ready to Accelerate Your Business?</h2>
-        <p>Transform your digital operations with practical consultancy built for measurable commercial results.</p>
-        <a href="/contact" class="btn btn-primary btn-lg">Book a Consultation <i data-lucide="arrow-right" class="btn-icon"></i></a>
+        <p>
+          Transform your digital operations with practical consultancy built
+          for measurable commercial results.
+        </p>
+        <a href="/contact" class="btn btn-primary btn-lg">
+          Book a Consultation
+          <i data-lucide="arrow-right" class="btn-icon"></i>
+        </a>
       </div>
     </div>
   </section>
@@ -95,9 +341,19 @@
   <div class="container">
     <div class="footer-inner">
       <div class="footer-brand">
-        <a href="/" class="logo"><img src="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/wordmark-caps-light.png" alt="Xtradite Digital" class="logo-img"></a>
-        <p>Practical consultancy for retail, ecommerce and manufacturing businesses ready to accelerate digital-first growth.</p>
+        <a href="/" class="logo">
+          <img
+            src="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/wordmark-caps-light.png"
+            alt="Xtradite Digital"
+            class="logo-img"
+          >
+        </a>
+        <p>
+          Practical consultancy for retail, ecommerce and manufacturing
+          businesses ready to accelerate digital-first growth.
+        </p>
       </div>
+
       <div class="footer-col">
         <h4>Services</h4>
         <a href="/services/ai-automation">AI &amp; Automation</a>
@@ -107,6 +363,7 @@
         <a href="/services/fractional-leadership">Fractional Leadership</a>
         <a href="/services/project-delivery">Project Delivery</a>
       </div>
+
       <div class="footer-col">
         <h4>Industries</h4>
         <a href="/industry-detail?slug=retail">Retail</a>
@@ -116,6 +373,7 @@
         <a href="/industry-detail?slug=professional-services">Professional Services</a>
         <a href="/industry-detail?slug=startups">Startups</a>
       </div>
+
       <div class="footer-col">
         <h4>Company</h4>
         <a href="/about">About</a>
@@ -123,6 +381,7 @@
         <a href="/case-studies">Case Studies</a>
         <a href="/contact">Contact</a>
       </div>
+
       <div class="footer-col">
         <h4>Legal</h4>
         <a href="/legal/privacy">Privacy Policy</a>
@@ -131,10 +390,18 @@
         <a href="/legal/terms">Terms</a>
       </div>
     </div>
+
     <div class="footer-bottom">
       <span>&copy; 2026 Xtradite Digital. All rights reserved.</span>
+
       <div class="footer-social">
-        <a href="#" aria-label="LinkedIn â€” add your company URL" title="Add your real LinkedIn URL here"><i data-lucide="linkedin"></i></a>
+        <a
+          href="#"
+          aria-label="LinkedIn — add your company URL"
+          title="Add your real LinkedIn URL here"
+        >
+          <i data-lucide="linkedin"></i>
+        </a>
       </div>
     </div>
   </div>
@@ -143,7 +410,179 @@
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js" defer></script>
 <script src="assets/js/site.js" defer></script>
 <script type="module" src="assets/js/pages/industries.js"></script>
+
+<script>
+  (() => {
+    const FEED_AD_SLOT = "5634887470";
+    const FEED_INSERT_AFTER_CARD = 3;
+    const MINIMUM_CARDS_FOR_FEED_AD = 5;
+
+    let observer;
+    let loaderCheck;
+
+    function hasMarketingConsent() {
+      return Boolean(
+        window.Cookiebot && Cookiebot.hasResponse && Cookiebot.consent && Cookiebot.consent.marketing
+      );
+    }
+
+    function adsenseIsAvailable() {
+      return Array.isArray(window.adsbygoogle);
+    }
+
+    function createFeedAd() {
+      const wrapper = document.createElement("aside");
+
+      wrapper.className = "listing-ad listing-ad--feed";
+      wrapper.setAttribute("aria-label", "Advertisement");
+      wrapper.dataset.adUnit = "industry-feed";
+      wrapper.hidden = true;
+
+      const label = document.createElement("span");
+      label.className = "listing-ad__label";
+      label.textContent = "Advertisement";
+
+      const ad = document.createElement("ins");
+      ad.className = "adsbygoogle";
+      ad.style.display = "block";
+      ad.dataset.adFormat = "fluid";
+      ad.dataset.adLayoutKey = "-gw-3+1f-3d+2z";
+      ad.dataset.adClient = "ca-pub-7308041122340160";
+      ad.dataset.adSlot = FEED_AD_SLOT;
+
+      wrapper.append(label, ad);
+
+      return wrapper;
+    }
+
+    function placeFeedAd() {
+      const grid = document.getElementById("industries-grid");
+
+      if (!grid || grid.querySelector('[data-ad-unit="industry-feed"]')) {
+        return;
+      }
+
+      const cards = Array.from(grid.children).filter((child) => {
+        return !child.matches(".listing-ad");
+      });
+
+      if (cards.length < MINIMUM_CARDS_FOR_FEED_AD) {
+        return;
+      }
+
+      const insertionPoint = cards[Math.min(
+        FEED_INSERT_AFTER_CARD - 1,
+        cards.length - 1
+      )];
+
+      insertionPoint.insertAdjacentElement("afterend", createFeedAd());
+    }
+
+    function initialiseAd(adElement) {
+      const wrapper = adElement.closest(".listing-ad");
+
+      if (!wrapper || wrapper.dataset.initialised === "true") {
+        return;
+      }
+
+      wrapper.hidden = false;
+
+      try {
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+        wrapper.dataset.initialised = "true";
+      } catch (error) {
+        wrapper.hidden = true;
+        console.warn("AdSense unit could not be initialised.", error);
+      }
+    }
+
+    function initialiseEligibleAds() {
+      if (!hasMarketingConsent() || !adsenseIsAvailable()) {
+        return;
+      }
+
+      document
+        .querySelectorAll(".listing-ad .adsbygoogle")
+        .forEach(initialiseAd);
+    }
+
+    function waitForAdSense() {
+      if (!hasMarketingConsent() || adsenseIsAvailable() || loaderCheck) {
+        initialiseEligibleAds();
+        return;
+      }
+
+      let attempts = 0;
+
+      loaderCheck = window.setInterval(() => {
+        attempts += 1;
+
+        if (adsenseIsAvailable()) {
+          window.clearInterval(loaderCheck);
+          loaderCheck = null;
+          initialiseEligibleAds();
+        } else if (attempts >= 20) {
+          window.clearInterval(loaderCheck);
+          loaderCheck = null;
+        }
+      }, 500);
+    }
+
+    function prepareAds() {
+      placeFeedAd();
+      waitForAdSense();
+    }
+
+    function watchIndustryGrid() {
+      const grid = document.getElementById("industries-grid");
+
+      if (!grid) {
+        return;
+      }
+
+      observer = new MutationObserver(() => {
+        const cards = Array.from(grid.children).filter((child) => {
+          return !child.matches(".listing-ad");
+        });
+
+        if (!cards.length) {
+          return;
+        }
+
+        prepareAds();
+
+        if (
+          grid.querySelector('[data-ad-unit="industry-feed"]') ||
+          cards.length < MINIMUM_CARDS_FOR_FEED_AD
+        ) {
+          observer.disconnect();
+        }
+      });
+
+      observer.observe(grid, {
+        childList: true
+      });
+
+      if (grid.children.length) {
+        prepareAds();
+      }
+    }
+
+    window.addEventListener("CookiebotOnConsentReady", waitForAdSense);
+    window.addEventListener("CookiebotOnAccept", waitForAdSense);
+
+    window.addEventListener("CookiebotOnDecline", () => {
+      document.querySelectorAll(".listing-ad").forEach((ad) => {
+        if (ad.dataset.initialised !== "true") {
+          ad.hidden = true;
+        }
+      });
+    });
+
+    document.addEventListener("DOMContentLoaded", watchIndustryGrid);
+  })();
+</script>
+
+<script src="assets/js/adsense-units.js" defer></script>
 </body>
 </html>
-
-

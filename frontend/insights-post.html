@@ -1,33 +1,113 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="google-adsense-account" content="ca-pub-7308041122340160">
-<script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="07680bbc-6c7e-4a44-9d8b-a2ff6766646c" type="text/javascript"></script>
-<script data-cookieconsent="ignore"> window.dataLayer = window.dataLayer || []; function gtag() { dataLayer.push(arguments); } gtag("consent", "default", { ad_personalization: "denied", ad_storage: "denied", ad_user_data: "denied", analytics_storage: "denied", functionality_storage: "denied", personalization_storage: "denied", security_storage: "granted", wait_for_update: 500, }); gtag("set", "ads_data_redaction", true); gtag("set", "url_passthrough", false);</script>
-<!-- Google tag (gtag.js) -->
-<script type="text/plain" data-cookieconsent="statistics" async src="https://www.googletagmanager.com/gtag/js?id=G-WYXTKGJ9JS"></script>
-<script type="text/plain" data-cookieconsent="statistics">
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
 
-  gtag('config', 'G-WYXTKGJ9JS');
+<!-- Google Consent Mode defaults: must run before Cookiebot and Google tags -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+
+  function gtag() {
+    dataLayer.push(arguments);
+  }
+
+  gtag("consent", "default", {
+    ad_storage: "denied",
+    ad_user_data: "denied",
+    ad_personalization: "denied",
+    analytics_storage: "denied",
+    functionality_storage: "denied",
+    personalization_storage: "denied",
+    security_storage: "granted",
+    wait_for_update: 500
+  });
+
+  gtag("set", "ads_data_redaction", true);
+  gtag("set", "url_passthrough", false);
 </script>
-<!-- Google AdSense -->
+
+<!-- Cookiebot CMP -->
+<script
+  id="Cookiebot"
+  src="https://consent.cookiebot.com/uc.js"
+  data-cbid="07680bbc-6c7e-4a44-9d8b-a2ff6766646c"
+  data-blockingmode="auto"
+  data-framework="IAB"
+  type="text/javascript"
+></script>
+
+<!-- Synchronise genuine Cookiebot choices with Google Consent Mode -->
+<script>
+  function loadAdSenseAfterConsent() {
+    if (
+      !window.Cookiebot ||
+      !Cookiebot.hasResponse ||
+      !Cookiebot.consent.marketing ||
+      document.getElementById("adsense-loader")
+    ) {
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.id = "adsense-loader";
+    script.async = true;
+    script.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7308041122340160";
+    script.crossOrigin = "anonymous";
+    document.head.appendChild(script);
+  }
+
+  function updateGoogleConsentFromCookiebot() {
+    if (!window.Cookiebot || !Cookiebot.hasResponse) {
+      return;
+    }
+
+    const marketingGranted = Cookiebot.consent.marketing === true;
+    const statisticsGranted = Cookiebot.consent.statistics === true;
+    const preferencesGranted = Cookiebot.consent.preferences === true;
+
+    gtag("consent", "update", {
+      ad_storage: marketingGranted ? "granted" : "denied",
+      ad_user_data: marketingGranted ? "granted" : "denied",
+      ad_personalization: marketingGranted ? "granted" : "denied",
+      analytics_storage: statisticsGranted ? "granted" : "denied",
+      functionality_storage: preferencesGranted ? "granted" : "denied",
+      personalization_storage: preferencesGranted ? "granted" : "denied",
+      security_storage: "granted"
+    });
+
+    gtag("set", "ads_data_redaction", !marketingGranted);
+
+    if (marketingGranted) {
+      loadAdSenseAfterConsent();
+    }
+  }
+
+  window.addEventListener("CookiebotOnConsentReady", updateGoogleConsentFromCookiebot);
+  window.addEventListener("CookiebotOnAccept", updateGoogleConsentFromCookiebot);
+  window.addEventListener("CookiebotOnDecline", updateGoogleConsentFromCookiebot);
+</script>
+
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-WYXTKGJ9JS"></script>
+<script>
+  gtag("js", new Date());
+  gtag("config", "G-WYXTKGJ9JS");
+</script>
+
 <!-- Vercel Speed Insights -->
 <script src="assets/js/speed-insights-init.js" defer></script>
-<script type="text/plain" data-cookieconsent="marketing" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7308041122340160" crossorigin="anonymous"></script>
 <title>Insight — Xtradite Digital</title>
 <meta name="description" content="Read the latest thinking from Xtradite Digital on operations, growth and leadership.">
-<meta property="og:title" content="Insight â€” Xtradite Digital">
+<meta property="og:title" content="Insight — Xtradite Digital">
 <meta property="og:description" content="Read the latest thinking from Xtradite Digital on operations, growth and leadership.">
 <meta property="og:type" content="article">
 <meta name="twitter:card" content="summary_large_image">
 <!-- Overridden per-post by assets/js/pages/insights-post.js once the post loads. -->
 <link rel="stylesheet" href="assets/css/tokens.css">
 <link rel="stylesheet" href="assets/css/main.css">
+<link rel="stylesheet" href="assets/css/adsense.css">
 <link rel="icon" href="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/favicon-dark.ico" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/favicon-light.ico" media="(prefers-color-scheme: light)">
 <link rel="icon" href="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/favicon-light.ico">
@@ -40,11 +120,110 @@
 <meta property="og:site_name" content="Xtradite Digital">
 <meta property="og:locale" content="en_GB">
 <meta property="og:url" content="https://www.xtradite-digital.co.uk/insights-post">
-<meta name="twitter:title" content="Insight â€” Xtradite Digital">
+<meta name="twitter:title" content="Insight — Xtradite Digital">
 <meta name="twitter:description" content="Read the latest thinking from Xtradite Digital on operations, growth and leadership.">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Organization", "name": "Xtradite Digital", "url": "https://www.xtradite-digital.co.uk/", "description": "UK digital consultancy helping ambitious retail, ecommerce and manufacturing businesses close operational and commercial gaps with hands-on delivery.", "areaServed": "GB", "knowsAbout": ["Digital Strategy", "AI & Automation", "eCommerce Growth", "Operational Excellence", "Fractional Leadership", "Project Delivery"]}</script>
 <!-- Vercel Web Analytics -->
 <script defer src="https://cdn.vercel-insights.com/v1/script.js"></script>
+
+<style>
+  .article-ad {
+    clear: both;
+    width: 100%;
+    margin: var(--space-48) 0;
+  }
+
+  .article-ad__label {
+    display: block;
+    margin-bottom: var(--space-8);
+    color: var(--color-text-muted, #8f8f8f);
+    font-size: var(--font-size-xs, 0.75rem);
+    line-height: 1;
+    letter-spacing: 0.05em;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  .article-ad--in-content {
+    padding: var(--space-20) 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .article-ad--multiplex {
+    min-height: 280px;
+    margin-top: var(--space-56);
+  }
+
+  @media (max-width: 767px) {
+    .article-ad {
+      margin: var(--space-40) 0;
+    }
+
+    .article-ad--in-content {
+      padding: var(--space-16) 0;
+    }
+  }
+
+  .article-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 760px) minmax(180px, 300px);
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: start;
+    justify-content: center;
+  }
+
+  .article-layout__main,
+  .article-layout__rail {
+    min-width: 0;
+  }
+
+  .article-rail-sticky {
+    position: sticky;
+    top: calc(var(--space-24) + 80px);
+  }
+
+  .article-ad--rail {
+    margin: 0;
+  }
+
+  .article-ad--vertical {
+    min-height: 600px;
+  }
+
+  .article-ad--square {
+    display: none;
+    min-height: 250px;
+  }
+
+  @media (max-width: 1100px) {
+    .article-layout {
+      grid-template-columns: minmax(0, 760px) minmax(180px, 250px);
+      gap: var(--space-32);
+    }
+
+    .article-ad--vertical {
+      display: none;
+    }
+
+    .article-ad--square {
+      display: block;
+    }
+  }
+
+  @media (max-width: 860px) {
+    .article-layout {
+      display: block;
+      max-width: 760px;
+    }
+
+    .article-layout__rail {
+      display: none;
+    }
+  }
+
+</style>
+
 </head>
 <body>
 
@@ -69,7 +248,8 @@
 <main>
 
   <section class="section-tight">
-    <div class="container" style="max-width: 760px;">
+    <div class="container article-layout">
+      <article class="article-layout__main">
       <a href="/insights" class="back-link"><i data-lucide="arrow-left"></i> Back to Insights</a>
 
       <div id="not-found" class="not-found" hidden>
@@ -91,11 +271,27 @@
         <div id="post-cover-wrap"></div>
         <div class="richtext" id="post-body"></div>
 
+        <aside
+          class="article-ad article-ad--multiplex"
+          id="post-multiplex-ad"
+          aria-label="Advertisement"
+          hidden
+        >
+          <span class="article-ad__label">Advertisement</span>
+          <ins
+            class="adsbygoogle"
+            style="display:block"
+            data-ad-format="autorelaxed"
+            data-ad-client="ca-pub-7308041122340160"
+            data-ad-slot="2190466483"
+          ></ins>
+        </aside>
+
         <div class="author-box">
           <div class="author-avatar">XD</div>
           <div>
             <h4>About Xtradite Digital</h4>
-            <p>Practical consultancy for retail, ecommerce and manufacturing businesses ready to accelerate digital-first growth â€” hands-on delivery, not just strategy decks.</p>
+            <p>Practical consultancy for retail, ecommerce and manufacturing businesses ready to accelerate digital-first growth — hands-on delivery, not just strategy decks.</p>
           </div>
         </div>
 
@@ -112,6 +308,45 @@
           <div class="related-grid" id="related-posts"></div>
         </div>
       </div>
+      </article>
+
+      <aside class="article-layout__rail" aria-label="Sponsored content">
+        <div class="article-rail-sticky">
+          <div
+            class="article-ad article-ad--rail article-ad--vertical"
+            id="post-vertical-ad"
+            aria-label="Advertisement"
+            hidden
+          >
+            <span class="article-ad__label">Advertisement</span>
+            <ins
+              class="adsbygoogle"
+              style="display:block"
+              data-ad-client="ca-pub-7308041122340160"
+              data-ad-slot="9921616846"
+              data-ad-format="auto"
+              data-full-width-responsive="true"
+            ></ins>
+          </div>
+
+          <div
+            class="article-ad article-ad--rail article-ad--square"
+            id="post-square-ad"
+            aria-label="Advertisement"
+            hidden
+          >
+            <span class="article-ad__label">Advertisement</span>
+            <ins
+              class="adsbygoogle"
+              style="display:block"
+              data-ad-client="ca-pub-7308041122340160"
+              data-ad-slot="6205733112"
+              data-ad-format="auto"
+              data-full-width-responsive="true"
+            ></ins>
+          </div>
+        </div>
+      </aside>
     </div>
   </section>
 
@@ -160,7 +395,7 @@
     <div class="footer-bottom">
       <span>&copy; 2026 Xtradite Digital. All rights reserved.</span>
       <div class="footer-social">
-        <a href="#" aria-label="LinkedIn â€” add your company URL" title="Add your real LinkedIn URL here"><i data-lucide="linkedin"></i></a>
+        <a href="#" aria-label="LinkedIn — add your company URL" title="Add your real LinkedIn URL here"><i data-lucide="linkedin"></i></a>
       </div>
     </div>
   </div>
@@ -169,7 +404,182 @@
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js" defer></script>
 <script src="assets/js/site.js" defer></script>
 <script type="module" src="assets/js/pages/insights-post.js"></script>
+
+<script>
+  (() => {
+    const ADSENSE_CLIENT = 'ca-pub-7308041122340160';
+    const IN_ARTICLE_SLOT = '5137183702';
+    const MIN_PARAGRAPHS_FOR_IN_ARTICLE_AD = 7;
+    const INSERT_AFTER_PARAGRAPH = 4;
+
+    let adsInitialised = false;
+    let observer;
+
+    function hasMarketingConsent() {
+      return Boolean(
+        window.Cookiebot && Cookiebot.hasResponse && Cookiebot.consent && Cookiebot.consent.marketing
+      );
+    }
+
+    function adsenseIsAvailable() {
+      return Array.isArray(window.adsbygoogle);
+    }
+
+    function createInArticleAd() {
+      const wrapper = document.createElement('aside');
+      wrapper.className = 'article-ad article-ad--in-content';
+      wrapper.setAttribute('aria-label', 'Advertisement');
+      wrapper.hidden = true;
+      wrapper.dataset.adUnit = 'in-article';
+
+      const label = document.createElement('span');
+      label.className = 'article-ad__label';
+      label.textContent = 'Advertisement';
+
+      const ad = document.createElement('ins');
+      ad.className = 'adsbygoogle';
+      ad.style.display = 'block';
+      ad.style.textAlign = 'center';
+      ad.dataset.adLayout = 'in-article';
+      ad.dataset.adFormat = 'fluid';
+      ad.dataset.adClient = ADSENSE_CLIENT;
+      ad.dataset.adSlot = IN_ARTICLE_SLOT;
+
+      wrapper.append(label, ad);
+      return wrapper;
+    }
+
+    function placeInArticleAd() {
+      const postBody = document.getElementById('post-body');
+      if (!postBody || postBody.querySelector('[data-ad-unit="in-article"]')) {
+        return;
+      }
+
+      const paragraphs = Array.from(postBody.querySelectorAll(':scope > p'))
+        .filter((paragraph) => paragraph.textContent.trim().length >= 80);
+
+      if (paragraphs.length < MIN_PARAGRAPHS_FOR_IN_ARTICLE_AD) {
+        return;
+      }
+
+      const insertionPoint = paragraphs[Math.min(
+        INSERT_AFTER_PARAGRAPH - 1,
+        paragraphs.length - 1
+      )];
+
+      insertionPoint.insertAdjacentElement('afterend', createInArticleAd());
+    }
+
+    function initialiseAd(adElement) {
+      const wrapper = adElement.closest('.article-ad');
+      if (!wrapper || wrapper.dataset.initialised === 'true') {
+        return;
+      }
+
+      wrapper.hidden = false;
+
+      try {
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+        wrapper.dataset.initialised = 'true';
+      } catch (error) {
+        wrapper.hidden = true;
+        console.warn('AdSense unit could not be initialised.', error);
+      }
+    }
+
+    function initialiseEligibleAds() {
+      if (!hasMarketingConsent() || !adsenseIsAvailable()) {
+        return;
+      }
+
+      document.querySelectorAll('.article-ad .adsbygoogle').forEach((adElement) => {
+        const wrapper = adElement.closest('.article-ad');
+
+        if (!wrapper) {
+          return;
+        }
+
+        const isRailAd = wrapper.classList.contains('article-ad--rail');
+        const isVisible = window.getComputedStyle(wrapper).display !== 'none';
+
+        if (!isRailAd || isVisible) {
+          initialiseAd(adElement);
+        }
+      });
+
+      adsInitialised = true;
+    }
+
+    function prepareAds() {
+      placeInArticleAd();
+
+      initialiseEligibleAds();
+
+      if (hasMarketingConsent() && !adsenseIsAvailable()) {
+        let attempts = 0;
+        const loaderCheck = window.setInterval(() => {
+          attempts += 1;
+
+          if (adsenseIsAvailable()) {
+            window.clearInterval(loaderCheck);
+            initialiseEligibleAds();
+          } else if (attempts >= 20) {
+            window.clearInterval(loaderCheck);
+          }
+        }, 500);
+      }
+    }
+
+    function watchForPostContent() {
+      const postBody = document.getElementById('post-body');
+      if (!postBody) {
+        return;
+      }
+
+      observer = new MutationObserver(() => {
+        if (!postBody.textContent.trim()) {
+          return;
+        }
+
+        prepareAds();
+        observer.disconnect();
+      });
+
+      observer.observe(postBody, {
+        childList: true,
+        subtree: true
+      });
+
+      if (postBody.textContent.trim()) {
+        prepareAds();
+        observer.disconnect();
+      }
+    }
+
+    let resizeTimer;
+
+    window.addEventListener('resize', () => {
+      window.clearTimeout(resizeTimer);
+
+      resizeTimer = window.setTimeout(() => {
+        initialiseEligibleAds();
+      }, 200);
+    });
+
+    window.addEventListener('CookiebotOnConsentReady', initialiseEligibleAds);
+    window.addEventListener('CookiebotOnAccept', initialiseEligibleAds);
+    window.addEventListener('CookiebotOnDecline', () => {
+      document.querySelectorAll('.article-ad').forEach((ad) => {
+        if (ad.dataset.initialised !== 'true') {
+          ad.hidden = true;
+        }
+      });
+    });
+
+    document.addEventListener('DOMContentLoaded', watchForPostContent);
+  })();
+</script>
+
+<script src="assets/js/adsense-units.js" defer></script>
 </body>
 </html>
-
-

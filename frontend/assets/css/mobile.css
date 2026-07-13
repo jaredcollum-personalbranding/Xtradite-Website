@@ -1,0 +1,133 @@
+/* Xtradite Digital — shared mobile responsive refinements */
+@media (max-width: 767px) {
+  html { scroll-padding-top: 72px; }
+  body { font-size: .9375rem; line-height: 1.65; overflow-x: hidden; }
+  .container { padding-inline: 18px; }
+  section, .section-tight { padding-block: 48px; }
+  main > section:first-child:not(.hero) { padding-top: 40px; }
+
+  h1, .hero h1, [style*="font-size: var(--font-size-display"] {
+    font-size: clamp(2rem, 10vw, 2.75rem) !important;
+    line-height: 1.04;
+    letter-spacing: -.035em;
+  }
+  h2, .cta-banner h2 { font-size: clamp(1.65rem, 7.5vw, 2.1rem); line-height: 1.12; }
+  h3, .card h3, .richtext h2 { font-size: clamp(1.25rem, 5.5vw, 1.55rem); line-height: 1.2; }
+  h4, .track-record-subhead { font-size: 1.05rem; }
+
+  .header-inner { gap: 12px; padding-top: 14px; padding-bottom: 14px; }
+  .logo-img { height: 19px; max-width: min(52vw, 190px); }
+  .site-nav { padding: 8px 18px 20px; }
+  .site-nav a { padding: 11px 0; font-size: .9rem; }
+  .site-nav .header-cta-mobile { width: 100%; justify-content: center; }
+
+  .hero, .hero.left-aligned { padding: 72px 0 52px; }
+  .hero .container, .hero.left-aligned .container { max-width: none; }
+  .hero h1 { margin-bottom: 18px; }
+  .hero-sub, .section-head p, .cta-banner p { font-size: 1rem; line-height: 1.65; }
+  .hero-sub { margin-bottom: 28px; }
+  .hero-ctas { display: grid; grid-template-columns: 1fr; gap: 12px; width: 100%; }
+
+  .btn, .btn-lg {
+    min-height: 48px;
+    padding: 12px 18px;
+    font-size: .9375rem;
+    white-space: normal;
+    text-align: center;
+    line-height: 1.25;
+  }
+  .btn-sm { min-height: 42px; padding: 10px 16px; font-size: .875rem; }
+  .hero-ctas .btn, .cta-banner .btn, .contact-layout .btn, form .btn { width: 100%; }
+
+  .eyebrow { margin-bottom: 16px; padding: 7px 12px; font-size: .66rem; }
+  .section-head { margin-bottom: 32px; text-align: left; }
+  .section-head p { margin-top: 12px; }
+
+  .grid-2, .grid-3, .related-grid, .detail-hero-grid, .founder-grid { gap: 18px; }
+  .card, .service-card, .case-card, .blog-card, .related-post-card {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 22px;
+    border-radius: var(--radius-lg);
+  }
+  .card p.card-desc, .card .richtext, .case-card p, .blog-card p { flex: 1 1 auto; }
+  .card-link, .card > .btn, .service-card > .btn, .case-card > .btn, .blog-card > .btn {
+    margin-top: auto;
+    align-self: flex-start;
+  }
+  .blog-card-cover, .related-post-card .blog-card-cover-sm {
+    margin-left: -22px;
+    margin-right: -22px;
+    margin-bottom: 20px;
+  }
+  .service-card .card-icon { width: 42px; height: 42px; margin-bottom: 18px; }
+  .case-card .card-image { margin-bottom: 18px; }
+
+  .stats-strip { gap: 20px 12px; padding-block: 36px; }
+  .stat-number { font-size: 1.75rem; }
+  .stat-label { font-size: .65rem; line-height: 1.35; }
+
+  .timeline { gap: 14px; }
+  .timeline-step { padding: 20px; }
+  .banner-card { align-items: flex-start; gap: 18px; }
+  .banner-card-body { min-width: 0; width: 100%; }
+  .banner-card .btn, .banner-card .card-link { width: 100%; justify-content: center; margin-top: 4px; }
+  .mini-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .mini-stat { min-width: 0; }
+
+  .cta-banner { padding: 34px 22px; border-radius: var(--radius-lg); }
+  .cta-banner p { margin-bottom: 24px; }
+  .glance-card, .founder-facts, .author-box, .note-banner { padding: 20px; }
+  .author-box { flex-direction: column; margin-top: 40px; }
+
+  .richtext p, .richtext li { font-size: .9375rem; }
+  .richtext h2 { margin-top: 32px; }
+  .post-meta { gap: 8px 10px; margin-bottom: 24px; }
+  .post-meta .dot { display: none; }
+  .post-cover { margin: 24px 0 30px; }
+  .post-cover-expand { padding: 6px 9px; font-size: .62rem; }
+
+  .tag-filter-bar {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 8px;
+    margin: 0 -18px 28px;
+    padding: 0 18px 8px;
+    scrollbar-width: none;
+  }
+  .tag-filter-bar::-webkit-scrollbar { display: none; }
+  .tag-filter-chip { flex: 0 0 auto; padding: 8px 14px; font-size: .8rem; }
+
+  .faq-question { gap: 12px; padding: 18px 0; font-size: .95rem; line-height: 1.4; text-align: left; }
+  .faq-answer p { padding-bottom: 18px; }
+  .form-field { margin-bottom: 18px; }
+  .form-field input, .form-field textarea { padding: 13px 14px; font-size: 1rem; }
+
+  .site-footer { padding-top: 48px; }
+  .footer-inner { gap: 28px; padding-bottom: 36px; }
+  .footer-brand { margin-bottom: 4px; }
+  .footer-brand p { max-width: none; }
+  .footer-col h4 { margin-bottom: 14px; }
+  .footer-col a { margin-bottom: 10px; }
+  .footer-bottom { align-items: flex-start; padding-block: 20px; }
+
+  .legal-body h2 { margin-top: 32px; }
+  .legal-updated { margin-bottom: 32px; }
+  .deliverable-list { gap: 14px; }
+  .tech-logo-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .tech-logo-item { padding: 14px 6px; }
+  .lightbox-overlay { padding: 16px; }
+  .lightbox-close { top: 12px; right: 12px; }
+
+  .sitewide-ad, .article-ad, .listing-ad, .industry-ad { margin-top: 32px; margin-bottom: 32px; }
+}
+
+@media (max-width: 380px) {
+  .container { padding-inline: 15px; }
+  h1, .hero h1, [style*="font-size: var(--font-size-display"] { font-size: 1.9rem !important; }
+  h2, .cta-banner h2 { font-size: 1.55rem; }
+  .card, .service-card, .case-card, .blog-card, .related-post-card { padding: 19px; }
+  .blog-card-cover, .related-post-card .blog-card-cover-sm { margin-left: -19px; margin-right: -19px; }
+  .mini-stats, .tech-logo-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

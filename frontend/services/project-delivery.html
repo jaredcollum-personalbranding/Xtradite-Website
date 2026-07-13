@@ -1,24 +1,103 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="google-adsense-account" content="ca-pub-7308041122340160">
-<script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="07680bbc-6c7e-4a44-9d8b-a2ff6766646c" type="text/javascript"></script>
-<script data-cookieconsent="ignore"> window.dataLayer = window.dataLayer || []; function gtag() { dataLayer.push(arguments); } gtag("consent", "default", { ad_personalization: "denied", ad_storage: "denied", ad_user_data: "denied", analytics_storage: "denied", functionality_storage: "denied", personalization_storage: "denied", security_storage: "granted", wait_for_update: 500, }); gtag("set", "ads_data_redaction", true); gtag("set", "url_passthrough", false);</script>
-<!-- Google tag (gtag.js) -->
-<script type="text/plain" data-cookieconsent="statistics" async src="https://www.googletagmanager.com/gtag/js?id=G-WYXTKGJ9JS"></script>
-<script type="text/plain" data-cookieconsent="statistics">
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
 
-  gtag('config', 'G-WYXTKGJ9JS');
+<!-- Google Consent Mode defaults: must run before Cookiebot and Google tags -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+
+  function gtag() {
+    dataLayer.push(arguments);
+  }
+
+  gtag("consent", "default", {
+    ad_storage: "denied",
+    ad_user_data: "denied",
+    ad_personalization: "denied",
+    analytics_storage: "denied",
+    functionality_storage: "denied",
+    personalization_storage: "denied",
+    security_storage: "granted",
+    wait_for_update: 500
+  });
+
+  gtag("set", "ads_data_redaction", true);
+  gtag("set", "url_passthrough", false);
 </script>
-<!-- Google AdSense -->
+
+<!-- Cookiebot CMP -->
+<script
+  id="Cookiebot"
+  src="https://consent.cookiebot.com/uc.js"
+  data-cbid="07680bbc-6c7e-4a44-9d8b-a2ff6766646c"
+  data-blockingmode="auto"
+  data-framework="IAB"
+  type="text/javascript"
+></script>
+
+<!-- Synchronise genuine Cookiebot choices with Google Consent Mode -->
+<script>
+  function loadAdSenseAfterConsent() {
+    if (
+      !window.Cookiebot ||
+      !Cookiebot.hasResponse ||
+      !Cookiebot.consent.marketing ||
+      document.getElementById("adsense-loader")
+    ) {
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.id = "adsense-loader";
+    script.async = true;
+    script.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7308041122340160";
+    script.crossOrigin = "anonymous";
+    document.head.appendChild(script);
+  }
+
+  function updateGoogleConsentFromCookiebot() {
+    if (!window.Cookiebot || !Cookiebot.hasResponse) {
+      return;
+    }
+
+    const marketingGranted = Cookiebot.consent.marketing === true;
+    const statisticsGranted = Cookiebot.consent.statistics === true;
+    const preferencesGranted = Cookiebot.consent.preferences === true;
+
+    gtag("consent", "update", {
+      ad_storage: marketingGranted ? "granted" : "denied",
+      ad_user_data: marketingGranted ? "granted" : "denied",
+      ad_personalization: marketingGranted ? "granted" : "denied",
+      analytics_storage: statisticsGranted ? "granted" : "denied",
+      functionality_storage: preferencesGranted ? "granted" : "denied",
+      personalization_storage: preferencesGranted ? "granted" : "denied",
+      security_storage: "granted"
+    });
+
+    gtag("set", "ads_data_redaction", !marketingGranted);
+
+    if (marketingGranted) {
+      loadAdSenseAfterConsent();
+    }
+  }
+
+  window.addEventListener("CookiebotOnConsentReady", updateGoogleConsentFromCookiebot);
+  window.addEventListener("CookiebotOnAccept", updateGoogleConsentFromCookiebot);
+  window.addEventListener("CookiebotOnDecline", updateGoogleConsentFromCookiebot);
+</script>
+
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-WYXTKGJ9JS"></script>
+<script>
+  gtag("js", new Date());
+  gtag("config", "G-WYXTKGJ9JS");
+</script>
+
 <!-- Vercel Speed Insights -->
 <script src="../assets/js/speed-insights-init.js" defer></script>
-<script type="text/plain" data-cookieconsent="marketing" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7308041122340160" crossorigin="anonymous"></script>
 <title>Service — Xtradite Digital</title>
 <meta name="description" content="Explore Xtradite Digital's services in detail.">
 <link rel="stylesheet" href="/assets/css/tokens.css">
@@ -163,6 +242,16 @@
     </div>
   </section>
 
+
+  <section class="section-tight" data-sitewide-ad-section>
+    <div class="container">
+      <aside class="sitewide-ad sitewide-ad--multiplex" aria-label="Advertisement" hidden>
+        <span class="sitewide-ad__label">Advertisement</span>
+        <ins class="adsbygoogle" style="display:block" data-ad-format="autorelaxed" data-ad-client="ca-pub-7308041122340160" data-ad-slot="2190466483"></ins>
+      </aside>
+    </div>
+  </section>
+
 </main>
 
 <footer class="site-footer">
@@ -217,7 +306,7 @@
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js" defer></script>
 <script src="/assets/js/site.js" defer></script>
 <script type="module" src="/assets/js/pages/service-detail.js"></script>
+<script src="../assets/js/adsense-units.js" defer></script>
 </body>
 </html>
-
 

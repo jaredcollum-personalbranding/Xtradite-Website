@@ -10,10 +10,30 @@ import {
   faqListHtml,
   wireFaqAccordion,
 } from "../render-helpers.js";
+import { renderServiceLocationCoverage } from "./service-locations.js";
+import { enhanceServiceExperience } from "./service-experience.js";
+import { organiseServiceContentTabs, renderDetailedDeliveryTimeline } from "./service-content-architecture.js";
+import { watchDeliveryTimeline } from "./service-delivery-timeline.js";
 
 const root = document.getElementById("service-detail-root");
 const notFound = document.getElementById("not-found");
 const slug = getSlugParam();
+
+function ensureContentArchitectureStyles() {
+  const styles = [
+    ["serviceContentArchitectureCss", "/assets/css/service-content-architecture.css"],
+    ["serviceDeliveryTimelineCss", "/assets/css/service-delivery-timeline-v2.css"],
+  ];
+
+  styles.forEach(([datasetKey, href]) => {
+    if (document.querySelector(`link[data-${datasetKey.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)}]`)) return;
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.dataset[datasetKey] = "true";
+    link.href = href;
+    document.head.appendChild(link);
+  });
+}
 
 function setMetaByName(name, content) {
   if (!content) return;
@@ -92,6 +112,7 @@ async function load() {
   if (!item) return showNotFound();
 
   applySeo(item);
+  ensureContentArchitectureStyles();
 
   document.getElementById("breadcrumb-current").textContent = item.title;
   document.getElementById("service-icon").setAttribute("data-lucide", item.icon || "circle");
@@ -132,6 +153,12 @@ async function load() {
     document.getElementById("faq-section").hidden = false;
   }
 
+  organiseServiceContentTabs(item);
+  renderDetailedDeliveryTimeline(item);
+  watchDeliveryTimeline();
+  renderServiceLocationCoverage(item);
+  enhanceServiceExperience(item);
+
   const relatedCaseStudy = item.relatedCaseStudies?.[0];
   const relatedSlug = relatedCaseStudy?.slug;
   if (relatedSlug) {
@@ -139,16 +166,11 @@ async function load() {
       const cs = relatedCaseStudy;
       const relatedWrap = document.getElementById("related-case-study");
       if (cs && relatedWrap) {
-        relatedWrap.innerHTML = `
-          <span class="eyebrow">Related Case Study</span>
-          <h3>${escapeHtml(cs.client)}</h3>
-          <p class="card-desc">${escapeHtml(cs.challenge || "")}</p>
-          <span class="metric">${escapeHtml(cs.metric || "")}</span>
-          <a class="card-link" href="/case-study-detail?slug=${encodeURIComponent(cs.slug)}">View Case Study <i data-lucide="arrow-right"></i></a>`;
+        relatedWrap.innerHTML = `<span class="eyebrow">Related Case Study</span><h3>${escapeHtml(cs.client)}</h3><p class="card-desc">${escapeHtml(cs.challenge || "")}</p><span class="metric">${escapeHtml(cs.metric || "")}</span><a class="card-link" href="/case-study-detail?slug=${encodeURIComponent(cs.slug)}">View Case Study <i data-lucide="arrow-right"></i></a>`;
         relatedWrap.hidden = false;
       }
     } catch (e) {
-      console.error(e); // non-critical — related case study is a bonus, not core content
+      console.error(e);
     }
   }
 
@@ -161,7 +183,7 @@ async function load() {
         document.getElementById("related-insights-section").hidden = false;
       }
     } catch (e) {
-      console.error(e); // non-critical — related insights are a bonus, not core content
+      console.error(e);
     }
   }
 
