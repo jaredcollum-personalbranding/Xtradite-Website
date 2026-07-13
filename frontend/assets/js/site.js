@@ -1,7 +1,7 @@
 /**
- * Shared page chrome behavior — header navigation, scroll state, mobile nav toggle,
- * testimonial slider, FAQ accordion and stat counter animation. Plain script (no
- * imports), safe to load on every page before page-specific module scripts.
+ * Shared page chrome behaviour — global navigation, responsive menu controls,
+ * enquiry loading, testimonials, FAQs, statistic counters and icon rendering.
+ * Plain script: safe to load before page-specific modules on every route.
  */
 (function () {
   "use strict";
@@ -19,8 +19,9 @@
 
   const SUPABASE_URL = "https://bmhkdyshluiloorgnwoy.supabase.co";
   const SUPABASE_ANON_KEY = "sb_publishable_Aj9nCJLFY9aMycZeQ3buTQ_-n-Q7SFK";
-  const MENU_CACHE_KEY = "xtradite-global-menu-v1";
+  const MENU_CACHE_KEY = "xtradite-global-menu-v2";
   const MENU_CACHE_TTL = 30 * 60 * 1000;
+  const DESKTOP_QUERY = "(min-width: 1151px)";
 
   const FALLBACK_SERVICES = [
     { slug: "ai-automation", title: "AI & Automation", summary: "Practical AI and workflow automation that removes manual bottlenecks." },
@@ -55,23 +56,75 @@
   loadStylesheet("xtradite-tabs-css", "../css/tabs.css?v=20260713-1");
   loadStylesheet("xtradite-mega-menu-css", "../css/mega-menu.css?v=20260714-1");
   loadStylesheet("xtradite-enquiry-css", "../css/enquiry.css");
+  loadStylesheet("xtradite-jam-refinement-css", "../css/jam-refinement.css?v=20260714-1");
+
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function repairKnownMojibake(root = document) {
+    root.querySelectorAll?.(".stat-number").forEach((element) => {
+      if (element.textContent?.includes("Â£")) element.textContent = element.textContent.replaceAll("Â£", "£");
+      const target = element.getAttribute("data-count-to");
+      if (target?.includes("Â£")) element.setAttribute("data-count-to", target.replaceAll("Â£", "£"));
+    });
+  }
+
+  function linkedInSvg() {
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("viewBox", "0 0 24 24");
+    svg.setAttribute("aria-hidden", "true");
+    svg.setAttribute("focusable", "false");
+    svg.setAttribute("fill", "none");
+    svg.setAttribute("stroke", "currentColor");
+    svg.setAttribute("stroke-width", "2");
+    svg.setAttribute("stroke-linecap", "round");
+    svg.setAttribute("stroke-linejoin", "round");
+    svg.classList.add("lucide", "lucide-linkedin", "xtradite-brand-icon");
+    svg.innerHTML = '<path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"></path><rect width="4" height="12" x="2" y="9"></rect><circle cx="4" cy="4" r="2"></circle>';
+    return svg;
+  }
+
+  function replaceUnsupportedBrandIcons(root = document) {
+    root.querySelectorAll?.('i[data-lucide="linkedin"]').forEach((icon) => icon.replaceWith(linkedInSvg()));
+  }
+
+  function installLucideGuard() {
+    if (!window.lucide || typeof window.lucide.createIcons !== "function" || window.lucide.__xtraditeGuarded) return;
+    const nativeCreateIcons = window.lucide.createIcons.bind(window.lucide);
+    window.lucide.createIcons = (...args) => {
+      replaceUnsupportedBrandIcons(document);
+      return nativeCreateIcons(...args);
+    };
+    window.lucide.__xtraditeGuarded = true;
+  }
+
+  function renderIcons() {
+    installLucideGuard();
+    replaceUnsupportedBrandIcons(document);
+    if (window.lucide?.createIcons) window.lucide.createIcons();
+  }
+
+  installLucideGuard();
+  repairKnownMojibake();
+  replaceUnsupportedBrandIcons();
 
   function applyBrandLogos(root = document) {
-    root.querySelectorAll("img.logo-img").forEach((image) => {
+    root.querySelectorAll?.("img.logo-img").forEach((image) => {
       const inFooter = Boolean(image.closest(".site-footer"));
       const inHeader = Boolean(image.closest(".site-header"));
-      image.src = inFooter
-        ? BRAND_LOGOS.light
-        : inHeader
-          ? BRAND_LOGOS.dark
-          : BRAND_LOGOS.transparent;
+      image.src = inFooter ? BRAND_LOGOS.light : inHeader ? BRAND_LOGOS.dark : BRAND_LOGOS.transparent;
       image.alt = "Xtradite Digital";
       image.width = inFooter ? 132 : 120;
       image.height = inFooter ? 132 : 120;
       image.decoding = "async";
     });
 
-    root.querySelectorAll('script[type="application/ld+json"]').forEach((script) => {
+    root.querySelectorAll?.('script[type="application/ld+json"]').forEach((script) => {
       try {
         const data = JSON.parse(script.textContent || "{}");
         const records = Array.isArray(data) ? data : [data];
@@ -95,25 +148,17 @@
 
   applyBrandLogos();
 
-  const logoObserver = new MutationObserver((mutations) => {
+  const chromeObserver = new MutationObserver((mutations) => {
     mutations.forEach((mutation) => {
       mutation.addedNodes.forEach((node) => {
         if (!(node instanceof Element)) return;
-        if (node.matches("img.logo-img") || node.querySelector("img.logo-img")) {
-          applyBrandLogos(node.matches("img.logo-img") ? node.parentElement : node);
-        }
+        applyBrandLogos(node.matches("img.logo-img") ? node.parentElement : node);
+        repairKnownMojibake(node);
+        replaceUnsupportedBrandIcons(node);
       });
     });
   });
-  logoObserver.observe(document.documentElement, { childList: true, subtree: true });
-
-  function escapeHtml(value) {
-    return String(value ?? "")
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;");
-  }
+  chromeObserver.observe(document.documentElement, { childList: true, subtree: true });
 
   function currentMenuState() {
     const path = window.location.pathname.replace(/\/+$/, "") || "/";
@@ -179,7 +224,7 @@
         <button class="mega-nav-trigger" type="button" aria-expanded="false" aria-controls="mega-menu-what-we-do">
           <span>What We Do</span><span class="mega-nav-chevron" aria-hidden="true"></span>
         </button>
-        <div class="mega-menu-panel mega-menu-panel--what-we-do" id="mega-menu-what-we-do">
+        <div class="mega-menu-panel mega-menu-panel--what-we-do" id="mega-menu-what-we-do" aria-hidden="true">
           <div class="mega-menu-intro">
             <span class="mega-menu-kicker">Capabilities</span>
             <h2>Commercial thinking connected to implementation.</h2>
@@ -191,18 +236,14 @@
                 <div><span>Services</span><small>How we help</small></div>
                 <a href="/services">View all services <span aria-hidden="true">→</span></a>
               </div>
-              <div class="mega-menu-list mega-menu-list--services">
-                ${services.map((item) => serviceEntry(item, state)).join("")}
-              </div>
+              <div class="mega-menu-list mega-menu-list--services">${services.map((item) => serviceEntry(item, state)).join("")}</div>
             </section>
             <section class="mega-menu-column mega-menu-column--industries">
               <div class="mega-menu-column-head">
                 <div><span>Industries</span><small>Where we work</small></div>
                 <a href="/industries">View all industries <span aria-hidden="true">→</span></a>
               </div>
-              <div class="mega-menu-list mega-menu-list--industries">
-                ${industries.map((item) => industryEntry(item, state)).join("")}
-              </div>
+              <div class="mega-menu-list mega-menu-list--industries">${industries.map((item) => industryEntry(item, state)).join("")}</div>
             </section>
           </div>
         </div>
@@ -212,21 +253,19 @@
         <button class="mega-nav-trigger" type="button" aria-expanded="false" aria-controls="mega-menu-project-insights">
           <span>Project Insights</span><span class="mega-nav-chevron" aria-hidden="true"></span>
         </button>
-        <div class="mega-menu-panel mega-menu-panel--insights" id="mega-menu-project-insights">
+        <div class="mega-menu-panel mega-menu-panel--insights" id="mega-menu-project-insights" aria-hidden="true">
           <div class="mega-menu-intro mega-menu-intro--compact">
             <span class="mega-menu-kicker">Evidence & thinking</span>
             <h2>See the work, then understand the thinking behind it.</h2>
           </div>
           <div class="mega-insight-links">
             <a href="/case-studies"${currentAttribute(state.path === "/case-studies" || state.path === "/case-study-detail")}>
-              <span class="mega-insight-index">01</span>
-              <strong>Case Studies</strong>
+              <span class="mega-insight-index">01</span><strong>Case Studies</strong>
               <small>Delivery stories, commercial outcomes and practical evidence.</small>
               <span class="mega-insight-arrow" aria-hidden="true">→</span>
             </a>
             <a href="/insights"${currentAttribute(state.path === "/insights" || state.path === "/insights-post")}>
-              <span class="mega-insight-index">02</span>
-              <strong>Insights</strong>
+              <span class="mega-insight-index">02</span><strong>Insights</strong>
               <small>Analysis on growth, operations, technology and leadership.</small>
               <span class="mega-insight-arrow" aria-hidden="true">→</span>
             </a>
@@ -238,23 +277,47 @@
 
     document.querySelectorAll(".header-cta").forEach((cta) => cta.remove());
     wireMegaNavigation(nav);
+    renderIcons();
   }
 
   function setMegaMenuOpen(item, open) {
     if (!item) return;
     const trigger = item.querySelector(":scope > .mega-nav-trigger");
+    const panel = item.querySelector(":scope > .mega-menu-panel");
     item.classList.toggle("is-open", open);
-    if (trigger) trigger.setAttribute("aria-expanded", String(open));
+    trigger?.setAttribute("aria-expanded", String(open));
+    panel?.setAttribute("aria-hidden", String(!open));
   }
 
   function wireMegaNavigation(nav) {
     const items = Array.from(nav.querySelectorAll(".mega-nav-item"));
     const toggle = document.getElementById("nav-toggle");
+    const timers = new WeakMap();
+
+    const cancelTimer = (item) => {
+      const timer = timers.get(item);
+      if (timer) window.clearTimeout(timer);
+      timers.delete(item);
+    };
 
     const closeMenus = (except = null) => {
       items.forEach((item) => {
+        cancelTimer(item);
         if (item !== except) setMegaMenuOpen(item, false);
       });
+    };
+
+    const openAfter = (item, delay = 80) => {
+      cancelTimer(item);
+      timers.set(item, window.setTimeout(() => {
+        closeMenus(item);
+        setMegaMenuOpen(item, true);
+      }, delay));
+    };
+
+    const closeAfter = (item, delay = 180) => {
+      cancelTimer(item);
+      timers.set(item, window.setTimeout(() => setMegaMenuOpen(item, false), delay));
     };
 
     items.forEach((item) => {
@@ -274,8 +337,8 @@
           closeMenus(item);
           setMegaMenuOpen(item, true);
           panel.querySelector("a")?.focus();
-        }
-        if (event.key === "Escape") {
+        } else if (event.key === "Escape") {
+          event.preventDefault();
           setMegaMenuOpen(item, false);
         }
       });
@@ -288,22 +351,17 @@
       });
 
       item.addEventListener("pointerenter", () => {
-        if (!window.matchMedia("(min-width: 1151px)").matches) return;
-        closeMenus(item);
-        setMegaMenuOpen(item, true);
+        if (window.matchMedia(DESKTOP_QUERY).matches) openAfter(item);
       });
-
       item.addEventListener("pointerleave", () => {
-        if (!window.matchMedia("(min-width: 1151px)").matches) return;
-        setMegaMenuOpen(item, false);
+        if (window.matchMedia(DESKTOP_QUERY).matches) closeAfter(item);
       });
-
       item.addEventListener("focusin", () => {
-        if (!window.matchMedia("(min-width: 1151px)").matches) return;
+        if (!window.matchMedia(DESKTOP_QUERY).matches) return;
+        cancelTimer(item);
         closeMenus(item);
         setMegaMenuOpen(item, true);
       });
-
       item.addEventListener("focusout", () => {
         window.setTimeout(() => {
           if (!item.contains(document.activeElement)) setMegaMenuOpen(item, false);
@@ -323,12 +381,9 @@
     document.addEventListener("click", (event) => {
       if (!nav.contains(event.target)) closeMenus();
     });
-
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape") closeMenus();
     });
-
-    if (window.lucide) window.lucide.createIcons();
   }
 
   function readCachedMenu() {
@@ -353,10 +408,7 @@
   async function fetchMenuCollection(view, fields) {
     const url = `${SUPABASE_URL}/rest/v1/${view}?select=${encodeURIComponent(fields)}&order=sort_order.asc`;
     const response = await fetch(url, {
-      headers: {
-        apikey: SUPABASE_ANON_KEY,
-        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-      },
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
     });
     if (!response.ok) throw new Error(`Navigation content request failed: ${response.status}`);
     return response.json();
@@ -395,7 +447,6 @@
     document.body.appendChild(enquiryScript);
   }
 
-  // ---- Sticky header frosted-glass on scroll -----------------------------
   const header = document.getElementById("site-header");
   if (header) {
     const onScroll = () => header.classList.toggle("scrolled", window.scrollY > 8);
@@ -403,7 +454,6 @@
     window.addEventListener("scroll", onScroll, { passive: true });
   }
 
-  // ---- Mobile nav toggle ---------------------------------------------------
   const toggle = document.getElementById("nav-toggle");
   const nav = document.getElementById("site-nav");
   if (toggle && nav) {
@@ -418,97 +468,110 @@
     });
   }
 
-  // ---- Cookie settings -------------------------------------------------------
   document.querySelectorAll("[data-cookie-settings]").forEach((link) => {
     link.addEventListener("click", (event) => {
       event.preventDefault();
-      if (window.CookieConsent && typeof window.CookieConsent.renew === "function") {
-        window.CookieConsent.renew();
-      }
+      if (window.CookieConsent && typeof window.CookieConsent.renew === "function") window.CookieConsent.renew();
     });
   });
 
-  // ---- Testimonial slider(s) ------------------------------------------------
   document.querySelectorAll(".testimonial-slider").forEach((slider) => {
     const slides = Array.from(slider.querySelectorAll(".testimonial-slide"));
     const dotsWrap = slider.querySelector(".testimonial-dots");
     if (!slides.length) return;
     let active = 0;
-    slides.forEach((s, i) => s.classList.toggle("active", i === 0));
+    let timer = null;
+    let userPaused = false;
 
+    const show = (index) => {
+      active = (index + slides.length) % slides.length;
+      slides.forEach((slide, slideIndex) => slide.classList.toggle("active", slideIndex === active));
+      if (dotsWrap) Array.from(dotsWrap.children).forEach((dot, dotIndex) => dot.classList.toggle("active", dotIndex === active));
+    };
+
+    const stop = () => {
+      if (timer) window.clearInterval(timer);
+      timer = null;
+    };
+
+    const start = () => {
+      stop();
+      if (userPaused || slides.length < 2 || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      timer = window.setInterval(() => show(active + 1), 6000);
+    };
+
+    show(0);
     if (dotsWrap) {
-      slides.forEach((_, i) => {
+      dotsWrap.innerHTML = "";
+      slides.forEach((_, index) => {
         const dot = document.createElement("button");
-        dot.setAttribute("aria-label", `Show testimonial ${i + 1}`);
-        if (i === 0) dot.classList.add("active");
-        dot.addEventListener("click", () => show(i));
+        dot.type = "button";
+        dot.setAttribute("aria-label", `Show testimonial ${index + 1}`);
+        dot.addEventListener("click", () => {
+          userPaused = true;
+          stop();
+          show(index);
+        });
         dotsWrap.appendChild(dot);
       });
+      show(0);
     }
-
-    function show(i) {
-      active = i;
-      slides.forEach((s, idx) => s.classList.toggle("active", idx === i));
-      if (dotsWrap) {
-        Array.from(dotsWrap.children).forEach((d, idx) => d.classList.toggle("active", idx === i));
-      }
-    }
-
-    if (slides.length > 1) {
-      setInterval(() => show((active + 1) % slides.length), 6000);
-    }
+    slider.addEventListener("focusin", stop);
+    slider.addEventListener("pointerenter", stop);
+    slider.addEventListener("pointerleave", start);
+    start();
   });
 
-  // ---- FAQ accordion ----------------------------------------------------------
   document.querySelectorAll(".faq-item").forEach((item) => {
-    const q = item.querySelector(".faq-question");
-    if (!q) return;
-    q.addEventListener("click", () => {
+    const question = item.querySelector(".faq-question");
+    if (!question || question.dataset.faqReady === "true") return;
+    question.dataset.faqReady = "true";
+    question.setAttribute("aria-expanded", String(item.classList.contains("open")));
+    question.addEventListener("click", () => {
       const wasOpen = item.classList.contains("open");
-      item.parentElement.querySelectorAll(".faq-item").forEach((i) => i.classList.remove("open"));
-      if (!wasOpen) item.classList.add("open");
+      item.parentElement.querySelectorAll(".faq-item").forEach((sibling) => {
+        sibling.classList.remove("open");
+        sibling.querySelector(".faq-question")?.setAttribute("aria-expanded", "false");
+      });
+      if (!wasOpen) {
+        item.classList.add("open");
+        question.setAttribute("aria-expanded", "true");
+      }
     });
   });
 
-  // ---- Stat counter animation --------------------------------------------------
   const counters = document.querySelectorAll(".stat-number[data-count-to]");
   if (counters.length && "IntersectionObserver" in window) {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
-          animateCount(entry.target);
-          observer.unobserve(entry.target);
-        });
-      },
-      { threshold: 0.4 }
-    );
-    counters.forEach((c) => observer.observe(c));
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        animateCount(entry.target);
+        observer.unobserve(entry.target);
+      });
+    }, { threshold: 0.4 });
+    counters.forEach((counter) => observer.observe(counter));
   }
 
-  function animateCount(el) {
-    const target = el.getAttribute("data-count-to");
+  function animateCount(element) {
+    const target = element.getAttribute("data-count-to") || "";
     const match = target.match(/^([^\d]*)(\d+(?:\.\d+)?)(.*)$/);
-    if (!match) {
-      el.textContent = target;
+    if (!match || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      element.textContent = target;
       return;
     }
-    const [, prefix, numStr, suffix] = match;
-    const end = parseFloat(numStr);
-    const decimals = (numStr.split(".")[1] || "").length;
-    const duration = 1200;
-    const start = performance.now();
-    function tick(now) {
-      const progress = Math.min((now - start) / duration, 1);
+    const [, prefix, numString, suffix] = match;
+    const end = Number.parseFloat(numString);
+    const decimals = (numString.split(".")[1] || "").length;
+    const startTime = performance.now();
+    const tick = (now) => {
+      const progress = Math.min((now - startTime) / 1200, 1);
       const eased = 1 - Math.pow(1 - progress, 3);
-      const value = (end * eased).toFixed(decimals);
-      el.textContent = `${prefix}${value}${suffix}`;
+      element.textContent = `${prefix}${(end * eased).toFixed(decimals)}${suffix}`;
       if (progress < 1) requestAnimationFrame(tick);
-    }
+    };
     requestAnimationFrame(tick);
   }
 
-  // ---- Lucide icons -------------------------------------------------------------
-  if (window.lucide) window.lucide.createIcons();
-  else document.addEventListener("lucide:ready", () => window.lucide && window.lucide.createIcons());
+  renderIcons();
+  document.addEventListener("lucide:ready", renderIcons, { once: true });
 })();
