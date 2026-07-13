@@ -1,17 +1,32 @@
-/* Xtradite Digital square logo system */
+/* Shared Xtradite Digital header/footer branding */
 .logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex: 0 0 auto;
   min-width: 48px;
   min-height: 48px;
   line-height: 0;
+  overflow: visible;
 }
 
 .logo-img {
   display: block;
   width: 48px;
   height: 48px;
-  max-width: none;
+  max-width: 48px;
   object-fit: contain;
+  object-position: left centre;
   aspect-ratio: 1 / 1;
+}
+
+.site-header {
+  width: 100%;
+  isolation: isolate;
+}
+
+.site-header .header-inner {
+  min-height: 88px;
 }
 
 .site-header .logo-img {
@@ -19,9 +34,25 @@
   height: 48px;
 }
 
-.footer-brand .logo-img {
+.site-footer {
+  width: 100%;
+  overflow: hidden;
+}
+
+.site-footer .footer-inner,
+.site-footer .footer-bottom {
+  min-width: 0;
+}
+
+.footer-brand {
+  min-width: 0;
+}
+
+.footer-brand .logo-img,
+.site-footer .logo-img {
   width: 64px;
   height: 64px;
+  max-width: 64px;
 }
 
 .site-footer .logo {
@@ -29,20 +60,39 @@
   min-height: 64px;
 }
 
+.logo-img[data-image-error="true"] {
+  visibility: hidden;
+}
+
 @media (max-width: 640px) {
+  .site-header .header-inner {
+    min-height: 72px;
+  }
+
   .logo,
   .site-header .logo-img {
     width: 42px;
     height: 42px;
     min-width: 42px;
     min-height: 42px;
+    max-width: 42px;
   }
 
   .footer-brand .logo-img,
-  .site-footer .logo {
+  .site-footer .logo,
+  .site-footer .logo-img {
     width: 54px;
     height: 54px;
     min-width: 54px;
     min-height: 54px;
+    max-width: 54px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-header,
+  .site-nav,
+  .nav-toggle span {
+    transition: none !important;
   }
 }
