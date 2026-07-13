@@ -1,5 +1,6 @@
 import { getItemBySlug, queryItems } from "../cms.js";
-import { escapeHtml, renderIcons, getSlugParam, metricsStripHtml, wireMetricsCounters } from "../render-helpers.js";
+import { escapeHtml, renderIcons, getSlugParam } from "../render-helpers.js";
+import { renderEvidenceExperience, renderApproachExperience } from "./case-study-experience.js";
 
 const root = document.getElementById("case-study-detail-root");
 const notFound = document.getElementById("not-found");
@@ -101,22 +102,6 @@ function renderResultsGraphic(metrics) {
     }).join("")}`;
 }
 
-function renderApproach(steps) {
-  const wrap = document.getElementById("cs-approach");
-  wrap.innerHTML = `<ol class="cs-approach-steps" style="--approach-cols: ${Math.min(steps.length, 4)}">
-    ${steps.map((step, index) => `<li>
-      <span class="cs-step-number">${String(index + 1).padStart(2, "0")}</span>
-      <div><h3>${escapeHtml(step.title)}</h3><p>${escapeHtml(step.description)}</p></div>
-    </li>`).join("")}
-  </ol>`;
-
-  document.getElementById("cs-process-visual").innerHTML = steps.map((step, index) => `
-    <span class="cs-process-node"><i>${index + 1}</i><b>${escapeHtml(step.title)}</b></span>
-    ${index < steps.length - 1 ? '<span class="cs-process-link"><i></i></span>' : ""}
-  `).join("");
-  document.getElementById("cs-approach-section").hidden = false;
-}
-
 function relatedCaseHtml(item) {
   return `<a class="cs-related-case" href="/case-study-detail?slug=${encodeURIComponent(item.slug)}">
     <span class="eyebrow">${escapeHtml(item.industry || "Case study")}</span>
@@ -197,6 +182,7 @@ async function load() {
   if (!item) return showNotFound();
 
   applySeo(item);
+  root.dataset.caseStudySlug = item.slug;
   document.getElementById("breadcrumb-current").textContent = item.client;
   document.getElementById("cs-tag").textContent = item.industry || "Case study";
   document.getElementById("cs-headline").textContent = item.headline || item.client;
@@ -217,9 +203,7 @@ async function load() {
 
   const metrics = item.metrics || [];
   if (metrics.length) {
-    const metricsWrap = document.getElementById("cs-metrics");
-    metricsWrap.innerHTML = metricsStripHtml(metrics);
-    wireMetricsCounters(metricsWrap);
+    renderEvidenceExperience(item, metrics);
     document.getElementById("cs-evidence-section").hidden = false;
   }
 
@@ -227,7 +211,7 @@ async function load() {
     document.getElementById("cs-engagement-section").hidden = false;
   }
   renderRichText(document.getElementById("cs-challenge"), item.challenge);
-  if (item.approach?.length) renderApproach(item.approach);
+  if (item.approach?.length) renderApproachExperience(item.approach);
   const hasResultsCopy = renderRichText(document.getElementById("cs-results"), item.resultsDetail);
   renderResultsGraphic(metrics);
   document.getElementById("cs-results-section").hidden = !hasResultsCopy && !metrics.length;
