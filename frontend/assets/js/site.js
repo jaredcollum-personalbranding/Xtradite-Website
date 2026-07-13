@@ -21,7 +21,7 @@
     document.head.appendChild(link);
   }
 
-  ensureStylesheet('link[data-xtradite-brand-logo-css]', asset("../css/brand-logo.css"), "xtraditeBrandLogoCss");
+  ensureStylesheet('link[data-xtradite-brand-logo-css]', asset("../css/brand-logo.css?v=20260713-3"), "xtraditeBrandLogoCss");
   ensureStylesheet('link[data-xtradite-mobile-css]', asset("../css/mobile.css"), "xtraditeMobileCss");
   ensureStylesheet('link[data-xtradite-enquiry-css]', asset("../css/enquiry.css"), "xtraditeEnquiryCss");
 
@@ -79,8 +79,8 @@
       const footer = Boolean(image.closest(".site-footer"));
       image.src = LOGO_URL;
       image.alt = "Xtradite Digital";
-      image.width = footer ? 64 : 48;
-      image.height = footer ? 64 : 48;
+      image.width = footer ? 84 : 76;
+      image.height = footer ? 84 : 76;
       image.decoding = "async";
       image.loading = footer ? "lazy" : "eager";
       image.fetchPriority = footer ? "low" : "high";
