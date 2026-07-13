@@ -108,7 +108,7 @@ function genericMetricHtml(metric, index) {
 
 function extractCadence(item) {
   const text = (item.approach || []).map((step) => `${step.title || ""} ${step.description || ""}`).join(" ");
-  const match = text.match(/((?:\d+|one|two|three|four|five|six|seven|eight|nine|ten))\s+(?:controlled\s+|structured\s+)?(?:tests?|experiments?)\s+(?:a|per)\s+month[\s\S]*?((?:\d+|one|two|three|four|five|six|seven|eight|nine|ten|twelve))\s+months?/i);
+  const match = text.match(/((?:\d+|one|two|three|four|five|six|seven|eight|nine|ten))\s+(?:controlled\s+|structured\s+)?(?:tests?|experiments?)\s+(?:a|per|each)\s+month[\s\S]*?((?:\d+|one|two|three|four|five|six|seven|eight|nine|ten|twelve))\s+months?/i);
   if (!match) return null;
   const testsPerMonth = numericWordsToNumber(match[1]);
   const months = numericWordsToNumber(match[2]);
