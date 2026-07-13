@@ -8,83 +8,94 @@
   display: block;
   max-width: none;
   object-fit: contain;
+  object-position: left center;
   aspect-ratio: 1 / 1;
 }
 
-/* Keep the header compact while giving the brandmark enough visual weight. */
+/*
+ * The source artwork contains generous transparent space around the mark.
+ * A 120px rendered box gives the visible logo the intended prominence without
+ * making the navigation header disproportionately tall.
+ */
 .site-header .header-inner {
-  padding-top: 12px;
-  padding-bottom: 12px;
+  min-height: 124px;
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
 
 .site-header .logo {
-  width: 80px;
-  min-width: 80px;
-  min-height: 80px;
+  width: 120px;
+  min-width: 120px;
+  min-height: 108px;
 }
 
 .site-header .logo-img,
 .site-header .logo img {
-  width: 80px;
-  height: 80px;
+  width: 120px;
+  height: 120px;
 }
 
 /* The footer has more space, so the logo acts as a stronger brand anchor. */
 .site-footer .logo {
-  width: 112px;
-  min-width: 112px;
-  min-height: 112px;
+  width: 132px;
+  min-width: 132px;
+  min-height: 132px;
 }
 
 .site-footer .logo-img,
 .site-footer .logo img,
 .footer-brand .logo-img {
-  width: 112px;
-  height: 112px;
+  width: 132px;
+  height: 132px;
 }
 
 @media (max-width: 1150px) {
+  .site-header .header-inner {
+    min-height: 100px;
+  }
+
   .site-header .logo {
-    width: 70px;
-    min-width: 70px;
-    min-height: 70px;
+    width: 92px;
+    min-width: 92px;
+    min-height: 88px;
   }
 
   .site-header .logo-img,
   .site-header .logo img {
-    width: 70px;
-    height: 70px;
+    width: 92px;
+    height: 92px;
   }
 }
 
 @media (max-width: 640px) {
   .site-header .header-inner {
-    padding-top: 10px;
-    padding-bottom: 10px;
+    min-height: 82px;
+    padding-top: 5px;
+    padding-bottom: 5px;
   }
 
   .site-header .logo {
-    width: 62px;
-    min-width: 62px;
-    min-height: 62px;
+    width: 72px;
+    min-width: 72px;
+    min-height: 72px;
   }
 
   .site-header .logo-img,
   .site-header .logo img {
-    width: 62px;
-    height: 62px;
+    width: 72px;
+    height: 72px;
   }
 
   .site-footer .logo {
-    width: 92px;
-    min-width: 92px;
-    min-height: 92px;
+    width: 104px;
+    min-width: 104px;
+    min-height: 104px;
   }
 
   .site-footer .logo-img,
   .site-footer .logo img,
   .footer-brand .logo-img {
-    width: 92px;
-    height: 92px;
+    width: 104px;
+    height: 104px;
   }
 }
