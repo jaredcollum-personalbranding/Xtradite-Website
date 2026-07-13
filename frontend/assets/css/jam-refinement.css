@@ -1,0 +1,579 @@
+/* Jam-led refinement pass: hierarchy, interaction clarity and responsive balance. */
+
+/* Global interaction affordance ------------------------------------------------ */
+a.card,
+.service-card,
+.blog-card,
+.related-post-card,
+.case-card,
+.cs-related-case {
+  position: relative;
+  isolation: isolate;
+}
+
+a.card::after,
+.service-card::after,
+.blog-card::after,
+.related-post-card::after,
+.case-card::after,
+.cs-related-case::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 2px solid transparent;
+  border-radius: inherit;
+  pointer-events: none;
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+a.card:hover::after,
+a.card:focus-visible::after,
+.service-card:hover::after,
+.service-card:focus-visible::after,
+.blog-card:hover::after,
+.blog-card:focus-visible::after,
+.related-post-card:hover::after,
+.related-post-card:focus-visible::after,
+.case-card:hover::after,
+.case-card:focus-visible::after,
+.cs-related-case:hover::after,
+.cs-related-case:focus-visible::after {
+  border-color: color-mix(in oklab, var(--color-primary) 58%, transparent);
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--color-primary) 10%, transparent);
+}
+
+a.card:focus-visible,
+.service-card:focus-visible,
+.blog-card:focus-visible,
+.related-post-card:focus-visible,
+.case-card:focus-visible,
+.cs-related-case:focus-visible,
+button:focus-visible,
+input:focus-visible,
+summary:focus-visible {
+  outline: 3px solid color-mix(in oklab, var(--color-primary) 55%, transparent);
+  outline-offset: 4px;
+}
+
+.card .card-link {
+  margin-top: auto;
+  padding-top: var(--space-8);
+}
+
+.service-card,
+.blog-card,
+.case-card {
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
+}
+
+.service-card .card-desc,
+.blog-card .card-desc,
+.case-card .card-desc {
+  flex: 1;
+  line-height: 1.62;
+}
+
+/* Mega menu -------------------------------------------------------------------- */
+@media (min-width: 1151px) {
+  .mega-menu-panel {
+    width: min(1120px, calc(100vw - 64px));
+    max-height: min(690px, calc(100vh - 112px));
+    overflow: auto;
+    overscroll-behaviour: contain;
+  }
+
+  .mega-menu-panel--what-we-do {
+    grid-template-columns: minmax(240px, .72fr) minmax(0, 2.28fr);
+  }
+
+  .mega-menu-columns {
+    grid-template-columns: minmax(0, 1.38fr) minmax(260px, .62fr);
+  }
+
+  .mega-menu-intro {
+    padding: clamp(28px, 3vw, 42px);
+  }
+
+  .mega-menu-entry {
+    min-height: 0;
+    padding: 13px 14px;
+  }
+
+  .mega-menu-entry-copy {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-height: 1.38;
+  }
+
+  .mega-menu-entry--compact .mega-menu-entry-copy {
+    -webkit-line-clamp: 1;
+  }
+
+  .mega-menu-panel--insights {
+    width: min(760px, calc(100vw - 64px));
+  }
+}
+
+.mega-nav-trigger[aria-expanded="true"] {
+  color: var(--color-text-primary);
+}
+
+.mega-nav-trigger[aria-expanded="true"] .mega-nav-chevron {
+  transform: rotate(180deg);
+}
+
+/* Homepage rhythm -------------------------------------------------------------- */
+body:has(main > .hero) main > .hero {
+  padding-top: clamp(112px, 12vw, 164px);
+  padding-bottom: clamp(72px, 8vw, 108px);
+}
+
+body:has(#services) #services,
+body:has(#case-studies) #case-studies,
+body:has(#insights) #insights {
+  padding-block: clamp(72px, 8vw, 104px);
+}
+
+body:has(#services) #services + section,
+body:has(#case-studies) #case-studies + section,
+body:has(#insights) #insights + section {
+  border-top: 1px solid color-mix(in oklab, var(--color-ink) 8%, transparent);
+}
+
+body:has(main > .hero) .hero-sub {
+  max-width: 720px;
+  line-height: 1.65;
+}
+
+body:has(main > .hero) .stats-strip {
+  gap: clamp(18px, 3vw, 38px);
+  padding-block: clamp(38px, 5vw, 58px);
+}
+
+body:has(main > .hero) .stat-item {
+  min-width: 0;
+  padding-inline: var(--space-12);
+}
+
+body:has(main > .hero) .stat-number {
+  font-size: clamp(2rem, 4vw, 3.35rem);
+  line-height: 1;
+}
+
+body:has(main > .hero) .faq-list {
+  max-width: 880px;
+}
+
+body:has(main > .hero) .faq-question {
+  min-height: 76px;
+  padding-block: var(--space-20);
+}
+
+body:has(main > .hero) .site-footer {
+  margin-top: clamp(64px, 8vw, 112px);
+}
+
+/* Core service template -------------------------------------------------------- */
+.service-v3-roi {
+  position: relative !important;
+  top: auto !important;
+  gap: 0 !important;
+  overflow: hidden;
+}
+
+.service-v3-roi::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 4px;
+  background: var(--gradient-sunset);
+}
+
+.service-v3-roi-head h3 {
+  max-width: 520px;
+}
+
+.service-v3-model-status {
+  font-size: .75rem !important;
+  color: var(--color-text-secondary) !important;
+  background: color-mix(in oklab, var(--color-success, #24b47e) 8%, transparent);
+}
+
+.service-v3-roi-intro {
+  font-size: .96rem !important;
+  line-height: 1.65 !important;
+}
+
+.service-v3-roi-kpis {
+  gap: var(--space-12) !important;
+}
+
+.service-v3-roi-kpis article {
+  padding: var(--space-20) !important;
+  background: color-mix(in oklab, var(--color-bg-secondary) 88%, white);
+}
+
+.service-v3-roi-kpis span {
+  min-height: 0 !important;
+  font-size: .69rem !important;
+}
+
+.service-v3-roi-kpis strong {
+  font-size: clamp(1.8rem, 3vw, 2.65rem) !important;
+}
+
+.service-v3-roi-kpis small,
+.service-v3-roi-control > small,
+.service-v3-roi-note,
+.service-v3-scope-guide span,
+.service-v3-engagement-tabs small,
+.service-v3-coverage .service-coverage-tab-label small {
+  font-size: .74rem !important;
+  line-height: 1.5 !important;
+}
+
+.service-v3-roi-control label,
+.service-v3-roi-control output {
+  font-size: .86rem !important;
+}
+
+.service-v3-roi-control input[type="range"] {
+  min-height: 40px !important;
+}
+
+.service-v3-roi-control input[type="range"]::-webkit-slider-thumb {
+  width: 22px;
+  height: 22px;
+}
+
+.service-v3-scope-guide button {
+  min-height: 112px;
+  padding: var(--space-16) !important;
+}
+
+.service-v3-scope-guide button[aria-pressed="true"],
+.service-v3-scope-guide button.is-active {
+  background: var(--color-text-primary);
+  color: #fff;
+  border-color: var(--color-text-primary);
+  box-shadow: 0 12px 30px color-mix(in oklab, var(--color-ink) 18%, transparent);
+}
+
+.service-v3-scope-guide strong {
+  font-size: .86rem !important;
+}
+
+.service-v3-engagement-shell {
+  grid-template-columns: minmax(260px, .46fr) minmax(0, 1.54fr) !important;
+  gap: var(--space-20) !important;
+}
+
+.service-v3-engagement-tabs button {
+  min-height: 104px !important;
+}
+
+.service-v3-engagement-tabs button[aria-selected="true"] {
+  transform: translateX(4px);
+}
+
+.service-v3-engagement-panel {
+  min-height: 360px;
+}
+
+.service-v3-delivery-layout {
+  grid-template-columns: minmax(0, 1.65fr) minmax(300px, .55fr) !important;
+}
+
+.service-v3-tech-rail {
+  max-height: calc(100vh - 128px);
+  overflow: auto;
+}
+
+.service-v3-tech-rail .tech-logo-item {
+  display: grid;
+  grid-template-rows: 46px auto;
+  align-items: center;
+  justify-items: center;
+  min-height: 92px;
+  padding: 12px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  text-align: center;
+}
+
+.service-v3-tech-rail .tech-logo-item img {
+  width: 100%;
+  max-width: 92px;
+  height: 38px;
+  object-fit: contain;
+}
+
+.service-v3-tech-rail .tech-logo-item span {
+  margin-top: 7px;
+  color: var(--color-text-secondary);
+  font-size: .7rem;
+  line-height: 1.25;
+}
+
+.service-v3-coverage .service-coverage-tabs button {
+  min-height: 74px !important;
+  align-items: center !important;
+}
+
+.service-v3-coverage .service-coverage-tab-label small {
+  display: none !important;
+}
+
+.service-v3-coverage .service-coverage-tabs button[aria-selected="true"] {
+  box-shadow: inset 3px 0 0 var(--color-primary);
+}
+
+.service-v3-coverage a[href="/locations"] {
+  font-size: .82rem;
+}
+
+/* Case-study timeline ---------------------------------------------------------- */
+.cs-timeline-panel-copy p {
+  max-width: 62ch !important;
+}
+
+.cs-timeline-tab {
+  min-height: 92px;
+}
+
+.cs-timeline-tab[aria-selected="true"] {
+  background: color-mix(in oklab, var(--color-primary) 8%, var(--color-bg-secondary));
+  box-shadow: inset 0 -3px 0 var(--color-primary);
+}
+
+.cs-timeline-panel-visual {
+  min-width: 0;
+}
+
+.cs-related-case {
+  cursor: pointer;
+}
+
+/* Local service router: reduce competing structures --------------------------- */
+.local-service-signals,
+.local-engagement-modes {
+  display: none !important;
+}
+
+.local-service-shifts,
+.local-service-architecture,
+.local-service-process,
+.local-service-proof,
+.local-service-insights,
+.local-service-faq,
+.local-service-cta {
+  padding-block: clamp(72px, 8vw, 108px) !important;
+}
+
+.local-service-shifts + .local-service-architecture,
+.local-service-architecture + .local-service-process,
+.local-service-process + .local-service-proof,
+.local-service-proof + .local-service-insights,
+.local-service-insights + .local-service-faq {
+  border-top: 1px solid color-mix(in oklab, var(--color-ink) 9%, transparent);
+}
+
+.local-service-section-head {
+  max-width: 780px;
+  margin-bottom: clamp(30px, 4vw, 48px);
+}
+
+.local-service-section-head h2 {
+  max-width: 760px;
+}
+
+.local-service-section-head p,
+.local-process-card p,
+.local-proof-story > p,
+.local-tech-rail > p,
+.local-insight-grid p,
+.local-faq-list p {
+  max-width: 68ch;
+  line-height: 1.65;
+}
+
+.local-shift-table {
+  max-width: 980px;
+}
+
+.local-shift-row {
+  min-height: 76px;
+}
+
+.local-architecture-grid {
+  gap: var(--space-20);
+}
+
+.local-architecture-primary,
+.local-architecture-stack > article {
+  box-shadow: none !important;
+}
+
+.local-process-timeline {
+  max-width: 980px;
+  margin-inline: auto;
+}
+
+.local-proof-grid {
+  align-items: start;
+}
+
+.local-tech-list span {
+  min-height: 72px;
+}
+
+/* About hero ------------------------------------------------------------------- */
+body:has(.hero.left-aligned) .hero.left-aligned {
+  padding-top: clamp(112px, 12vw, 154px);
+  padding-bottom: clamp(70px, 8vw, 104px);
+}
+
+body:has(.hero.left-aligned) .hero.left-aligned .container {
+  max-width: 1040px;
+}
+
+body:has(.hero.left-aligned) .hero.left-aligned h1 {
+  max-width: 920px;
+  font-size: clamp(3rem, 6.2vw, 5.8rem);
+  line-height: .98;
+  text-wrap: balance;
+}
+
+body:has(.hero.left-aligned) .hero.left-aligned .hero-sub {
+  max-width: 720px;
+  font-size: clamp(1.05rem, 1.5vw, 1.25rem);
+  line-height: 1.65;
+}
+
+/* Industry and insights hierarchy --------------------------------------------- */
+#industry-services .card,
+.industry-related-services .card {
+  min-height: 100%;
+}
+
+.tag-filter-bar {
+  gap: var(--space-8) !important;
+}
+
+.tag-filter-chip {
+  min-height: 40px;
+}
+
+.article-layout__main {
+  max-width: 760px;
+}
+
+#post-title {
+  max-width: 16ch;
+  text-wrap: balance;
+}
+
+#post-body {
+  max-width: 68ch;
+}
+
+#post-body p {
+  margin-bottom: 1.45em;
+  color: var(--color-text-secondary);
+  font-size: clamp(1.03rem, 1.2vw, 1.14rem);
+  line-height: 1.78;
+}
+
+#post-body h2 {
+  margin-top: clamp(2.5rem, 5vw, 4rem);
+  text-wrap: balance;
+}
+
+#post-body h3 {
+  margin-top: clamp(2rem, 4vw, 3rem);
+}
+
+/* Responsive ------------------------------------------------------------------- */
+@media (max-width: 980px) {
+  .service-v3-engagement-shell,
+  .service-v3-delivery-layout {
+    grid-template-columns: 1fr !important;
+  }
+
+  .service-v3-tech-rail {
+    max-height: none;
+    overflow: visible;
+  }
+
+  .local-service-shifts,
+  .local-service-architecture,
+  .local-service-process,
+  .local-service-proof,
+  .local-service-insights,
+  .local-service-faq,
+  .local-service-cta {
+    padding-block: 64px !important;
+  }
+}
+
+@media (max-width: 760px) {
+  body:has(main > .hero) main > .hero,
+  body:has(.hero.left-aligned) .hero.left-aligned {
+    padding-top: 88px;
+    padding-bottom: 64px;
+  }
+
+  body:has(.hero.left-aligned) .hero.left-aligned h1 {
+    font-size: clamp(2.5rem, 13vw, 4rem);
+  }
+
+  .service-v3-roi-kpis,
+  .service-v3-scope-guide {
+    gap: var(--space-10) !important;
+  }
+
+  .service-v3-scope-guide button {
+    min-height: 0;
+  }
+
+  .service-v3-engagement-tabs button {
+    min-height: 92px !important;
+  }
+
+  .service-v3-tech-rail .tech-logo-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .cs-timeline-panel {
+    grid-template-columns: 1fr !important;
+    gap: var(--space-28) !important;
+  }
+
+  .cs-timeline-panel-visual {
+    padding-top: var(--space-24);
+    padding-left: 0 !important;
+    border-top: 1px solid var(--color-border);
+    border-left: 0 !important;
+  }
+
+  #post-body p {
+    font-size: 1rem;
+    line-height: 1.72;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behaviour: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
