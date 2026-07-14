@@ -11,7 +11,7 @@ if (!isContactPage) {
     <button class="enquiry-trigger-edge" type="button" data-enquiry-open="drawer" aria-label="Open enquiry form">Start an enquiry</button>
     <button class="enquiry-trigger-mobile" type="button" data-enquiry-open="modal">Start an enquiry</button>
 
-    <div class="enquiry-overlay" id="enquiry-modal" aria-hidden="true">
+    <div class="enquiry-overlay" id="enquiry-modal" aria-hidden="true" inert>
       <section class="enquiry-panel" role="dialog" aria-modal="true" aria-labelledby="enquiry-modal-title">
         <button class="enquiry-close" type="button" data-enquiry-close aria-label="Close enquiry form">×</button>
         <p class="enquiry-kicker">Get in touch</p>
@@ -21,7 +21,7 @@ if (!isContactPage) {
       </section>
     </div>
 
-    <div class="enquiry-drawer" id="enquiry-drawer" aria-hidden="true">
+    <div class="enquiry-drawer" id="enquiry-drawer" aria-hidden="true" inert>
       <div class="enquiry-drawer__backdrop" data-enquiry-close></div>
       <aside class="enquiry-drawer__panel" role="dialog" aria-modal="true" aria-labelledby="enquiry-drawer-title">
         <button class="enquiry-close" type="button" data-enquiry-close aria-label="Close enquiry form">×</button>
@@ -100,6 +100,7 @@ function initialiseEnquiryUi() {
     close(false);
     returnFocus = trigger || document.activeElement;
     activeContainer = type === "drawer" && window.innerWidth > 767 ? drawer : modal;
+    activeContainer.removeAttribute("inert");
     activeContainer.classList.add("is-open");
     activeContainer.setAttribute("aria-hidden", "false");
     document.body.classList.add("enquiry-open");
@@ -112,6 +113,7 @@ function initialiseEnquiryUi() {
     [modal, drawer].forEach((container) => {
       container?.classList.remove("is-open");
       container?.setAttribute("aria-hidden", "true");
+      container?.setAttribute("inert", "");
     });
     document.body.classList.remove("enquiry-open");
     activeContainer = null;

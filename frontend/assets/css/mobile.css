@@ -20,6 +20,7 @@
   .site-nav { padding: 8px 18px 20px; }
   .site-nav a { padding: 11px 0; font-size: .9rem; }
   .site-nav .header-cta-mobile { width: 100%; justify-content: center; }
+  .nav-toggle { width: 44px; height: 44px; min-width: 44px; min-height: 44px; padding: 10px; }
 
   .hero, .hero.left-aligned { padding: 72px 0 52px; }
   .hero .container, .hero.left-aligned .container { max-width: none; }

@@ -1,4 +1,5 @@
 const DESKTOP_QUERY = "(min-width: 901px)";
+const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
 function initialiseDeliveryTimeline() {
   const timeline = document.querySelector(".service-delivery-timeline");
@@ -9,11 +10,12 @@ function initialiseDeliveryTimeline() {
   if (!phases.length) return;
 
   const setActive = (index, { focus = false, allowCollapse = false } = {}) => {
-    const current = phases[index];
+    const safeIndex = Math.max(0, Math.min(index, phases.length - 1));
+    const current = phases[safeIndex];
     const collapseCurrent = allowCollapse && current.classList.contains("is-open");
 
     phases.forEach((phase, phaseIndex) => {
-      const active = phaseIndex === index && !collapseCurrent;
+      const active = phaseIndex === safeIndex && !collapseCurrent;
       const trigger = phase.querySelector(".service-delivery-phase-trigger");
       const content = phase.querySelector(".service-delivery-phase-content");
       phase.classList.toggle("is-current", active);
@@ -26,18 +28,20 @@ function initialiseDeliveryTimeline() {
       }
     });
 
-    timeline.style.setProperty("--active-stage", String(index));
-    timeline.style.setProperty("--delivery-progress", `${((index + 1) / phases.length) * 100}%`);
-    if (focus) phases[index].querySelector(".service-delivery-phase-trigger")?.focus({ preventScroll: true });
+    timeline.style.setProperty("--active-stage", String(safeIndex));
+    timeline.style.setProperty("--delivery-progress", `${((safeIndex + 1) / phases.length) * 100}%`);
+    if (focus) phases[safeIndex].querySelector(".service-delivery-phase-trigger")?.focus({ preventScroll: true });
   };
 
   phases.forEach((phase, index) => {
     const trigger = phase.querySelector(".service-delivery-phase-trigger");
     if (!trigger) return;
+    if (trigger instanceof HTMLButtonElement) trigger.type = "button";
     trigger.addEventListener("click", (event) => {
       event.preventDefault();
       event.stopImmediatePropagation();
-      setActive(index, { allowCollapse: !window.matchMedia(DESKTOP_QUERY).matches });
+      const mobileOrReduced = !window.matchMedia(DESKTOP_QUERY).matches || reducedMotion.matches;
+      setActive(index, { allowCollapse: mobileOrReduced });
     }, true);
     trigger.addEventListener("keydown", (event) => {
       if (!["ArrowDown", "ArrowRight", "ArrowUp", "ArrowLeft", "Home", "End"].includes(event.key)) return;
@@ -55,8 +59,11 @@ function initialiseDeliveryTimeline() {
   const configureObserver = () => {
     observer?.disconnect();
     observer = null;
-    if (!window.matchMedia(DESKTOP_QUERY).matches || !("IntersectionObserver" in window)) {
-      setActive(Math.max(0, phases.findIndex((phase) => phase.classList.contains("is-open"))));
+    const desktop = window.matchMedia(DESKTOP_QUERY).matches;
+    timeline.dataset.deliveryMode = !desktop ? "accordion" : reducedMotion.matches ? "manual" : "scroll";
+    if (!desktop || reducedMotion.matches || !("IntersectionObserver" in window)) {
+      const openIndex = phases.findIndex((phase) => phase.classList.contains("is-open"));
+      setActive(openIndex >= 0 ? openIndex : 0);
       return;
     }
 
@@ -78,6 +85,7 @@ function initialiseDeliveryTimeline() {
 
   const media = window.matchMedia(DESKTOP_QUERY);
   media.addEventListener?.("change", configureObserver);
+  reducedMotion.addEventListener?.("change", configureObserver);
   setActive(0);
   configureObserver();
 }
