@@ -1,5 +1,9 @@
 /* Xtradite Digital square logo system */
 .logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex: 0 0 auto;
   line-height: 0;
   overflow: visible;
 }
@@ -10,6 +14,11 @@
   object-fit: contain;
   object-position: left center;
   aspect-ratio: 1 / 1;
+}
+
+.site-header {
+  width: 100%;
+  isolation: isolate;
 }
 
 /*
@@ -35,6 +44,17 @@
   height: 120px;
 }
 
+.site-footer {
+  width: 100%;
+  overflow: hidden;
+}
+
+.site-footer .footer-inner,
+.site-footer .footer-bottom,
+.footer-brand {
+  min-width: 0;
+}
+
 /* The footer has more space, so the logo acts as a stronger brand anchor. */
 .site-footer .logo {
   width: 132px;
@@ -47,6 +67,10 @@
 .footer-brand .logo-img {
   width: 132px;
   height: 132px;
+}
+
+.logo-img[data-image-error="true"] {
+  visibility: hidden;
 }
 
 @media (max-width: 1150px) {
@@ -97,5 +121,13 @@
   .footer-brand .logo-img {
     width: 104px;
     height: 104px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-header,
+  .site-nav,
+  .nav-toggle span {
+    transition: none !important;
   }
 }
