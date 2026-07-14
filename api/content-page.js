@@ -36,7 +36,7 @@ const PAGE_TYPES = {
     pageType: "WebPage"
   },
   insight: {
-    table: "blog_posts",
+    table: "blog_posts_delivery",
     template: "insights-post.html",
     route: "insights",
     parentName: "Insights",
