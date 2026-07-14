@@ -215,7 +215,7 @@ function renderProofAndTechnology(service) {
   const caseStudy = asArray(service.related_case_studies)[0];
   if (!caseStudy && !technologies.length) return "";
   return `<section class="local-service-proof"><div class="location-shell"><div class="local-proof-grid">
-    ${caseStudy ? `<article class="local-proof-story"><span class="eyebrow">Evidence from delivery</span><h2>${esc(caseStudy.client)}</h2><p>${esc(caseStudy.challenge || "")}</p>${caseStudy.metric ? `<strong>${esc(caseStudy.metric)}</strong>` : ""}<a class="local-text-link" href="/case-study-detail?slug=${encodeURIComponent(caseStudy.slug)}">Read the full case study <i data-lucide="arrow-up-right"></i></a></article>` : ""}
+    ${caseStudy ? `<article class="local-proof-story"><span class="eyebrow">Evidence from delivery</span><h2>${esc(caseStudy.client)}</h2><p>${esc(caseStudy.challenge || "")}</p>${caseStudy.metric ? `<strong>${esc(caseStudy.metric)}</strong>` : ""}<a class="local-text-link" href="/case-studies/${encodeURIComponent(caseStudy.slug)}">Read the full case study <i data-lucide="arrow-up-right"></i></a></article>` : ""}
     ${technologies.length ? `<aside class="local-tech-rail"><span class="eyebrow">Technology environment</span><h3>Technology serves the operating model</h3><p>The engagement can improve an existing estate or govern a controlled platform change. Tools are selected around the work, data and ownership required.</p><div class="local-tech-list">${technologies.map((item) => `<span>${item.url ? `<img src="${esc(item.url)}" alt="" loading="lazy">` : ""}<b>${esc(item.label || item.file)}</b><small>${esc(item.category || "Technology")}</small></span>`).join("")}</div></aside>` : ""}
   </div></div></section>`;
 }
@@ -225,7 +225,7 @@ function renderInsights(service) {
   if (!insights.length) return "";
   return `<section class="local-service-insights"><div class="location-shell">
     <div class="local-service-section-head"><span class="eyebrow">Project insight</span><h2>Thinking connected to the work</h2><p>These articles explain the operating assumptions, risks and decisions that sit behind the service.</p></div>
-    <div class="local-insight-grid">${insights.map((post) => `<a href="/insights-post?slug=${encodeURIComponent(post.slug)}"><span>${esc(asArray(post.tags)[0] || service.category || "Insight")}</span><h3>${esc(post.title)}</h3><p>${esc(post.excerpt || "")}</p><strong>Read the article <i data-lucide="arrow-right"></i></strong></a>`).join("")}</div>
+    <div class="local-insight-grid">${insights.map((post) => `<a href="/insights/${encodeURIComponent(post.slug)}"><span>${esc(asArray(post.tags)[0] || service.category || "Insight")}</span><h3>${esc(post.title)}</h3><p>${esc(post.excerpt || "")}</p><strong>Read the article <i data-lucide="arrow-right"></i></strong></a>`).join("")}</div>
   </div></section>`;
 }
 
