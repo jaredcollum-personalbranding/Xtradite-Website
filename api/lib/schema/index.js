@@ -85,6 +85,19 @@ function buildGraph({ canonical, title, description, pageType = "WebPage", prima
 
 function primaryEntityFor(type, item, canonical, description) {
   const entityId = `${canonical}#primary`;
+  if (type === "service") {
+    return compact({
+      "@type": "Service",
+      "@id": entityId,
+      name: item.title,
+      serviceType: item.category || item.title,
+      description,
+      url: canonical,
+      provider: { "@id": ORGANISATION_ID },
+      areaServed: { "@type": "Country", name: "United Kingdom" },
+      mainEntityOfPage: { "@id": `${canonical}#webpage` }
+    });
+  }
   if (type === "industry") {
     return compact({
       "@type": "CollectionPage",
