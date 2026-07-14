@@ -5,7 +5,7 @@
   "cleanUrls": true,
   "functions": {
     "api/content-page.js": {
-      "includeFiles": "frontend/{industry-detail,case-study-detail,insights-post}.html"
+      "includeFiles": "frontend/{service-detail,industry-detail,case-study-detail,insights-post}.html"
     }
   },
   "redirects": [
@@ -41,6 +41,7 @@
     { "source": "/case-studies/:slug", "destination": "/api/content-page?type=case-study&slug=:slug" },
     { "source": "/insights/:slug", "destination": "/api/content-page?type=insight&slug=:slug" },
     { "source": "/services/shopify-migration", "destination": "/service-detail?slug=shopify-migration" },
+    { "source": "/services/:slug", "destination": "/api/content-page?type=service&slug=:slug" },
     { "source": "/locations", "destination": "/api/location-with-jam?path=locations" },
     { "source": "/uk", "destination": "/api/location-with-jam?path=" },
     { "source": "/uk/:path*", "destination": "/api/location-with-jam?path=:path*" }
