@@ -34,102 +34,49 @@ jobs:
         run: npm install --no-audit --no-fund
 
       - name: Unit tests
-        id: unit
-        continue-on-error: true
         run: npm run test:unit
 
       - name: Integration tests
-        id: integration
-        continue-on-error: true
         run: npm run test:integration
 
       - name: Type and syntax checks
-        id: typecheck
-        continue-on-error: true
         run: npm run typecheck
 
       - name: Lint publication controls
-        id: lint
-        continue-on-error: true
         run: npm run lint
 
       - name: Verify routes
-        id: routes
-        continue-on-error: true
         run: npm run check:routes
 
       - name: Verify sitemap
-        id: sitemap
-        continue-on-error: true
         run: npm run check:sitemap
 
       - name: Verify structured data
-        id: structured_data
-        continue-on-error: true
         run: npm run check:structured-data
 
       - name: Verify migrations
-        id: migration
-        continue-on-error: true
         run: npm run check:migration
 
       - name: Verify service evidence
-        id: service_evidence
-        continue-on-error: true
         run: npm run check:service-evidence
 
       - name: Verify case-study evidence
-        id: case_study_evidence
-        continue-on-error: true
         run: npm run check:case-study-evidence
 
       - name: Verify service template
-        id: service_template
-        continue-on-error: true
         run: npm run check:service-template
 
       - name: Verify Jam remediation
-        id: jam_remediation
-        continue-on-error: true
         run: npm run check:jam-remediation
 
       - name: Build Jam metadata
-        id: build_jam
-        continue-on-error: true
         run: npm run build:jam
 
       - name: Inject Jam recorder
-        id: inject_jam
-        continue-on-error: true
         run: node scripts/inject-jam.js
 
       - name: Build SEO output
-        id: build_seo
-        continue-on-error: true
         run: npm run build:seo
 
       - name: Validate Jam foundation
-        id: validate_jam
-        continue-on-error: true
         run: npm run validate:jam
-
-      - name: Fail when any production validation failed
-        if: always()
-        shell: bash
-        run: |
-          test "${{ steps.unit.outcome }}" = "success"
-          test "${{ steps.integration.outcome }}" = "success"
-          test "${{ steps.typecheck.outcome }}" = "success"
-          test "${{ steps.lint.outcome }}" = "success"
-          test "${{ steps.routes.outcome }}" = "success"
-          test "${{ steps.sitemap.outcome }}" = "success"
-          test "${{ steps.structured_data.outcome }}" = "success"
-          test "${{ steps.migration.outcome }}" = "success"
-          test "${{ steps.service_evidence.outcome }}" = "success"
-          test "${{ steps.case_study_evidence.outcome }}" = "success"
-          test "${{ steps.service_template.outcome }}" = "success"
-          test "${{ steps.jam_remediation.outcome }}" = "success"
-          test "${{ steps.build_jam.outcome }}" = "success"
-          test "${{ steps.inject_jam.outcome }}" = "success"
-          test "${{ steps.build_seo.outcome }}" = "success"
-          test "${{ steps.validate_jam.outcome }}" = "success"
