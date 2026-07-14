@@ -135,6 +135,30 @@
     panels.forEach((panel) => panel.toggleAttribute("inert", panel.getAttribute("aria-hidden") !== "false"));
   }
 
+  function syncMobileNavigation(nav) {
+    if (!(nav instanceof HTMLElement)) return;
+    if (desktopNavigation.matches) {
+      nav.removeAttribute("inert");
+      nav.removeAttribute("aria-hidden");
+      return;
+    }
+    const open = nav.classList.contains("open");
+    nav.toggleAttribute("inert", !open);
+    nav.setAttribute("aria-hidden", String(!open));
+  }
+
+  function hardenMobileNavigation() {
+    const nav = document.getElementById("site-nav");
+    const toggle = document.getElementById("nav-toggle");
+    if (!nav || !toggle || nav.dataset.mobileAccessibilityReady === "true") return;
+    nav.dataset.mobileAccessibilityReady = "true";
+    syncMobileNavigation(nav);
+    toggle.addEventListener("click", () => requestAnimationFrame(() => syncMobileNavigation(nav)));
+    desktopNavigation.addEventListener?.("change", () => syncMobileNavigation(nav));
+    const classObserver = new MutationObserver(() => syncMobileNavigation(nav));
+    classObserver.observe(nav, { attributes: true, attributeFilter: ["class"] });
+  }
+
   function setMegaItemOpen(item, open) {
     const trigger = item?.querySelector(":scope > .mega-nav-trigger");
     const panel = item?.querySelector(":scope > .mega-menu-panel");
@@ -205,6 +229,7 @@
     root.querySelectorAll?.(".faq-list").forEach(upgradeFaqList);
     root.querySelectorAll?.('[role="tablist"]').forEach(normaliseTabs);
     syncMegaPanelInert(root);
+    hardenMobileNavigation();
     hardenMegaMenu();
   }
 
