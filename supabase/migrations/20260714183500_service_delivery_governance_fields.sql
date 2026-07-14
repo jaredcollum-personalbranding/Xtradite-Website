@@ -1,5 +1,6 @@
 -- Expose governed publication and entity fields through the public service view.
--- Related case studies remain fail-closed under the independent evidence gate.
+-- Existing delivery columns retain their original order; new governance fields are
+-- appended so CREATE OR REPLACE VIEW remains compatible with the live contract.
 
 create or replace view public.services_delivery
 with (security_invoker = true)
@@ -16,13 +17,7 @@ select
   s.sort_order,
   s.created_at,
   s.updated_at,
-  s.published_at,
   s.status,
-  s.noindex,
-  s.canonical_path,
-  s.primary_entity,
-  s.about_entities,
-  s.mention_entities,
   coalesce((
     select jsonb_agg(li.content order by li.sort_order)
     from public.service_list_items li
@@ -131,7 +126,13 @@ select
     ) order by u.sort_order)
     from public.service_technology_use_cases u
     where u.service_id = s.id and u.status = 'published'
-  ), '[]'::jsonb) as technology_examples
+  ), '[]'::jsonb) as technology_examples,
+  s.published_at,
+  s.noindex,
+  s.canonical_path,
+  s.primary_entity,
+  s.about_entities,
+  s.mention_entities
 from public.services s
 where s.status = 'published';
 
