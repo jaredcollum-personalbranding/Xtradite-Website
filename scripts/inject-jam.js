@@ -26,18 +26,8 @@ const sharedStyles = [
 ];
 
 const encodingRepairs = new Map([
-  ["Â£", "£"],
-  ["Â©", "©"],
-  ["Â®", "®"],
-  ["Â·", "·"],
-  ["Â ", " "],
-  ["â€”", "—"],
-  ["â€“", "–"],
-  ["â€™", "’"],
-  ["â€˜", "‘"],
-  ["â€œ", "“"],
-  ["â€", "”"],
-  ["â€¦", "…"],
+  ["Â£", "£"], ["Â©", "©"], ["Â®", "®"], ["Â·", "·"], ["Â ", " "],
+  ["â€”", "—"], ["â€“", "–"], ["â€™", "’"], ["â€˜", "‘"], ["â€œ", "“"], ["â€", "”"], ["â€¦", "…"],
 ]);
 
 function filesRecursively(directory, pattern) {
@@ -50,19 +40,21 @@ function filesRecursively(directory, pattern) {
 
 function repairSource(source) {
   let output = source;
-  encodingRepairs.forEach((replacement, broken) => {
-    output = output.split(broken).join(replacement);
-  });
-  return output
-    .replaceAll("overscroll-behaviour", "overscroll-behavior")
-    .replaceAll("scroll-behaviour", "scroll-behavior");
+  encodingRepairs.forEach((replacement, broken) => { output = output.split(broken).join(replacement); });
+  return output.replaceAll("overscroll-behaviour", "overscroll-behavior").replaceAll("scroll-behaviour", "scroll-behavior");
+}
+
+function removeObsoleteRuntimeRepairs(source, file) {
+  if (path.basename(file) !== "site.js") return source;
+  return source
+    .replace(/\n\s*function loadStylesheet\(datasetName, href\) \{[\s\S]*?loadStylesheet\("xtradite-jam-refinement-css"[^\n]*\);\n/, "\n")
+    .replace(/\n\s*function repairKnownMojibake\(root = document\) \{[\s\S]*?\n\s*\}\n/, "\n")
+    .replace(/^\s*repairKnownMojibake\([^;]*\);\s*$/gm, "");
 }
 
 function styleBlockFor(source) {
-  return sharedStyles
-    .filter(([marker]) => !source.includes(`data-${marker}`))
-    .map(([marker, href]) => `  <link rel="stylesheet" href="${href}" data-${marker}>`)
-    .join("\n");
+  return sharedStyles.filter(([marker]) => !source.includes(`data-${marker}`))
+    .map(([marker, href]) => `  <link rel="stylesheet" href="${href}" data-${marker}>`).join("\n");
 }
 
 let updated = 0;
@@ -71,33 +63,22 @@ let repaired = 0;
 
 for (const file of filesRecursively(frontendDirectory, /\.(?:html?|css|js)$/i)) {
   const source = fs.readFileSync(file, "utf8");
-  let output = repairSource(source);
+  let output = removeObsoleteRuntimeRepairs(repairSource(source), file);
   if (output !== source) repaired += 1;
 
   if (/\.html?$/i.test(file)) {
     const openingHead = output.match(/<head(?:\s[^>]*)?>/i);
     if (!openingHead) throw new Error(`Cannot prepare page: no <head> element in ${path.relative(process.cwd(), file)}`);
-
-    if (!output.includes(teamMarker)) {
-      output = output.replace(openingHead[0], `${openingHead[0]}${jamHead}`);
-    } else if (!output.includes(metadataMarker)) {
-      output = output.replace(/<\/head>/i, `  <script type="module" src="/assets/js/jam-metadata.js"></script>\n</head>`);
-    }
-
+    if (!output.includes(teamMarker)) output = output.replace(openingHead[0], `${openingHead[0]}${jamHead}`);
+    else if (!output.includes(metadataMarker)) output = output.replace(/<\/head>/i, `  <script type="module" src="/assets/js/jam-metadata.js"></script>\n</head>`);
     const styles = styleBlockFor(output);
     if (styles) output = output.replace(/<\/head>/i, `${styles}\n</head>`);
-    if (!output.includes(designSystemMarker)) {
-      output = output.replace(/<\/body>/i, `  <script src="/assets/js/design-system.js" defer></script>\n</body>`);
-    }
+    if (!output.includes(designSystemMarker)) output = output.replace(/<\/body>/i, `  <script src="/assets/js/design-system.js" defer></script>\n</body>`);
   }
 
-  if (output === source) {
-    unchanged += 1;
-    continue;
-  }
-
+  if (output === source) { unchanged += 1; continue; }
   fs.writeFileSync(file, output, "utf8");
   updated += 1;
 }
 
-console.log(`Prepared ${updated} frontend file(s); ${unchanged} unchanged; ${repaired} encoding or CSS spelling repair(s).`);
+console.log(`Prepared ${updated} frontend file(s); ${unchanged} unchanged; ${repaired} source repair(s).`);
