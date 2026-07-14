@@ -37,7 +37,11 @@ jobs:
           npx playwright install --with-deps chromium
 
       - name: Build and validate frontend
-        run: npm run build
+        shell: bash
+        run: |
+          mkdir -p artifacts/jam-acceptance
+          set -o pipefail
+          npm run build 2>&1 | tee artifacts/jam-acceptance/build.log
 
       - name: Start local frontend
         run: |
