@@ -51,6 +51,9 @@ jobs:
       - name: Run eight-viewport, interaction and reduced-motion suite
         run: node scripts/run-jam-acceptance.mjs
 
+      - name: Run keyboard, contrast and touch-target suite
+        run: node scripts/run-jam-accessibility.mjs
+
       - name: Persist generated site controller cleanup
         if: github.event_name == 'push' && github.ref == 'refs/heads/feat/jam-work-packages-57-62'
         shell: bash
