@@ -1,6 +1,6 @@
 # Jam refinement implementation and acceptance map
 
-This document maps GitHub issues #57–#62 to the implementation on `feat/jam-work-packages-57-62`. Pull request #63 remains unmerged until the acceptance evidence has been reviewed.
+This document maps GitHub issues #57–#62 to the completed implementation on `feat/jam-work-packages-57-62`. Pull request #63 remains unmerged for review.
 
 ## #57 — Global typography, layout stability and shared CSS loading
 
@@ -10,11 +10,12 @@ Implemented through:
 - `scripts/validate-jam-foundation.js`
 - `frontend/assets/css/jam-refinement.css`
 - Existing shared component stylesheets injected into every HTML `<head>` during the build
+- Source-level removal of runtime stylesheet injection and mojibake repair from `frontend/assets/js/site.js`
 
 Controls:
 
 - Shared styles are present before first paint.
-- Runtime stylesheet injection and runtime mojibake repair are removed from generated `site.js`.
+- Runtime stylesheet injection and runtime mojibake repair are absent from source and generated output.
 - Common encoding artefacts and invalid CSS property spellings fail the build.
 - Container-aware `clamp()` typography, balanced wrapping and intrinsic grid sizing are required by validation.
 
@@ -28,7 +29,7 @@ Implemented through:
 
 Controls:
 
-- Hero communicates `diagnose → design → deliver → improve` with reduced-motion support.
+- The hero communicates `diagnose → design → deliver → improve` with reduced-motion support.
 - Proof points form part of the same opening narrative.
 - Featured work is loaded from published Supabase case studies.
 - Explicit featured flags are preferred; otherwise records are ranked by content completeness.
@@ -41,8 +42,10 @@ Controls:
 Implemented through:
 
 - `frontend/assets/js/design-system.js`
+- `frontend/assets/js/enquiry.js`
 - `frontend/assets/css/tabs.css`
 - `frontend/assets/css/mega-menu.css`
+- `frontend/assets/css/mobile.css`
 - Shared FAQ styles in the existing design system
 
 Controls:
@@ -51,6 +54,9 @@ Controls:
 - Inactive panels are hidden, inert and marked `aria-hidden`.
 - FAQs use deterministic control/panel relationships, buttons, numbered labels, `aria-expanded`, arrow navigation and inert closed panels.
 - Mega-menu panels use the shared layered header, Escape close with focus return and focus-out close.
+- Dynamically inserted menu panels synchronise their inert state.
+- The closed mobile navigation and closed enquiry interfaces are excluded from the keyboard order.
+- The mobile navigation toggle meets the 44 × 44 pixel touch-target requirement.
 
 ## #60 — Service delivery storytelling and technology content model
 
@@ -97,6 +103,8 @@ Implemented through:
 
 - `.github/workflows/jam-acceptance.yml`
 - `scripts/run-jam-acceptance.mjs`
+- `scripts/run-jam-accessibility.mjs`
+- `scripts/capture-jam-required-screenshots.mjs`
 - `scripts/validate-jam-foundation.js`
 
 Automated matrix:
@@ -110,12 +118,64 @@ Automated matrix:
 - 390 × 844
 - 360 × 800
 
-The suite covers homepage, service, case-study, case-studies index and industry routes. It records heading/body overflow, console errors, same-origin request failures, keyboard interactions, ARIA state, reduced-motion behaviour and required screenshots. It also captures production-versus-branch screenshots for the homepage, representative service page and longest case-study headline.
+The suite covers homepage, service, case-study, case-studies index and industry routes. It records heading/body overflow, console errors, same-origin request failures, keyboard interactions, ARIA state, reduced-motion behaviour, representative colour contrast and primary touch targets. It also captures production-versus-branch screenshots for the homepage, representative service page and longest case-study headline.
 
-## Supabase changes
+## Final acceptance results
+
+Exact tested commit: `1b44feaa5c8cb4bfa6ea2c92f06741958a5ae66e`
+
+GitHub Actions run: `29304413940`
+
+Acceptance artefact: `jam-acceptance-51cadf950898824337c3b7be3bd4e09401110655`
+
+- Production build and Jam foundation validator: passed.
+- Required viewports: 8/8.
+- Pages per viewport: 5.
+- Page/viewport combinations: 40.
+- Recorded screenshots: 57.
+- Required evidence screenshots: 11/11.
+- Interaction checks: 9/9 passed.
+- Reduced-motion checks: 2/2 passed.
+- Accessibility checks: 30/30 passed.
+- Touch-target groups: 6/6 passed.
+- Representative contrast groups: 6/6 passed.
+- Keyboard traversal groups: 6/6 passed.
+- Heading/body overflow failures: 0.
+- Application console errors: 0.
+- Same-origin request failures: 0.
+
+Required screenshots include:
+
+- Homepage hero.
+- Homepage featured work.
+- Service tabs.
+- Service timeline.
+- Service technology content.
+- FAQ component.
+- Case-study hero.
+- Case-study charts.
+- Case-study timeline.
+- Mega-menu.
+- Case-studies presentation.
+
+## Vercel acceptance
+
+The branch preview reached `READY` at implementation commit `b431419caa6b32b0d0388d6150430e8ce6dd668c`:
+
+`https://xtradite-website-a1v73712u-xtradite.vercel.app`
+
+The homepage and representative service routes returned HTTP 200 with the build-injected critical CSS present in the original HTML. Later pushes containing the final mobile-navigation inert fix and acceptance evidence were rejected by Vercel's account build-rate limiter. The exact final head was therefore validated through the same production build command and complete Playwright matrix in GitHub Actions rather than a second Vercel deployment.
+
+## Supabase changes and advisers
 
 No new destructive database change is introduced by PR #63. The additive technology-use-case migration was applied previously and remains the source for service technology examples.
 
-## Acceptance results
+The Supabase adviser review identified existing informational or warning-level items rather than migration failures:
 
-Pending the GitHub Actions run and Vercel preview availability.
+- `content_reviews` has RLS enabled without public policies, consistent with its private editorial purpose.
+- Some public delivery tables and views are exposed through read-only roles for website delivery.
+- Several indexes are currently reported as unused, including the new service-technology index; these should be reassessed after production traffic rather than removed before launch.
+
+## Known limitation
+
+The final GitHub head does not have its own Vercel preview because of the platform build-rate limit. No source, build, browser, accessibility or Supabase migration failure remains. Pull request #63 is review-ready and intentionally unmerged.
