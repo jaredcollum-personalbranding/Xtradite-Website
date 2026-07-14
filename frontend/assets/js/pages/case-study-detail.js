@@ -30,8 +30,7 @@ function setCanonical(href) {
 
 function mediaFor(item, role) {
   const media = item.media || item.mediaAssets || [];
-  return media
-    .filter((asset) => asset.role === role && (asset.publicUrl || asset.url || asset.src))
+  return media.filter((asset) => asset.role === role && (asset.publicUrl || asset.url || asset.src))
     .sort((a, b) => Number(b.isPrimary) - Number(a.isPrimary) || (a.sortOrder || 0) - (b.sortOrder || 0))[0];
 }
 
@@ -41,7 +40,6 @@ function applySeo(item) {
   const url = `${window.location.origin}/case-study-detail?slug=${encodeURIComponent(item.slug)}`;
   const hero = mediaFor(item, "og") || mediaFor(item, "hero");
   const heroUrl = hero?.publicUrl || hero?.url || hero?.src;
-
   document.title = title;
   setMeta('meta[name="description"]', "content", description);
   setMeta('meta[property="og:title"]', "content", title);
@@ -53,23 +51,18 @@ function applySeo(item) {
   setMeta('meta[name="twitter:title"]', "content", title);
   setMeta('meta[name="twitter:description"]', "content", description);
   setCanonical(url);
-
-  const script = document.createElement("script");
-  script.type = "application/ld+json";
-  script.textContent = JSON.stringify({
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline: item.headline || item.client,
-    description,
-    about: item.industry,
-    datePublished: item.publishedAt || undefined,
-    dateModified: item.updatedAt || undefined,
-    image: heroUrl || undefined,
-    author: { "@type": "Organization", name: "Xtradite Digital" },
-    publisher: { "@type": "Organization", name: "Xtradite Digital" },
-    mainEntityOfPage: url,
-  });
-  document.head.appendChild(script);
+  const existingServerSchema = document.querySelector('script[data-schema="server"]');
+  if (!existingServerSchema) {
+    const script = document.createElement("script");
+    script.type = "application/ld+json";
+    script.textContent = JSON.stringify({
+      "@context": "https://schema.org", "@type": ["Article", "CreativeWork"], headline: item.headline || item.client,
+      description, about: item.industry, datePublished: item.publishedAt || undefined, dateModified: item.updatedAt || undefined,
+      image: heroUrl || undefined, author: { "@type": "Organization", name: "Xtradite Digital" },
+      publisher: { "@type": "Organization", name: "Xtradite Digital" }, mainEntityOfPage: url,
+    });
+    document.head.appendChild(script);
+  }
 }
 
 function renderRichText(element, value) {
@@ -79,36 +72,53 @@ function renderRichText(element, value) {
   return true;
 }
 
+function plainSentence(value, limit = 170) {
+  const text = String(value || "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+  if (!text) return "";
+  const first = text.match(/^.*?[.!?](?:\s|$)/)?.[0]?.trim() || text;
+  return first.length > limit ? `${first.slice(0, limit).replace(/\s+\S*$/, "")}…` : first;
+}
+
+function renderCapacityConstraint(item) {
+  const visual = document.querySelector(".cs-context-visual");
+  if (!visual) return;
+  const annotation = plainSentence(item.challenge || item.cardSummary, 150) || "Activity was increasing faster than the operating model could process it reliably.";
+  visual.removeAttribute("aria-hidden");
+  visual.setAttribute("role", "img");
+  visual.setAttribute("aria-label", `Constraint diagram for ${item.client}: demand continues to rise while effective throughput flattens at an operating-capacity limit.`);
+  visual.innerHTML = `
+    <span class="cs-context-label">Where activity stopped producing proportional output</span>
+    <div class="capacity-chart">
+      <div class="capacity-chart-axis"><span>Lower activity</span><span>Higher activity</span></div>
+      <div class="capacity-chart-track">
+        <i class="capacity-chart-demand" aria-hidden="true"></i>
+        <i class="capacity-chart-output" aria-hidden="true"></i>
+        <i class="capacity-chart-cap" aria-hidden="true"></i>
+        <i class="capacity-chart-constraint" aria-hidden="true"></i>
+      </div>
+      <div class="capacity-chart-axis"><span>Demand / workload</span><span>Operating strain</span></div>
+    </div>
+    <p class="capacity-chart-note"><strong>Constraint point:</strong> ${escapeHtml(annotation)}</p>
+    <p class="capacity-chart-note">The intervention changed the process, ownership or capacity model so additional activity could translate into dependable output.</p>`;
+}
+
 function isTargetMetric(metric) {
-  return /\b(target|goal|forecast|projected|projection)\b/i.test(`${metric.label || ""} ${metric.value || ""}`);
+  return /\b(target|goal|forecast|projected|projection|estimated|indicative)\b/i.test(`${metric.label || ""} ${metric.value || ""}`);
 }
 
 function renderResultsGraphic(metrics) {
   const wrap = document.getElementById("cs-results-graphic");
   const selected = (metrics || []).slice(0, 3);
-  if (!selected.length) {
-    wrap.hidden = true;
-    return;
-  }
-  wrap.innerHTML = `
-    <div class="cs-results-graphic-head"><span>Outcome record</span><span>Delivered / target</span></div>
+  if (!wrap || !selected.length) { if (wrap) wrap.hidden = true; return; }
+  wrap.innerHTML = `<div class="cs-results-graphic-head"><span>Outcome record</span><span>Delivered / target</span></div>
     ${selected.map((metric, index) => {
       const target = isTargetMetric(metric);
-      return `<div class="cs-result-row">
-        <span class="cs-result-index">0${index + 1}</span>
-        <div><strong>${escapeHtml(metric.value)}</strong><span>${escapeHtml(metric.label)}</span></div>
-        <em class="${target ? "is-target" : "is-delivered"}">${target ? "Target" : "Delivered"}</em>
-      </div>`;
+      return `<div class="cs-result-row"><span class="cs-result-index">0${index + 1}</span><div><strong>${escapeHtml(metric.value)}</strong><span>${escapeHtml(metric.label)}</span></div><em class="${target ? "is-target" : "is-delivered"}">${target ? "Target / estimate" : "Delivered"}</em></div>`;
     }).join("")}`;
 }
 
 function relatedCaseHtml(item) {
-  return `<a class="cs-related-case" href="/case-study-detail?slug=${encodeURIComponent(item.slug)}">
-    <span class="eyebrow">${escapeHtml(item.industry || "Case study")}</span>
-    <h3>${escapeHtml(item.headline || item.client)}</h3>
-    <div><span>${escapeHtml(item.client)}</span><strong>${escapeHtml(item.metric || "Read the story")}</strong></div>
-    <span class="card-link">View case study <i data-lucide="arrow-right"></i></span>
-  </a>`;
+  return `<a class="cs-related-case" href="/case-study-detail?slug=${encodeURIComponent(item.slug)}"><span class="eyebrow">${escapeHtml(item.industry || "Case study")}</span><h3>${escapeHtml(item.headline || item.client)}</h3><div><span>${escapeHtml(item.client)}</span><strong>${escapeHtml(item.metric || "Read the story")}</strong></div><span class="card-link">View case study <i data-lucide="arrow-right"></i></span></a>`;
 }
 
 function renderHeroMedia(item) {
@@ -118,23 +128,17 @@ function renderHeroMedia(item) {
   const visual = document.getElementById("cs-hero-visual");
   visual.classList.add("has-media");
   const imageUrl = media?.publicUrl || media?.url || media?.src;
-  if (imageUrl) {
-    visual.style.backgroundImage = `linear-gradient(180deg, transparent 35%, rgba(23, 19, 34, .72)), url("${String(imageUrl).replace(/"/g, "%22")}")`;
-  }
+  if (imageUrl) visual.style.backgroundImage = `linear-gradient(180deg, transparent 35%, rgba(23, 19, 34, .72)), url("${String(imageUrl).replace(/"/g, "%22")}")`;
   if (video && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
     const videoUrl = video.publicUrl || video.url || video.src;
     const element = document.createElement("video");
     element.className = "cs-hero-video";
-    element.muted = true;
-    element.loop = true;
-    element.autoplay = true;
-    element.playsInline = true;
-    element.preload = "metadata";
+    element.muted = true; element.loop = true; element.autoplay = true; element.playsInline = true; element.preload = "metadata";
     if (imageUrl) element.poster = imageUrl;
     element.innerHTML = `<source src="${escapeHtml(videoUrl)}" type="${escapeHtml(video.mimeType || "video/mp4")}">`;
     visual.prepend(element);
   }
-  visual.setAttribute("aria-label", media?.altText || media?.alt || video?.altText || "Case study editorial media");
+  visual.setAttribute("aria-label", media?.altText || media?.alt || video?.altText || "Case-study editorial media");
   visual.removeAttribute("aria-hidden");
 }
 
@@ -144,41 +148,23 @@ async function renderRelated(item) {
   const serviceWrap = document.getElementById("related-service");
   if (service?.slug && serviceWrap) {
     serviceWrap.href = `/services/${encodeURIComponent(service.slug)}`;
-    serviceWrap.innerHTML = `
-      <span class="eyebrow">Related service</span>
-      <div class="cs-service-icon"><i data-lucide="${escapeHtml(service.icon || "arrow-up-right")}"></i></div>
-      <h3>${escapeHtml(service.title)}</h3>
-      <p>${escapeHtml(service.summary || "Explore the capability behind this engagement.")}</p>
-      <span class="card-link">Explore this service <i data-lucide="arrow-right"></i></span>`;
+    serviceWrap.innerHTML = `<span class="eyebrow">Related service</span><div class="cs-service-icon"><i data-lucide="${escapeHtml(service.icon || "arrow-up-right")}"></i></div><h3>${escapeHtml(service.title)}</h3><p>${escapeHtml(service.summary || "Explore the capability behind this engagement.")}</p><span class="card-link">Explore this service <i data-lucide="arrow-right"></i></span>`;
     serviceWrap.hidden = false;
     hasRelated = true;
   }
-
   try {
     const { items } = await queryItems("case_studies_delivery", { sort: [{ fieldName: "sort_order", order: "ASC" }] });
-    const others = items
-      .filter((candidate) => candidate.slug !== item.slug)
-      .sort((a, b) => Number(b.industry === item.industry) - Number(a.industry === item.industry))
-      .slice(0, 2);
-    if (others.length) {
-      document.getElementById("related-case-studies").innerHTML = others.map(relatedCaseHtml).join("");
-      hasRelated = true;
-    }
-  } catch (error) {
-    console.error(error);
-  }
+    const others = items.filter((candidate) => candidate.slug !== item.slug).sort((a, b) => Number(b.industry === item.industry) - Number(a.industry === item.industry)).slice(0, 2);
+    if (others.length) { document.getElementById("related-case-studies").innerHTML = others.map(relatedCaseHtml).join(""); hasRelated = true; }
+  } catch (error) { console.error(error); }
   document.getElementById("cs-related-section").hidden = !hasRelated;
 }
 
 async function load() {
   if (!slug) return showNotFound();
   let item;
-  try {
-    item = await getItemBySlug("case_studies_delivery", "slug", slug);
-  } catch (error) {
-    console.error(error);
-    return showNotFound("Couldn't load this page", "We couldn't reach the live content service. Please refresh, or try again in a moment.");
-  }
+  try { item = await getItemBySlug("case_studies_delivery", "slug", slug); }
+  catch (error) { console.error(error); return showNotFound("Couldn't load this page", "We couldn't reach the live content service. Please refresh, or try again in a moment."); }
   if (!item) return showNotFound();
 
   applySeo(item);
@@ -190,39 +176,23 @@ async function load() {
   document.getElementById("cs-primary-metric").textContent = item.metric || "";
   document.getElementById("cs-visual-metric").textContent = item.metric || item.industry || "Impact";
   document.getElementById("cs-primary-proof").hidden = !item.metric;
-
-  if (item.cardSummary) {
-    document.getElementById("cs-summary").textContent = item.cardSummary;
-    document.getElementById("cs-summary").hidden = false;
-  }
-  if (item.confidentialityNote) {
-    document.getElementById("cs-confidentiality").textContent = item.confidentialityNote;
-    document.getElementById("cs-confidentiality").hidden = false;
-  }
+  if (item.cardSummary) { document.getElementById("cs-summary").textContent = item.cardSummary; document.getElementById("cs-summary").hidden = false; }
+  if (item.confidentialityNote) { document.getElementById("cs-confidentiality").textContent = item.confidentialityNote; document.getElementById("cs-confidentiality").hidden = false; }
   renderHeroMedia(item);
 
   const metrics = item.metrics || [];
-  if (metrics.length) {
-    renderEvidenceExperience(item, metrics);
-    document.getElementById("cs-evidence-section").hidden = false;
-  }
-
-  if (renderRichText(document.getElementById("cs-description"), item.description)) {
-    document.getElementById("cs-engagement-section").hidden = false;
-  }
+  if (metrics.length) { renderEvidenceExperience(item, metrics); document.getElementById("cs-evidence-section").hidden = false; }
+  if (renderRichText(document.getElementById("cs-description"), item.description)) document.getElementById("cs-engagement-section").hidden = false;
   renderRichText(document.getElementById("cs-challenge"), item.challenge);
+  renderCapacityConstraint(item);
   if (item.approach?.length) renderApproachExperience(item.approach);
   const hasResultsCopy = renderRichText(document.getElementById("cs-results"), item.resultsDetail);
   renderResultsGraphic(metrics);
   document.getElementById("cs-results-section").hidden = !hasResultsCopy && !metrics.length;
-
   if (item.testimonialQuote) {
-    document.getElementById("cs-testimonial").innerHTML = `
-      <p>“${escapeHtml(item.testimonialQuote)}”</p>
-      ${item.testimonialAuthor ? `<cite>${escapeHtml(item.testimonialAuthor)}</cite>` : ""}`;
+    document.getElementById("cs-testimonial").innerHTML = `<p>“${escapeHtml(item.testimonialQuote)}”</p>${item.testimonialAuthor ? `<cite>${escapeHtml(item.testimonialAuthor)}</cite>` : ""}`;
     document.getElementById("cs-testimonial-section").hidden = false;
   }
-
   await renderRelated(item);
   root.hidden = false;
   renderIcons();
