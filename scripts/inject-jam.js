@@ -6,6 +6,7 @@ const teamMarker = 'name="jam:team"';
 const metadataMarker = 'src="/assets/js/jam-metadata.js"';
 const designSystemMarker = 'src="/assets/js/design-system.js"';
 const brandResilienceMarker = 'src="/assets/js/brand-resilience.js"';
+const assetVersion = "20260714-3";
 
 const jamHead = `
   <meta name="jam:team" content="e8e1b81a-519b-40e4-9720-4d2182dbc6da" />
@@ -14,16 +15,16 @@ const jamHead = `
   <script type="module" src="/assets/js/jam-metadata.js"></script>`;
 
 const sharedStyles = [
-  ["xtradite-brand-logo-css", "/assets/css/brand-logo.css?v=20260714"],
-  ["xtradite-mobile-css", "/assets/css/mobile.css?v=20260714"],
-  ["xtradite-tabs-css", "/assets/css/tabs.css?v=20260714"],
-  ["xtradite-mega-menu-css", "/assets/css/mega-menu.css?v=20260714"],
-  ["xtradite-enquiry-css", "/assets/css/enquiry.css?v=20260714"],
-  ["service-content-architecture-css", "/assets/css/service-content-architecture.css?v=20260714"],
-  ["service-delivery-timeline-css", "/assets/css/service-delivery-timeline-v2.css?v=20260714"],
-  ["service-template-v3-css", "/assets/css/service-template-v3.css?v=20260714"],
-  ["case-study-experience-css", "/assets/css/case-study-experience.css?v=20260714"],
-  ["xtradite-jam-refinement-css", "/assets/css/jam-refinement.css?v=20260714-2"],
+  ["xtradite-brand-logo-css", `/assets/css/brand-logo.css?v=${assetVersion}`],
+  ["xtradite-mobile-css", `/assets/css/mobile.css?v=${assetVersion}`],
+  ["xtradite-tabs-css", `/assets/css/tabs.css?v=${assetVersion}`],
+  ["xtradite-mega-menu-css", `/assets/css/mega-menu.css?v=${assetVersion}`],
+  ["xtradite-enquiry-css", `/assets/css/enquiry.css?v=${assetVersion}`],
+  ["service-content-architecture-css", `/assets/css/service-content-architecture.css?v=${assetVersion}`],
+  ["service-delivery-timeline-css", `/assets/css/service-delivery-timeline-v2.css?v=${assetVersion}`],
+  ["service-template-v3-css", `/assets/css/service-template-v3.css?v=${assetVersion}`],
+  ["case-study-experience-css", `/assets/css/case-study-experience.css?v=${assetVersion}`],
+  ["xtradite-jam-refinement-css", `/assets/css/jam-refinement.css?v=${assetVersion}`],
 ];
 
 const encodingRepairs = new Map([
@@ -45,12 +46,88 @@ function repairSource(source) {
   return output.replaceAll("overscroll-behaviour", "overscroll-behavior").replaceAll("scroll-behaviour", "scroll-behavior");
 }
 
+function removeNamedFunction(source, functionName) {
+  const signature = `function ${functionName}`;
+  const start = source.indexOf(signature);
+  if (start === -1) return source;
+
+  const openingBrace = source.indexOf("{", start + signature.length);
+  if (openingBrace === -1) throw new Error(`Cannot remove ${functionName}: opening brace not found`);
+
+  let depth = 0;
+  let quote = "";
+  let escaped = false;
+  let lineComment = false;
+  let blockComment = false;
+
+  for (let index = openingBrace; index < source.length; index += 1) {
+    const character = source[index];
+    const next = source[index + 1];
+
+    if (lineComment) {
+      if (character === "\n") lineComment = false;
+      continue;
+    }
+    if (blockComment) {
+      if (character === "*" && next === "/") {
+        blockComment = false;
+        index += 1;
+      }
+      continue;
+    }
+    if (quote) {
+      if (escaped) escaped = false;
+      else if (character === "\\") escaped = true;
+      else if (character === quote) quote = "";
+      continue;
+    }
+    if (character === "/" && next === "/") {
+      lineComment = true;
+      index += 1;
+      continue;
+    }
+    if (character === "/" && next === "*") {
+      blockComment = true;
+      index += 1;
+      continue;
+    }
+    if (character === '"' || character === "'" || character === "`") {
+      quote = character;
+      continue;
+    }
+    if (character === "{") depth += 1;
+    if (character === "}") {
+      depth -= 1;
+      if (depth === 0) {
+        let end = index + 1;
+        while (source[end] === "\r" || source[end] === "\n") end += 1;
+        return `${source.slice(0, start)}${source.slice(end)}`;
+      }
+    }
+  }
+
+  throw new Error(`Cannot remove ${functionName}: closing brace not found`);
+}
+
 function removeObsoleteRuntimeRepairs(source, file) {
   if (path.basename(file) !== "site.js") return source;
-  return source
-    .replace(/\n\s*function loadStylesheet\(datasetName, href\) \{[\s\S]*?loadStylesheet\("xtradite-jam-refinement-css"[^\n]*\);\n/, "\n")
-    .replace(/\n\s*function repairKnownMojibake\(root = document\) \{[\s\S]*?\n\s*\}\n/, "\n")
-    .replace(/^\s*repairKnownMojibake\([^;]*\);\s*$/gm, "");
+
+  let output = source.replace(
+    /\n\s*const currentScript = document\.currentScript;[\s\S]*?new URL\("\/assets\/js\/", window\.location\.origin\);\n/,
+    "\n",
+  );
+  output = removeNamedFunction(output, "loadStylesheet");
+  output = removeNamedFunction(output, "repairKnownMojibake");
+  output = output
+    .replace(/^\s*loadStylesheet\([^;]+;\s*$/gm, "")
+    .replace(/^\s*repairKnownMojibake\([^;]*\);\s*$/gm, "")
+    .replace(/\n{3,}/g, "\n\n");
+
+  if (/loadStylesheet|repairKnownMojibake|\bscriptBase\b/.test(output)) {
+    throw new Error("site.js still contains obsolete runtime CSS or encoding-repair code after preparation");
+  }
+
+  return output;
 }
 
 function styleBlockFor(source) {
