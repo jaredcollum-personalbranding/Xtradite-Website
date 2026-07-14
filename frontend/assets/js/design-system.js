@@ -2,6 +2,7 @@
   "use strict";
 
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const desktopNavigation = window.matchMedia("(min-width: 1151px)");
   document.documentElement.classList.toggle("reduced-motion", reducedMotion.matches);
   reducedMotion.addEventListener?.("change", (event) => {
     document.documentElement.classList.toggle("reduced-motion", event.matches);
@@ -77,6 +78,10 @@
 
   function normaliseTabs(tablist) {
     if (!tablist || tablist.dataset.tabSystem === "true") return;
+    if (tablist.matches(".service-v3-engagement-tabs")) {
+      tablist.dataset.tabSystem = "local";
+      return;
+    }
     tablist.dataset.tabSystem = "true";
     const tabs = Array.from(tablist.querySelectorAll('[role="tab"]'));
     if (!tabs.length) return;
@@ -123,13 +128,18 @@
     });
   }
 
+  function setMegaItemOpen(item, open) {
+    const trigger = item?.querySelector(":scope > .mega-nav-trigger");
+    const panel = item?.querySelector(":scope > .mega-menu-panel");
+    item?.classList.toggle("is-open", open);
+    trigger?.setAttribute("aria-expanded", String(open));
+    panel?.setAttribute("aria-hidden", String(!open));
+  }
+
   function closeMegaItem(item, returnFocus = false) {
     if (!item) return;
     const trigger = item.querySelector(":scope > .mega-nav-trigger");
-    const panel = item.querySelector(":scope > .mega-menu-panel");
-    item.classList.remove("is-open");
-    trigger?.setAttribute("aria-expanded", "false");
-    panel?.setAttribute("aria-hidden", "true");
+    setMegaItemOpen(item, false);
     if (returnFocus) trigger?.focus();
   }
 
@@ -139,6 +149,18 @@
     if (!header || !nav || nav.dataset.layeringReady === "true") return;
     nav.dataset.layeringReady = "true";
     header.classList.add("has-layered-navigation");
+
+    nav.addEventListener("click", (event) => {
+      const trigger = event.target.closest(".mega-nav-trigger");
+      if (!trigger || !desktopNavigation.matches) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      const item = trigger.closest(".mega-nav-item");
+      nav.querySelectorAll(".mega-nav-item.is-open").forEach((openItem) => {
+        if (openItem !== item) closeMegaItem(openItem);
+      });
+      setMegaItemOpen(item, true);
+    }, true);
 
     document.addEventListener("keydown", (event) => {
       if (event.key !== "Escape") return;
