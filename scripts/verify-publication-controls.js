@@ -18,7 +18,7 @@ function lint() {
   const serverSupabase = read("api/lib/supabase.js");
   const locationCatalogue = read("api/lib/location-catalogue.js");
   const browserCms = read("frontend/assets/js/cms.js");
-  const migration = read("supabase/migrations/20260714153000_gold_seal_publication_controls.sql");
+  const migration = read("supabase/migrations/20260714140225_gold_seal_publication_controls.sql");
 
   requireText(serverSupabase, /PUBLIC_CONTENT_SELECTS/, "Server public field allowlists are required");
   requireText(browserCms, /PUBLIC_SELECTS/, "Browser public field allowlists are required");
@@ -61,7 +61,7 @@ function structuredData() {
 }
 
 function migration() {
-  const source = read("supabase/migrations/20260714153000_gold_seal_publication_controls.sql");
+  const source = read("supabase/migrations/20260714140225_gold_seal_publication_controls.sql");
   [
     /publication_is_effective/,
     /is_indexable boolean not null default false/,
