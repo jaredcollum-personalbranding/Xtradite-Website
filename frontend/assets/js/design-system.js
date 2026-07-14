@@ -128,6 +128,13 @@
     });
   }
 
+  function syncMegaPanelInert(root = document) {
+    const panels = [];
+    if (root instanceof Element && root.matches(".mega-menu-panel")) panels.push(root);
+    root.querySelectorAll?.(".mega-menu-panel").forEach((panel) => panels.push(panel));
+    panels.forEach((panel) => panel.toggleAttribute("inert", panel.getAttribute("aria-hidden") !== "false"));
+  }
+
   function setMegaItemOpen(item, open) {
     const trigger = item?.querySelector(":scope > .mega-nav-trigger");
     const panel = item?.querySelector(":scope > .mega-menu-panel");
@@ -156,14 +163,10 @@
     if (!header || !nav || nav.dataset.layeringReady === "true") return;
     nav.dataset.layeringReady = "true";
     header.classList.add("has-layered-navigation");
+    syncMegaPanelInert(nav);
 
-    const syncPanelInert = (panel) => {
-      if (!(panel instanceof HTMLElement) || !panel.classList.contains("mega-menu-panel")) return;
-      panel.toggleAttribute("inert", panel.getAttribute("aria-hidden") !== "false");
-    };
-    nav.querySelectorAll(".mega-menu-panel").forEach(syncPanelInert);
     const panelObserver = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => syncPanelInert(mutation.target));
+      mutations.forEach((mutation) => syncMegaPanelInert(mutation.target));
     });
     panelObserver.observe(nav, { attributes: true, attributeFilter: ["aria-hidden"], subtree: true });
 
@@ -201,13 +204,14 @@
   function prepare(root = document) {
     root.querySelectorAll?.(".faq-list").forEach(upgradeFaqList);
     root.querySelectorAll?.('[role="tablist"]').forEach(normaliseTabs);
+    syncMegaPanelInert(root);
     hardenMegaMenu();
   }
 
   prepare();
   const observer = new MutationObserver((mutations) => {
     mutations.forEach((mutation) => mutation.addedNodes.forEach((node) => {
-      if (node instanceof Element) prepare(node.matches(".faq-list,[role=tablist]") ? node.parentElement : node);
+      if (node instanceof Element) prepare(node.matches(".faq-list,[role=tablist],.mega-menu-panel") ? node.parentElement : node);
     }));
   });
   observer.observe(document.body, { childList: true, subtree: true });
