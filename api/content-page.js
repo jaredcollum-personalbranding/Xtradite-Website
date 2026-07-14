@@ -32,7 +32,7 @@ const PAGE_TYPES = {
     route: "case-studies",
     parentName: "Case Studies",
     title: (item) => item.seo_title || `${item.client} — Xtradite Digital Case Study`,
-    description: (item) => item.seo_description || item.card_summary || item.headline || item.challenge || `How Xtradite Digital helped ${item.client}.`,
+    description: (item) => item.seo_description || item.card_summary || item.headline || item.challenge || `How Xtradite Digital worked with ${item.client}.`,
     pageType: "WebPage"
   },
   insight: {
@@ -55,7 +55,20 @@ function replaceOrInsert(html, pattern, replacement) {
   return html.replace(/<\/head>/i, `${replacement}\n</head>`);
 }
 
-function injectSeo(html, { type, item, config, canonical, title, description }) {
+function canonicalFor(item, config, slug) {
+  const expectedPath = `/${config.route}/${slug}`;
+  const candidate = typeof item.canonical_path === "string" ? item.canonical_path.trim() : "";
+  const pathValue = candidate.startsWith("/") ? candidate : expectedPath;
+  return new URL(pathValue, SITE_URL).href;
+}
+
+function robotsFor(item) {
+  return item.noindex === true
+    ? "noindex, nofollow"
+    : "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1";
+}
+
+function injectSeo(html, { type, item, config, canonical, title, description, robots }) {
   const primary = primaryEntityFor(type, item, canonical, description);
   const graph = buildGraph({
     canonical,
@@ -75,7 +88,7 @@ function injectSeo(html, { type, item, config, canonical, title, description }) 
   output = replaceOrInsert(output, /<base\s+href=["'][^"']*["'][^>]*>/i, '<base href="/">');
   output = replaceOrInsert(output, /<title>[\s\S]*?<\/title>/i, `<title>${escapeHtml(title)}</title>`);
   output = replaceOrInsert(output, /<meta\s+name=["']description["'][^>]*>/i, `<meta name="description" content="${escapeHtml(description)}">`);
-  output = replaceOrInsert(output, /<meta\s+name=["']robots["'][^>]*>/i, '<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">');
+  output = replaceOrInsert(output, /<meta\s+name=["']robots["'][^>]*>/i, `<meta name="robots" content="${robots}">`);
   output = replaceOrInsert(output, /<link\s+rel=["']canonical["'][^>]*>/i, `<link rel="canonical" href="${canonical}">`);
   output = replaceOrInsert(output, /<link\s+rel=["']icon["'][^>]*type=["']image\/svg\+xml["'][^>]*>/i, `<link rel="icon" type="image/svg+xml" href="${FAVICON}">`);
   output = replaceOrInsert(output, /<meta\s+name=["']theme-color["'][^>]*>/i, '<meta name="theme-color" content="#0D0D0D">');
@@ -114,18 +127,20 @@ module.exports = async (req, res) => {
 
   try {
     const item = await fetchPublishedBySlug(config.table, slug, publicSelectFor(config.table));
-    if (!item) {
+    if (!item || (type === "case-study" && item.public_approval_status !== "approved")) {
       sendNotFound(res);
       return;
     }
 
-    const canonical = `${SITE_URL}/${config.route}/${slug}`;
+    const canonical = canonicalFor(item, config, slug);
     const title = config.title(item);
     const description = config.description(item);
+    const robots = robotsFor(item);
     const template = fs.readFileSync(path.join(process.cwd(), "frontend", config.template), "utf8");
-    const html = injectSeo(template, { type, item, config, canonical, title, description });
+    const html = injectSeo(template, { type, item, config, canonical, title, description, robots });
 
     res.setHeader("Content-Type", "text/html; charset=utf-8");
+    res.setHeader("X-Robots-Tag", robots);
     res.setHeader("Cache-Control", "public, max-age=0, s-maxage=900, stale-while-revalidate=86400");
     res.status(200).send(html);
   } catch (error) {
@@ -135,5 +150,7 @@ module.exports = async (req, res) => {
 };
 
 module.exports.PAGE_TYPES = PAGE_TYPES;
+module.exports.canonicalFor = canonicalFor;
+module.exports.robotsFor = robotsFor;
 module.exports.injectSeo = injectSeo;
 module.exports.sendNotFound = sendNotFound;
