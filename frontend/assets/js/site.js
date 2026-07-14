@@ -42,22 +42,6 @@
     { slug: "startups", title: "Startups & Scale-ups", summary: "Practical operating structure for fast-moving teams." },
   ];
 
-  function loadStylesheet(datasetName, href) {
-    if (document.querySelector(`link[data-${datasetName}]`)) return;
-    const stylesheet = document.createElement("link");
-    stylesheet.rel = "stylesheet";
-    stylesheet.setAttribute(`data-${datasetName}`, "true");
-    stylesheet.href = new URL(href, scriptBase).href;
-    document.head.appendChild(stylesheet);
-  }
-
-  loadStylesheet("xtradite-brand-logo-css", "../css/brand-logo.css?v=20260713-4");
-  loadStylesheet("xtradite-mobile-css", "../css/mobile.css");
-  loadStylesheet("xtradite-tabs-css", "../css/tabs.css?v=20260713-1");
-  loadStylesheet("xtradite-mega-menu-css", "../css/mega-menu.css?v=20260714-1");
-  loadStylesheet("xtradite-enquiry-css", "../css/enquiry.css");
-  loadStylesheet("xtradite-jam-refinement-css", "../css/jam-refinement.css?v=20260714-1");
-
   function escapeHtml(value) {
     return String(value ?? "")
       .replace(/&/g, "&amp;")
@@ -66,15 +50,7 @@
       .replace(/"/g, "&quot;");
   }
 
-  function repairKnownMojibake(root = document) {
-    root.querySelectorAll?.(".stat-number").forEach((element) => {
-      if (element.textContent?.includes("Â£")) element.textContent = element.textContent.replaceAll("Â£", "£");
-      const target = element.getAttribute("data-count-to");
-      if (target?.includes("Â£")) element.setAttribute("data-count-to", target.replaceAll("Â£", "£"));
-    });
-  }
-
-  function linkedInSvg() {
+    function linkedInSvg() {
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg.setAttribute("viewBox", "0 0 24 24");
     svg.setAttribute("aria-hidden", "true");
@@ -110,7 +86,7 @@
   }
 
   installLucideGuard();
-  repairKnownMojibake();
+
   replaceUnsupportedBrandIcons();
 
   function applyBrandLogos(root = document) {
@@ -153,7 +129,7 @@
       mutation.addedNodes.forEach((node) => {
         if (!(node instanceof Element)) return;
         applyBrandLogos(node.matches("img.logo-img") ? node.parentElement : node);
-        repairKnownMojibake(node);
+
         replaceUnsupportedBrandIcons(node);
       });
     });
@@ -203,7 +179,7 @@
 
   function industryEntry(item, state) {
     const active = state.path === "/industry-detail" && state.slug === item.slug;
-    return `<a class="mega-menu-entry mega-menu-entry--compact${activeClass(active)}" href="/industry-detail?slug=${encodeURIComponent(item.slug)}"${currentAttribute(active)}>
+    return `<a class="mega-menu-entry mega-menu-entry--compact${activeClass(active)}" href="/industries/${encodeURIComponent(item.slug)}"${currentAttribute(active)}>
       <span class="mega-menu-entry-title">${escapeHtml(item.title)}</span>
       ${item.summary ? `<span class="mega-menu-entry-copy">${escapeHtml(item.summary)}</span>` : ""}
     </a>`;
