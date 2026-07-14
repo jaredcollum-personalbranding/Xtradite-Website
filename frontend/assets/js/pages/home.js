@@ -26,15 +26,15 @@ function completenessScore(item) {
   return [
     item.challenge,
     item.approach?.[0]?.description || item.approach?.[0]?.title,
-    item.metric || item.metrics?.[0]?.value,
     item.cardSummary || item.description,
     item.relatedServices?.[0]?.title,
   ].filter(Boolean).length;
 }
 
 function selectFeaturedWork(items) {
-  const explicit = items.find((item) => item.isFeatured === true || item.featured === true || item.homepageFeatured === true);
-  const ranked = [...items].sort((a, b) => completenessScore(b) - completenessScore(a) || Number(a.sortOrder || 0) - Number(b.sortOrder || 0));
+  const eligible = items.filter((item) => item.publicApprovalStatus === "approved");
+  const explicit = eligible.find((item) => item.isFeatured === true || item.featured === true || item.homepageFeatured === true);
+  const ranked = [...eligible].sort((a, b) => completenessScore(b) - completenessScore(a) || Number(a.sortOrder || 0) - Number(b.sortOrder || 0));
   const primary = explicit || ranked[0];
   return { primary, secondary: ranked.filter((item) => item.slug !== primary?.slug).slice(0, 2) };
 }
@@ -42,8 +42,6 @@ function selectFeaturedWork(items) {
 function featuredStoryHtml(primary, secondary) {
   const approach = primary.approach?.[0];
   const service = primary.relatedServices?.[0];
-  const result = primary.metric || primary.metrics?.[0]?.value;
-  const resultLabel = primary.metrics?.find((metric) => metric.value === result)?.label || primary.cardSummary;
   const challenge = concise(primary.challenge, "", 120);
   const intervention = concise(approach?.description, approach?.title, 120);
   const capability = concise(service?.title, "", 80);
@@ -58,12 +56,12 @@ function featuredStoryHtml(primary, secondary) {
       <div><span class="eyebrow">${escapeHtml(primary.industry || "Case study")}</span><h3>${escapeHtml(primary.headline || primary.client)}</h3><p>${escapeHtml(concise(primary.cardSummary || primary.description, primary.challenge, 240))}</p></div>
       ${journey.length ? `<div class="featured-work-journey" aria-label="Case-study journey">${journey.map(([label, value]) => `<div class="featured-work-step"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`).join("")}</div>` : ""}
       <div class="featured-work-result">
-        ${result ? `<div><strong>${escapeHtml(result)}</strong><span>${escapeHtml(concise(resultLabel, "Reported case-study result", 100))}</span></div>` : `<div><span>Read the complete evidence and outcome in the case study.</span></div>`}
+        <div><span>Read the governed case study for the available evidence, contribution boundaries and limitations.</span></div>
         <a class="btn btn-primary" href="/case-studies/${encodeURIComponent(primary.slug)}">Read the full case study <i data-lucide="arrow-right"></i></a>
       </div>
     </article>
     <aside class="featured-work-aside" aria-label="More featured work">
-      ${secondary.map((item) => `<a class="featured-work-secondary" href="/case-studies/${encodeURIComponent(item.slug)}"><span class="eyebrow">${escapeHtml(item.industry || "Case study")}</span><h4>${escapeHtml(item.headline || item.client)}</h4><p>${escapeHtml(concise(item.cardSummary, item.challenge, 130))}</p>${item.metric ? `<span class="metric">${escapeHtml(item.metric)}</span>` : ""}<span class="card-link">View case study <i data-lucide="arrow-right"></i></span></a>`).join("")}
+      ${secondary.map((item) => `<a class="featured-work-secondary" href="/case-studies/${encodeURIComponent(item.slug)}"><span class="eyebrow">${escapeHtml(item.industry || "Case study")}</span><h4>${escapeHtml(item.headline || item.client)}</h4><p>${escapeHtml(concise(item.cardSummary, item.challenge, 130))}</p><span class="card-link">View case study <i data-lucide="arrow-right"></i></span></a>`).join("")}
       <a href="/case-studies" class="btn btn-secondary">View all case studies</a>
     </aside>
   </div>`;
@@ -76,20 +74,20 @@ async function loadFeaturedWork() {
   root.innerHTML = '<div class="featured-work-empty" role="status"><strong>Loading featured work…</strong></div>';
   try {
     const { items } = await queryItems("case_studies_delivery", { sort: [{ fieldName: "sort_order", order: "ASC" }] });
-    if (!items.length) {
-      root.innerHTML = '<div class="featured-work-empty"><strong>Featured work is being prepared.</strong><p>Case studies will appear here when published in Supabase.</p><a class="btn btn-secondary" href="/case-studies">Browse case studies</a></div>';
+    const { primary, secondary } = selectFeaturedWork(items);
+    if (!primary) {
+      root.innerHTML = '<div class="featured-work-empty"><strong>Case studies are under evidence review.</strong><p>Only independently approved records are shown publicly. Service and insight content remains available while reviews are completed.</p><a class="btn btn-secondary" href="/services">Review services</a></div>';
       return;
     }
-    const { primary, secondary } = selectFeaturedWork(items);
-    if (!primary || completenessScore(primary) < 3) {
-      root.innerHTML = '<div class="featured-work-empty"><strong>Case-study evidence is available in the library.</strong><p>The homepage feature will appear when a published record contains a clear constraint, intervention and result.</p><a class="btn btn-secondary" href="/case-studies">Browse case studies</a></div>';
+    if (completenessScore(primary) < 3) {
+      root.innerHTML = '<div class="featured-work-empty"><strong>Approved case-study evidence is being prepared.</strong><p>The homepage feature will appear when an approved record contains a clear constraint, intervention and contribution statement.</p><a class="btn btn-secondary" href="/services">Review services</a></div>';
       return;
     }
     root.innerHTML = featuredStoryHtml(primary, secondary);
     renderIcons();
   } catch (error) {
     console.error(error);
-    root.innerHTML = '<div class="featured-work-empty"><strong>Featured work could not be loaded.</strong><p>Browse the case-study library directly.</p><a class="btn btn-secondary" href="/case-studies">View case studies</a></div>';
+    root.innerHTML = '<div class="featured-work-empty"><strong>Featured work could not be loaded.</strong><p>Review the service library while case-study evidence is checked.</p><a class="btn btn-secondary" href="/services">View services</a></div>';
   } finally {
     root.removeAttribute("aria-busy");
   }
