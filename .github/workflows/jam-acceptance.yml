@@ -43,11 +43,14 @@ jobs:
       - name: Run eight-viewport, interaction and reduced-motion suite
         run: node scripts/run-jam-acceptance.mjs
 
-      - name: Upload acceptance report and screenshots
+      - name: Upload acceptance report, screenshots and generated source
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: jam-acceptance-${{ github.sha }}
-          path: artifacts/jam-acceptance
+          path: |
+            artifacts/jam-acceptance
+            frontend/assets/js/site.js
+            frontend/index.html
           if-no-files-found: warn
           retention-days: 30
