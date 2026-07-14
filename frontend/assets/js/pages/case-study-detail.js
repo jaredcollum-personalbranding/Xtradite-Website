@@ -80,15 +80,45 @@ function renderRichText(element, value) {
   return true;
 }
 
+function plainSentence(value, limit = 170) {
+  const text = String(value || "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+  if (!text) return "";
+  const first = text.match(/^.*?[.!?](?:\s|$)/)?.[0]?.trim() || text;
+  return first.length > limit ? `${first.slice(0, limit).replace(/\s+\S*$/, "")}…` : first;
+}
+
+function renderCapacityConstraint(item) {
+  const visual = document.querySelector(".cs-context-visual");
+  if (!visual) return;
+  const annotation = plainSentence(item.challenge || item.cardSummary, 150) || "Activity was increasing faster than the operating model could process it reliably.";
+  visual.removeAttribute("aria-hidden");
+  visual.setAttribute("role", "img");
+  visual.setAttribute("aria-label", `Constraint diagram for ${item.client}: demand continues to rise while effective throughput flattens at an operating-capacity limit.`);
+  visual.innerHTML = `
+    <span class="cs-context-label">Where activity stopped producing proportional output</span>
+    <div class="capacity-chart">
+      <div class="capacity-chart-axis"><span>Lower activity</span><span>Higher activity</span></div>
+      <div class="capacity-chart-track">
+        <i class="capacity-chart-demand" aria-hidden="true"></i>
+        <i class="capacity-chart-output" aria-hidden="true"></i>
+        <i class="capacity-chart-cap" aria-hidden="true"></i>
+        <i class="capacity-chart-constraint" aria-hidden="true"></i>
+      </div>
+      <div class="capacity-chart-axis"><span>Demand / workload</span><span>Operating strain</span></div>
+    </div>
+    <p class="capacity-chart-note"><strong>Constraint point:</strong> ${escapeHtml(annotation)}</p>
+    <p class="capacity-chart-note">The intervention changed the process, ownership or capacity model so additional activity could translate into dependable output.</p>`;
+}
+
 function isTargetMetric(metric) {
-  return /\b(target|goal|forecast|projected|projection)\b/i.test(`${metric.label || ""} ${metric.value || ""}`);
+  return /\b(target|goal|forecast|projected|projection|estimated|indicative)\b/i.test(`${metric.label || ""} ${metric.value || ""}`);
 }
 
 function renderResultsGraphic(metrics) {
   const wrap = document.getElementById("cs-results-graphic");
   const selected = (metrics || []).slice(0, 3);
-  if (!selected.length) {
-    wrap.hidden = true;
+  if (!wrap || !selected.length) {
+    if (wrap) wrap.hidden = true;
     return;
   }
   wrap.innerHTML = `
@@ -98,7 +128,7 @@ function renderResultsGraphic(metrics) {
       return `<div class="cs-result-row">
         <span class="cs-result-index">0${index + 1}</span>
         <div><strong>${escapeHtml(metric.value)}</strong><span>${escapeHtml(metric.label)}</span></div>
-        <em class="${target ? "is-target" : "is-delivered"}">${target ? "Target" : "Delivered"}</em>
+        <em class="${target ? "is-target" : "is-delivered"}">${target ? "Target / estimate" : "Delivered"}</em>
       </div>`;
     }).join("")}`;
 }
@@ -212,6 +242,7 @@ async function load() {
     document.getElementById("cs-engagement-section").hidden = false;
   }
   renderRichText(document.getElementById("cs-challenge"), item.challenge);
+  renderCapacityConstraint(item);
   if (item.approach?.length) renderApproachExperience(item.approach);
   const hasResultsCopy = renderRichText(document.getElementById("cs-results"), item.resultsDetail);
   renderResultsGraphic(metrics);
