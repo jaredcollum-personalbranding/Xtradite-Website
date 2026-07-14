@@ -1,5 +1,6 @@
 const { fetchRows } = require("./lib/supabase");
 const { loadLocationCatalogue } = require("./lib/location-catalogue");
+const { isValidSlug } = require("./lib/publication-eligibility");
 const { SITE_URL } = require("./lib/schema");
 
 const STATIC_PATHS = [
@@ -34,8 +35,8 @@ function urlEntry(path, lastmod) {
   ].filter(Boolean).join("\n");
 }
 
-async function locationEntries() {
-  const { locations, servicesByLocation } = await loadLocationCatalogue();
+function buildLocationEntries({ locations, servicesByLocation }) {
+  if (!locations.length) return [];
   const entries = [{ path: "/uk" }];
 
   unique(locations.map((location) => location.nationSlug))
@@ -59,24 +60,33 @@ async function locationEntries() {
   return entries;
 }
 
+async function locationEntries() {
+  return buildLocationEntries(await loadLocationCatalogue());
+}
+
+function normaliseSitemapRows(rows, config) {
+  return rows
+    .filter((row) => isValidSlug(row.slug))
+    .filter((row) => row.canonical_path === `/${config.route}/${row.slug}`)
+    .map((row) => ({
+      path: row.canonical_path,
+      lastmod: toDate(row.updated_at || row.published_at),
+    }));
+}
+
 async function dynamicEntries(type) {
   const configs = {
-    services: { table: "services", route: "services", select: "slug,updated_at" },
-    industries: { table: "industries", route: "industries", select: "slug,updated_at" },
-    "case-studies": { table: "case_studies", route: "case-studies", select: "slug,updated_at" },
-    insights: { table: "blog_posts_delivery", route: "insights", select: "slug,updated_at,first_published_at" },
+    services: { contentType: "service", route: "services" },
+    industries: { contentType: "industry", route: "industries" },
+    "case-studies": { contentType: "case_study", route: "case-studies" },
+    insights: { contentType: "blog_post", route: "insights" },
   };
   const config = configs[type];
-  const rows = await fetchRows(config.table, {
-    select: config.select,
-    filters: { status: "eq.published", slug: "not.is.null" },
+  const rows = await fetchRows("published_content_sitemap", {
+    select: "content_type,slug,canonical_path,updated_at,published_at",
+    filters: { content_type: `eq.${config.contentType}` },
   });
-  return rows
-    .filter((row) => /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(row.slug || ""))
-    .map((row) => ({
-      path: `/${config.route}/${row.slug}`,
-      lastmod: toDate(row.updated_at || row.first_published_at),
-    }));
+  return normaliseSitemapRows(rows, config);
 }
 
 function sendXml(res, xml, cache = 3600) {
@@ -119,3 +129,8 @@ module.exports = async (req, res) => {
     res.status(503).setHeader("Retry-After", "300").send("Sitemap temporarily unavailable");
   }
 };
+
+module.exports.buildLocationEntries = buildLocationEntries;
+module.exports.dynamicEntries = dynamicEntries;
+module.exports.normaliseSitemapRows = normaliseSitemapRows;
+module.exports.urlEntry = urlEntry;
