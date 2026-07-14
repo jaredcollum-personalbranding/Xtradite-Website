@@ -134,6 +134,7 @@
     item?.classList.toggle("is-open", open);
     trigger?.setAttribute("aria-expanded", String(open));
     panel?.setAttribute("aria-hidden", String(!open));
+    panel?.toggleAttribute("inert", !open);
   }
 
   function closeMegaItem(item, returnFocus = false) {
@@ -155,6 +156,16 @@
     if (!header || !nav || nav.dataset.layeringReady === "true") return;
     nav.dataset.layeringReady = "true";
     header.classList.add("has-layered-navigation");
+
+    const syncPanelInert = (panel) => {
+      if (!(panel instanceof HTMLElement) || !panel.classList.contains("mega-menu-panel")) return;
+      panel.toggleAttribute("inert", panel.getAttribute("aria-hidden") !== "false");
+    };
+    nav.querySelectorAll(".mega-menu-panel").forEach(syncPanelInert);
+    const panelObserver = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => syncPanelInert(mutation.target));
+    });
+    panelObserver.observe(nav, { attributes: true, attributeFilter: ["aria-hidden"], subtree: true });
 
     nav.addEventListener("focusin", (event) => {
       const item = event.target.closest(".mega-nav-item");
