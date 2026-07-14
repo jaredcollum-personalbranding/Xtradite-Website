@@ -6,7 +6,8 @@
   "scripts": {
     "build:jam": "esbuild scripts/jam-metadata-entry.js --bundle --format=esm --platform=browser --target=es2020 --outfile=frontend/assets/js/jam-metadata.js",
     "build:seo": "node scripts/inject-seo.js",
-    "build": "npm run build:jam && node scripts/inject-jam.js && npm run build:seo"
+    "validate:jam": "node scripts/validate-jam-foundation.js",
+    "build": "npm run build:jam && node scripts/inject-jam.js && npm run build:seo && npm run validate:jam"
   },
   "dependencies": {
     "@jam.dev/sdk": "^1.0.1",
