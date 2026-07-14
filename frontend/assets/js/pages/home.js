@@ -1,6 +1,6 @@
 import { queryItems } from "../cms.js";
 import { queryPosts } from "../blog.js";
-import { serviceCardHtml, caseStudyCardHtml, blogCardHtml, showSkeletons, showEmpty, renderIcons } from "../render-helpers.js";
+import { serviceCardHtml, blogCardHtml, showSkeletons, showEmpty, renderIcons, escapeHtml } from "../render-helpers.js";
 
 async function loadServices() {
   const grid = document.getElementById("services-grid");
@@ -8,27 +8,57 @@ async function loadServices() {
   showSkeletons(grid, 6);
   try {
     const { items } = await queryItems("services_delivery", { sort: [{ fieldName: "sort_order", order: "ASC" }] });
-    if (!items.length) return showEmpty(grid, "Services are managed in Supabase — add rows to the services table to show them here.");
+    if (!items.length) return showEmpty(grid, "Services are being prepared. Please check back shortly.");
     grid.innerHTML = items.map(serviceCardHtml).join("");
     renderIcons();
-  } catch (e) {
-    console.error(e);
-    showEmpty(grid, "Couldn't load services right now.");
+  } catch (error) {
+    console.error(error);
+    showEmpty(grid, "Services could not be loaded right now.");
   }
 }
 
-async function loadCaseStudies() {
-  const grid = document.getElementById("case-studies-grid");
-  if (!grid) return;
-  showSkeletons(grid, 3);
+function concise(value, fallback, limit = 190) {
+  const text = String(value || fallback || "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+  return text.length > limit ? `${text.slice(0, limit).replace(/\s+\S*$/, "")}…` : text;
+}
+
+function featuredStoryHtml(primary, secondary) {
+  const approach = primary.approach?.[0];
+  const service = primary.relatedServices?.[0];
+  const result = primary.metric || primary.metrics?.[0]?.value || "Measured change";
+  const resultLabel = primary.metrics?.find((metric) => metric.value === result)?.label || primary.cardSummary || "Commercial or operational outcome";
+
+  return `<div class="featured-work-grid">
+    <article class="featured-work-story">
+      <div><span class="eyebrow">${escapeHtml(primary.industry || "Case study")}</span><h3>${escapeHtml(primary.headline || primary.client)}</h3><p>${escapeHtml(concise(primary.cardSummary || primary.description, primary.challenge, 240))}</p></div>
+      <div class="featured-work-journey" aria-label="Case-study journey">
+        <div class="featured-work-step"><span>Constraint</span><strong>${escapeHtml(concise(primary.challenge, "A material growth or delivery constraint needed resolving.", 120))}</strong></div>
+        <div class="featured-work-step"><span>Intervention</span><strong>${escapeHtml(concise(approach?.description, approach?.title || "A new operating model was introduced.", 120))}</strong></div>
+        <div class="featured-work-step"><span>Capability</span><strong>${escapeHtml(service?.title || primary.industry || "Connected strategy and implementation")}</strong></div>
+      </div>
+      <div class="featured-work-result"><div><strong>${escapeHtml(result)}</strong><span>${escapeHtml(concise(resultLabel, "Measured result", 100))}</span></div><a class="btn btn-primary" href="/case-study-detail?slug=${encodeURIComponent(primary.slug)}">Read the full case study <i data-lucide="arrow-right"></i></a></div>
+    </article>
+    <aside class="featured-work-aside" aria-label="More featured work">
+      ${secondary.map((item) => `<a class="featured-work-secondary" href="/case-study-detail?slug=${encodeURIComponent(item.slug)}"><span class="eyebrow">${escapeHtml(item.industry || "Case study")}</span><h4>${escapeHtml(item.headline || item.client)}</h4><p>${escapeHtml(concise(item.cardSummary, item.challenge, 130))}</p><span class="metric">${escapeHtml(item.metric || "View the evidence")}</span><span class="card-link">View case study <i data-lucide="arrow-right"></i></span></a>`).join("")}
+      <a href="/case-studies" class="btn btn-secondary">View all case studies</a>
+    </aside>
+  </div>`;
+}
+
+async function loadFeaturedWork() {
+  const root = document.getElementById("featured-work-root");
+  if (!root) return;
   try {
     const { items } = await queryItems("case_studies_delivery", { sort: [{ fieldName: "sort_order", order: "ASC" }] });
-    if (!items.length) return showEmpty(grid, "Case studies are managed in Supabase — add rows to the case_studies table to show them here.");
-    grid.innerHTML = items.slice(0, 3).map(caseStudyCardHtml).join("");
+    if (!items.length) {
+      root.innerHTML = '<div class="featured-work-empty"><strong>Featured work is being prepared.</strong><p>Case studies will appear here when published in Supabase.</p></div>';
+      return;
+    }
+    root.innerHTML = featuredStoryHtml(items[0], items.slice(1, 3));
     renderIcons();
-  } catch (e) {
-    console.error(e);
-    showEmpty(grid, "Couldn't load case studies right now.");
+  } catch (error) {
+    console.error(error);
+    root.innerHTML = '<div class="featured-work-empty"><strong>Featured work could not be loaded.</strong><p>Browse the case-study library directly.</p><a class="btn btn-secondary" href="/case-studies">View case studies</a></div>';
   }
 }
 
@@ -38,15 +68,38 @@ async function loadInsights() {
   showSkeletons(grid, 3);
   try {
     const { posts } = await queryPosts({ limit: 3 });
-    if (!posts.length) return showEmpty(grid, "Insights are managed in Supabase — add rows to the blog_posts table to show them here.");
+    if (!posts.length) return showEmpty(grid, "Insights are being prepared. Please check back shortly.");
     grid.innerHTML = posts.map(blogCardHtml).join("");
     renderIcons();
-  } catch (e) {
-    console.error(e);
-    showEmpty(grid, "Couldn't load insights right now.");
+  } catch (error) {
+    console.error(error);
+    showEmpty(grid, "Insights could not be loaded right now.");
   }
 }
 
+function animateHeroSystem() {
+  const system = document.querySelector(".home-hero-system");
+  const stages = Array.from(system?.querySelectorAll(".hero-system-stage") || []);
+  if (stages.length < 2 || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  let active = 0;
+  let timer = null;
+  let visible = true;
+  const tick = () => {
+    active = (active + 1) % stages.length;
+    stages.forEach((stage, index) => stage.classList.toggle("is-active", index === active));
+  };
+  const schedule = () => {
+    window.clearInterval(timer);
+    timer = visible && !document.hidden ? window.setInterval(tick, 2400) : null;
+  };
+  if ("IntersectionObserver" in window) {
+    new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; schedule(); }, { threshold: .25 }).observe(system);
+  }
+  document.addEventListener("visibilitychange", schedule);
+  schedule();
+}
+
 loadServices();
-loadCaseStudies();
+loadFeaturedWork();
 loadInsights();
+animateHeroSystem();
