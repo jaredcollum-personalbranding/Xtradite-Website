@@ -1,5 +1,5 @@
-const { locations, services: localServices } = require("../data/uk-locations");
 const { fetchRows } = require("./lib/supabase");
+const { loadLocationCatalogue } = require("./lib/location-catalogue");
 const { SITE_URL } = require("./lib/schema");
 
 const STATIC_PATHS = [
@@ -13,7 +13,7 @@ const STATIC_PATHS = [
   { path: "/contact", lastmod: null },
   { path: "/legal/privacy", lastmod: null },
   { path: "/legal/cookies", lastmod: null },
-  { path: "/legal/terms", lastmod: null }
+  { path: "/legal/terms", lastmod: null },
 ];
 
 const TYPES = new Set(["static", "services", "industries", "case-studies", "insights", "locations"]);
@@ -30,19 +30,32 @@ function urlEntry(path, lastmod) {
     "  <url>",
     `    <loc>${escapeXml(`${SITE_URL}${path}`)}</loc>`,
     lastmod ? `    <lastmod>${escapeXml(lastmod)}</lastmod>` : null,
-    "  </url>"
+    "  </url>",
   ].filter(Boolean).join("\n");
 }
 
-function locationEntries() {
+async function locationEntries() {
+  const { locations, servicesByLocation } = await loadLocationCatalogue();
   const entries = [{ path: "/uk" }];
-  unique(locations.map((location) => location.nationSlug)).forEach((nation) => entries.push({ path: `/uk/${nation}` }));
-  unique(locations.map((location) => `${location.nationSlug}/${location.regionSlug}`)).forEach((item) => entries.push({ path: `/uk/${item}` }));
-  unique(locations.map((location) => `${location.nationSlug}/${location.regionSlug}/${location.countySlug}`)).forEach((item) => entries.push({ path: `/uk/${item}` }));
+
+  unique(locations.map((location) => location.nationSlug))
+    .forEach((nation) => entries.push({ path: `/uk/${nation}` }));
+  unique(locations.map((location) => `${location.nationSlug}/${location.regionSlug}`))
+    .forEach((item) => entries.push({ path: `/uk/${item}` }));
+  unique(locations.map((location) => `${location.nationSlug}/${location.regionSlug}/${location.countySlug}`))
+    .forEach((item) => entries.push({ path: `/uk/${item}` }));
+
   locations.forEach((location) => {
-    entries.push({ path: cityPath(location) });
-    localServices.forEach((service) => entries.push({ path: `${cityPath(location)}/services/${service.slug}` }));
+    const path = cityPath(location);
+    entries.push({ path, lastmod: toDate(location.updatedAt) });
+    (servicesByLocation.get(location.id) || []).forEach((service) => {
+      entries.push({
+        path: `${path}/services/${service.slug}`,
+        lastmod: toDate(service.updatedAt || location.updatedAt),
+      });
+    });
   });
+
   return entries;
 }
 
@@ -51,18 +64,18 @@ async function dynamicEntries(type) {
     services: { table: "services", route: "services", select: "slug,updated_at" },
     industries: { table: "industries", route: "industries", select: "slug,updated_at" },
     "case-studies": { table: "case_studies", route: "case-studies", select: "slug,updated_at" },
-    insights: { table: "blog_posts", route: "insights", select: "slug,updated_at,first_published_at" }
+    insights: { table: "blog_posts", route: "insights", select: "slug,updated_at,first_published_at" },
   };
   const config = configs[type];
   const rows = await fetchRows(config.table, {
     select: config.select,
-    filters: { status: "eq.published", slug: "not.is.null" }
+    filters: { status: "eq.published", slug: "not.is.null" },
   });
   return rows
     .filter((row) => /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(row.slug || ""))
     .map((row) => ({
       path: `/${config.route}/${row.slug}`,
-      lastmod: toDate(row.updated_at || row.first_published_at)
+      lastmod: toDate(row.updated_at || row.first_published_at),
     }));
 }
 
@@ -82,7 +95,7 @@ module.exports = async (req, res) => {
       "  <sitemap>",
       `    <loc>${SITE_URL}/sitemaps/${name}.xml</loc>`,
       `    <lastmod>${now}</lastmod>`,
-      "  </sitemap>"
+      "  </sitemap>",
     ].join("\n"));
     sendXml(res, `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${items.join("\n")}\n</sitemapindex>\n`, 900);
     return;
@@ -96,7 +109,7 @@ module.exports = async (req, res) => {
   try {
     let entries;
     if (type === "static") entries = STATIC_PATHS;
-    else if (type === "locations") entries = locationEntries();
+    else if (type === "locations") entries = await locationEntries();
     else entries = await dynamicEntries(type);
 
     const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${entries.map((entry) => urlEntry(entry.path, entry.lastmod)).join("\n")}\n</urlset>\n`;

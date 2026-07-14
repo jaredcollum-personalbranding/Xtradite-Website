@@ -18,7 +18,7 @@ import { refineServiceTemplate } from "./service-template-v3.js";
 
 const root = document.getElementById("service-detail-root");
 const notFound = document.getElementById("not-found");
-const slug = getSlugParam();
+const slug = window.__CONTENT_SLUG__ || getSlugParam();
 
 function ensureContentArchitectureStyles() {
   const styles = [
@@ -69,6 +69,7 @@ function setCanonical(href) {
 }
 
 function setJsonLd(item, title, description, url) {
+  if (document.getElementById("xd-schema-graph")) return;
   const script = document.createElement("script");
   script.type = "application/ld+json";
   script.textContent = JSON.stringify({
@@ -94,7 +95,7 @@ function applySeo(item) {
   setMetaByProperty("og:description", description);
   setMetaByProperty("og:type", "website");
   setMetaByProperty("og:url", url);
-  setMetaByName("twitter:card", "summary");
+  setMetaByName("twitter:card", "summary_large_image");
   setMetaByName("twitter:title", item.seoTitle || item.title);
   setMetaByName("twitter:description", description);
   setCanonical(url);
@@ -168,7 +169,7 @@ async function load() {
       const cs = relatedCaseStudy;
       const relatedWrap = document.getElementById("related-case-study");
       if (cs && relatedWrap) {
-        relatedWrap.innerHTML = `<span class="eyebrow">Related Case Study</span><h3>${escapeHtml(cs.client)}</h3><p class="card-desc">${escapeHtml(cs.challenge || "")}</p><span class="metric">${escapeHtml(cs.metric || "")}</span><a class="card-link" href="/case-study-detail?slug=${encodeURIComponent(cs.slug)}">View Case Study <i data-lucide="arrow-right"></i></a>`;
+        relatedWrap.innerHTML = `<span class="eyebrow">Related Case Study</span><h3>${escapeHtml(cs.client)}</h3><p class="card-desc">${escapeHtml(cs.challenge || "")}</p><span class="metric">${escapeHtml(cs.metric || "")}</span><a class="card-link" href="/case-studies/${encodeURIComponent(cs.slug)}">View Case Study <i data-lucide="arrow-right"></i></a>`;
         relatedWrap.hidden = false;
       }
     } catch (e) {

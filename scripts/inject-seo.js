@@ -4,6 +4,9 @@ const { SITE_URL, ORGANISATION_ID, PERSON_ID, buildGraph } = require("../api/lib
 
 const frontendDirectory = path.join(__dirname, "..", "frontend");
 const dynamicTemplates = new Set(["industry-detail.html", "case-study-detail.html", "insights-post.html", "service-detail.html"]);
+const SOCIAL_IMAGE = `${SITE_URL}/assets/brand/xtradite-social-share.svg`;
+const SOCIAL_IMAGE_ALT = "Xtradite Digital — practical consultancy for measurable growth";
+const FAVICON = `${SITE_URL}/assets/brand/favicon.svg`;
 
 function files(directory, matcher) {
   return fs.readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
@@ -77,11 +80,32 @@ function pageTypeFor(relative) {
   return "WebPage";
 }
 
+function applySharedBrandMetadata(source) {
+  let output = source;
+  output = replaceMeta(output, /<link\s+rel=["']icon["'][^>]*type=["']image\/svg\+xml["'][^>]*>/i, `<link rel="icon" type="image/svg+xml" href="${FAVICON}">`);
+  output = replaceMeta(output, /<meta\s+name=["']theme-color["'][^>]*>/i, '<meta name="theme-color" content="#0D0D0D">');
+  return output;
+}
+
+function applySocialMetadata(source, title, description) {
+  let output = source;
+  output = replaceMeta(output, /<meta\s+property=["']og:image["'][^>]*>/i, `<meta property="og:image" content="${SOCIAL_IMAGE}">`);
+  output = replaceMeta(output, /<meta\s+property=["']og:image:width["'][^>]*>/i, '<meta property="og:image:width" content="1200">');
+  output = replaceMeta(output, /<meta\s+property=["']og:image:height["'][^>]*>/i, '<meta property="og:image:height" content="630">');
+  output = replaceMeta(output, /<meta\s+property=["']og:image:alt["'][^>]*>/i, `<meta property="og:image:alt" content="${SOCIAL_IMAGE_ALT}">`);
+  output = replaceMeta(output, /<meta\s+name=["']twitter:card["'][^>]*>/i, '<meta name="twitter:card" content="summary_large_image">');
+  output = replaceMeta(output, /<meta\s+name=["']twitter:image["'][^>]*>/i, `<meta name="twitter:image" content="${SOCIAL_IMAGE}">`);
+  output = replaceMeta(output, /<meta\s+name=["']twitter:image:alt["'][^>]*>/i, `<meta name="twitter:image:alt" content="${SOCIAL_IMAGE_ALT}">`);
+  output = replaceMeta(output, /<meta\s+property=["']og:title["'][^>]*>/i, `<meta property="og:title" content="${title.replace(/"/g, "&quot;")}">`);
+  output = replaceMeta(output, /<meta\s+property=["']og:description["'][^>]*>/i, `<meta property="og:description" content="${description.replace(/"/g, "&quot;")}">`);
+  return output;
+}
+
 let htmlUpdated = 0;
 for (const file of files(frontendDirectory, /\.html?$/i)) {
   const relative = path.relative(frontendDirectory, file).replace(/\\/g, "/");
   const source = fs.readFileSync(file, "utf8");
-  let output = normaliseInternalLinks(source);
+  let output = applySharedBrandMetadata(normaliseInternalLinks(source));
 
   if (dynamicTemplates.has(relative)) {
     output = replaceMeta(output, /<meta\s+name=["']robots["'][^>]*>/i, '<meta name="robots" content="noindex, follow">');
@@ -105,6 +129,7 @@ for (const file of files(frontendDirectory, /\.html?$/i)) {
 
     output = replaceMeta(output, /<link\s+rel=["']canonical["'][^>]*>/i, `<link rel="canonical" href="${canonical}">`);
     output = replaceMeta(output, /<meta\s+property=["']og:url["'][^>]*>/i, `<meta property="og:url" content="${canonical}">`);
+    output = applySocialMetadata(output, title, description);
     output = output.replace(/<script[^>]*type=["']application\/ld\+json["'][^>]*>[\s\S]*?<\/script>\s*/gi, "");
     output = output.replace(/<\/head>/i, `<script id="xd-schema-graph" type="application/ld+json">${JSON.stringify(graph).replace(/</g, "\\u003c")}</script>\n</head>`);
   }
@@ -125,4 +150,4 @@ for (const file of files(path.join(frontendDirectory, "assets", "js"), /\.js$/i)
   }
 }
 
-console.log(`SEO metadata and internal routes normalised in ${htmlUpdated} HTML and ${scriptUpdated} JavaScript file(s).`);
+console.log(`SEO metadata, brand assets and internal routes normalised in ${htmlUpdated} HTML and ${scriptUpdated} JavaScript file(s).`);

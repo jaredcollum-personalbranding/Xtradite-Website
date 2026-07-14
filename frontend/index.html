@@ -1,55 +1,24 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-GB">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="google-adsense-account" content="ca-pub-7308041122340160">
-
-<!-- Google Consent Mode defaults: must run before Cookiebot and Google tags -->
 <script>
   window.dataLayer = window.dataLayer || [];
-
-  function gtag() {
-    dataLayer.push(arguments);
-  }
-
+  function gtag() { dataLayer.push(arguments); }
   gtag("consent", "default", {
-    ad_storage: "denied",
-    ad_user_data: "denied",
-    ad_personalization: "denied",
-    analytics_storage: "denied",
-    functionality_storage: "denied",
-    personalization_storage: "denied",
-    security_storage: "granted",
-    wait_for_update: 500
+    ad_storage: "denied", ad_user_data: "denied", ad_personalization: "denied",
+    analytics_storage: "denied", functionality_storage: "denied",
+    personalization_storage: "denied", security_storage: "granted", wait_for_update: 500
   });
-
   gtag("set", "ads_data_redaction", true);
   gtag("set", "url_passthrough", false);
 </script>
-
-<!-- Cookiebot CMP -->
-<script
-  id="Cookiebot"
-  src="https://consent.cookiebot.com/uc.js"
-  data-cbid="07680bbc-6c7e-4a44-9d8b-a2ff6766646c"
-  data-blockingmode="auto"
-  data-framework="IAB"
-  type="text/javascript"
-></script>
-
-<!-- Synchronise genuine Cookiebot choices with Google Consent Mode -->
+<script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="07680bbc-6c7e-4a44-9d8b-a2ff6766646c" data-blockingmode="auto" data-framework="IAB" type="text/javascript"></script>
 <script>
   function loadAdSenseAfterConsent() {
-    if (
-      !window.Cookiebot ||
-      !Cookiebot.hasResponse ||
-      !Cookiebot.consent.marketing ||
-      document.getElementById("adsense-loader")
-    ) {
-      return;
-    }
-
+    if (!window.Cookiebot || !Cookiebot.hasResponse || !Cookiebot.consent.marketing || document.getElementById("adsense-loader")) return;
     const script = document.createElement("script");
     script.id = "adsense-loader";
     script.async = true;
@@ -57,16 +26,11 @@
     script.crossOrigin = "anonymous";
     document.head.appendChild(script);
   }
-
   function updateGoogleConsentFromCookiebot() {
-    if (!window.Cookiebot || !Cookiebot.hasResponse) {
-      return;
-    }
-
+    if (!window.Cookiebot || !Cookiebot.hasResponse) return;
     const marketingGranted = Cookiebot.consent.marketing === true;
     const statisticsGranted = Cookiebot.consent.statistics === true;
     const preferencesGranted = Cookiebot.consent.preferences === true;
-
     gtag("consent", "update", {
       ad_storage: marketingGranted ? "granted" : "denied",
       ad_user_data: marketingGranted ? "granted" : "denied",
@@ -76,27 +40,15 @@
       personalization_storage: preferencesGranted ? "granted" : "denied",
       security_storage: "granted"
     });
-
     gtag("set", "ads_data_redaction", !marketingGranted);
-
-    if (marketingGranted) {
-      loadAdSenseAfterConsent();
-    }
+    if (marketingGranted) loadAdSenseAfterConsent();
   }
-
   window.addEventListener("CookiebotOnConsentReady", updateGoogleConsentFromCookiebot);
   window.addEventListener("CookiebotOnAccept", updateGoogleConsentFromCookiebot);
   window.addEventListener("CookiebotOnDecline", updateGoogleConsentFromCookiebot);
 </script>
-
-<!-- Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-WYXTKGJ9JS"></script>
-<script>
-  gtag("js", new Date());
-  gtag("config", "G-WYXTKGJ9JS");
-</script>
-
-<!-- Vercel Speed Insights -->
+<script>gtag("js", new Date()); gtag("config", "G-WYXTKGJ9JS");</script>
 <script src="assets/js/speed-insights-init.js" defer></script>
 <title>Xtradite Digital — Practical Consultancy for Digital-First Growth</title>
 <meta name="description" content="UK digital consultancy helping ambitious retail, ecommerce and manufacturing businesses close operational and commercial gaps with hands-on delivery.">
@@ -106,250 +58,130 @@
 <link rel="icon" href="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/favicon-dark.ico" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/favicon-light.ico" media="(prefers-color-scheme: light)">
 <link rel="icon" href="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/favicon-light.ico">
-<link rel="icon" type="image/png" sizes="32x32" href="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/favicon-32-dark.png" media="(prefers-color-scheme: dark)">
-<link rel="icon" type="image/png" sizes="32x32" href="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/favicon-32-light.png" media="(prefers-color-scheme: light)">
-<link rel="icon" type="image/png" sizes="16x16" href="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/favicon-16-dark.png" media="(prefers-color-scheme: dark)">
-<link rel="icon" type="image/png" sizes="16x16" href="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/favicon-16-light.png" media="(prefers-color-scheme: light)">
 <link rel="apple-touch-icon" href="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/icon-tile-light.png">
 <link rel="canonical" href="https://www.xtradite-digital.co.uk/">
 <meta property="og:site_name" content="Xtradite Digital">
 <meta property="og:locale" content="en_GB">
-<meta property="og:title" content="Xtradite Digital â€” Practical Consultancy for Digital-First Growth">
+<meta property="og:title" content="Xtradite Digital — Practical Consultancy for Digital-First Growth">
 <meta property="og:description" content="UK digital consultancy helping ambitious retail, ecommerce and manufacturing businesses close operational and commercial gaps with hands-on delivery.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://www.xtradite-digital.co.uk/">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Xtradite Digital â€” Practical Consultancy for Digital-First Growth">
+<meta name="twitter:title" content="Xtradite Digital — Practical Consultancy for Digital-First Growth">
 <meta name="twitter:description" content="UK digital consultancy helping ambitious retail, ecommerce and manufacturing businesses close operational and commercial gaps with hands-on delivery.">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Organization", "name": "Xtradite Digital", "url": "https://www.xtradite-digital.co.uk/", "description": "UK digital consultancy helping ambitious retail, ecommerce and manufacturing businesses close operational and commercial gaps with hands-on delivery.", "areaServed": "GB", "knowsAbout": ["Digital Strategy", "AI & Automation", "eCommerce Growth", "Operational Excellence", "Fractional Leadership", "Project Delivery"]}</script>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebSite", "name": "Xtradite Digital", "url": "https://www.xtradite-digital.co.uk/"}</script>
-<!-- Vercel Web Analytics -->
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Xtradite Digital","url":"https://www.xtradite-digital.co.uk/","description":"UK digital consultancy helping ambitious retail, ecommerce and manufacturing businesses close operational and commercial gaps with hands-on delivery.","areaServed":"GB","knowsAbout":["Digital Strategy","AI & Automation","eCommerce Growth","Operational Excellence","Fractional Leadership","Project Delivery"]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Xtradite Digital","url":"https://www.xtradite-digital.co.uk/"}</script>
 <script defer src="https://cdn.vercel-insights.com/v1/script.js"></script>
 </head>
 <body>
-
 <header class="site-header" id="site-header">
   <div class="container header-inner">
     <a href="/" class="logo"><img src="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/wordmark-caps-light.png" alt="Xtradite Digital" class="logo-img"></a>
-    <nav class="site-nav" id="site-nav">
-      <a href="/" class="active">Home</a>
-      <a href="/services">Services</a>
-      <a href="/industries">Industries</a>
-      <a href="/case-studies">Case Studies</a>
-      <a href="/about">About</a>
-      <a href="/insights">Insights</a>
-      <a href="/contact">Contact</a>
-      <a href="/contact" class="btn btn-primary btn-sm header-cta-mobile">Book a Consultation</a>
+    <nav class="site-nav" id="site-nav" aria-label="Primary navigation">
+      <a href="/" class="active">Home</a><a href="/services">Services</a><a href="/industries">Industries</a><a href="/case-studies">Case Studies</a><a href="/about">About</a><a href="/insights">Insights</a><a href="/contact">Contact</a>
     </nav>
     <a href="/contact" class="btn btn-primary btn-sm header-cta">Book a Consultation</a>
-    <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation"><span></span><span></span><span></span></button>
+    <button class="nav-toggle" id="nav-toggle" type="button" aria-label="Toggle navigation"><span></span><span></span><span></span></button>
   </div>
 </header>
 
 <main>
-  <section class="hero">
+  <section class="hero home-hero">
     <div class="container">
-      <span class="eyebrow">UK Digital Consultancy</span>
-      <h1>Practical consultancy for digital-first growth.</h1>
-      <p class="hero-sub">We help ambitious retail, ecommerce and manufacturing businesses close the operational and commercial gaps holding growth back â€” with hands-on delivery, not just strategy decks.</p>
-      <div class="hero-ctas">
-        <a href="/contact" class="btn btn-primary btn-lg">Book a Consultation <i data-lucide="arrow-right" class="btn-icon"></i></a>
-        <a href="/services" class="btn btn-secondary btn-lg">View Services</a>
+      <div class="home-hero-copy">
+        <span class="eyebrow">UK Digital Consultancy</span>
+        <h1>Practical consultancy for <span class="hero-emphasis">digital-first growth.</span></h1>
+        <p class="hero-sub">We connect strategic direction to hands-on implementation, helping ambitious businesses diagnose constraints, redesign how work gets done and deliver measurable commercial change.</p>
+        <div class="hero-ctas">
+          <a href="/contact" class="btn btn-primary btn-lg">Book a Consultation <i data-lucide="arrow-right" class="btn-icon"></i></a>
+          <a href="/case-studies" class="btn btn-secondary btn-lg">See the Work</a>
+        </div>
+      </div>
+      <div class="home-hero-system" aria-label="Xtradite delivery method">
+        <div class="hero-system-stage is-active"><span class="hero-system-index">01</span><div><strong>Diagnose</strong><small>Find the commercial or operational constraint.</small></div><span>Evidence</span></div>
+        <div class="hero-system-stage"><span class="hero-system-index">02</span><div><strong>Design</strong><small>Create the operating model and measurable plan.</small></div><span>Direction</span></div>
+        <div class="hero-system-stage"><span class="hero-system-index">03</span><div><strong>Deliver</strong><small>Implement alongside teams, systems and suppliers.</small></div><span>Change</span></div>
+        <div class="hero-system-stage"><span class="hero-system-index">04</span><div><strong>Improve</strong><small>Measure, learn and remove the next constraint.</small></div><span>Growth</span></div>
       </div>
     </div>
   </section>
 
-  <div class="container">
+  <div class="container home-proof-strip">
     <div class="stats-strip">
-      <div class="stat-item"><span class="stat-number" data-count-to="15+">0</span><span class="stat-label">Years Experience</span></div>
-      <div class="stat-item"><span class="stat-number" data-count-to="Â£50M+">0</span><span class="stat-label">Revenue Influenced</span></div>
-      <div class="stat-item"><span class="stat-number" data-count-to="100+">0</span><span class="stat-label">Projects Delivered</span></div>
-      <div class="stat-item"><span class="stat-number">UK</span><span class="stat-label">Based Consultancy</span></div>
+      <div class="stat-item"><span class="stat-number" data-count-to="15+">0</span><span class="stat-label">Years’ experience</span></div>
+      <div class="stat-item"><span class="stat-number" data-count-to="£50M+">0</span><span class="stat-label">Revenue influenced</span></div>
+      <div class="stat-item"><span class="stat-number" data-count-to="100+">0</span><span class="stat-label">Projects delivered</span></div>
+      <div class="stat-item"><span class="stat-number">UK</span><span class="stat-label">Based consultancy</span></div>
     </div>
   </div>
 
   <section id="services">
     <div class="container">
-      <div class="section-head">
-        <span class="eyebrow">What We Do</span>
-        <h2>Consultancy built for measurable commercial results.</h2>
-      </div>
+      <div class="section-head"><span class="eyebrow">What We Do</span><h2>Consultancy built for measurable commercial results.</h2></div>
       <div class="grid-3" id="services-grid"></div>
     </div>
   </section>
 
-  <section class="section-alt">
+  <section id="featured-work" class="section-alt featured-work-section">
     <div class="container">
-      <div class="section-head">
-        <span class="eyebrow">How We Work</span>
-        <h2>A five-step process, every engagement.</h2>
-      </div>
-      <div class="timeline">
-        <div class="timeline-step"><span class="step-num">01</span><h4>Discover</h4><p>Understand the business, the data and where growth is being lost.</p></div>
-        <div class="timeline-step"><span class="step-num">02</span><h4>Assess</h4><p>Audit operations, systems and commercial performance against the market.</p></div>
-        <div class="timeline-step"><span class="step-num">03</span><h4>Design</h4><p>Build a practical roadmap tied to commercial outcomes, not theory.</p></div>
-        <div class="timeline-step"><span class="step-num">04</span><h4>Deliver</h4><p>Implement hands-on, working alongside your team to embed change.</p></div>
-        <div class="timeline-step"><span class="step-num">05</span><h4>Optimise</h4><p>Measure, refine and compound the gains long after go-live.</p></div>
-      </div>
-    </div>
-  </section>
-
-  <section id="case-studies">
-    <div class="container">
-      <div class="section-head">
-        <span class="eyebrow">Case Studies</span>
-        <h2>Results our clients can point to.</h2>
-      </div>
-      <div class="grid-3" id="case-studies-grid"></div>
-      <div style="text-align:center; margin-top: var(--space-40);">
-        <a href="/case-studies" class="btn btn-secondary">View All Case Studies</a>
-      </div>
+      <div class="section-head left"><span class="eyebrow">Featured Work</span><h2>From business constraint to measurable outcome.</h2><p>Evidence-led stories showing how strategy, operating design and implementation work together.</p></div>
+      <div class="featured-work-root" id="featured-work-root" aria-live="polite"><div class="featured-work-empty">Loading featured work…</div></div>
     </div>
   </section>
 
   <section id="insights">
     <div class="container">
-      <div class="section-head">
-        <span class="eyebrow">Insights</span>
-        <h2>Ideas on operations, growth, and leadership.</h2>
-      </div>
+      <div class="section-head"><span class="eyebrow">Insights</span><h2>Ideas on operations, growth and leadership.</h2></div>
       <div class="grid-3" id="home-insights-grid"></div>
-      <div style="text-align:center; margin-top: var(--space-40);">
-        <a href="/insights" class="btn btn-secondary">View All Insights</a>
-      </div>
+      <div style="text-align:center; margin-top: var(--space-40);"><a href="/insights" class="btn btn-secondary">View All Insights</a></div>
     </div>
   </section>
 
   <section class="section-alt">
     <div class="container">
-      <div class="section-head">
-        <span class="eyebrow">What Our Clients Say</span>
-        <h2>Trusted by operators who need results.</h2>
-      </div>
+      <div class="section-head"><span class="eyebrow">What Our Clients Say</span><h2>Trusted by operators who need results.</h2></div>
       <div class="testimonial-slider">
-        <div class="testimonial-slide">
-          <blockquote>&ldquo;Xtradite helped us redesign our digital operations and improve commercial performance across every channel.&rdquo;</blockquote>
-          <cite><strong>Sarah Whitfield</strong>COO, Northfield Retail Group</cite>
-        </div>
-        <div class="testimonial-slide">
-          <blockquote>&ldquo;They brought the operational rigour we were missing, and the results showed up in the numbers within a quarter.&rdquo;</blockquote>
-          <cite><strong>Daniel Okafor</strong>Managing Director, Kaldura Manufacturing</cite>
-        </div>
-        <div class="testimonial-slide">
-          <blockquote>&ldquo;Xtradite felt like an extension of our leadership team, not an outside consultancy.&rdquo;</blockquote>
-          <cite><strong>Priya Anand</strong>Head of Ecommerce, Verlane Marketplace</cite>
-        </div>
+        <div class="testimonial-slide"><blockquote>&ldquo;Xtradite helped us redesign our digital operations and improve commercial performance across every channel.&rdquo;</blockquote><cite><strong>Sarah Whitfield</strong>COO, Northfield Retail Group</cite></div>
+        <div class="testimonial-slide"><blockquote>&ldquo;They brought the operational rigour we were missing, and the results showed up in the numbers within a quarter.&rdquo;</blockquote><cite><strong>Daniel Okafor</strong>Managing Director, Kaldura Manufacturing</cite></div>
+        <div class="testimonial-slide"><blockquote>&ldquo;Xtradite felt like an extension of our leadership team, not an outside consultancy.&rdquo;</blockquote><cite><strong>Priya Anand</strong>Head of Ecommerce, Verlane Marketplace</cite></div>
         <div class="testimonial-dots"></div>
       </div>
-      <span class="placeholder-flag">Sample testimonials â€” pending real, sign-off client quotes before launch.</span>
+      <span class="placeholder-flag">Sample testimonials — pending real, signed-off client quotes before launch.</span>
     </div>
   </section>
 
   <section>
     <div class="container">
-      <div class="section-head">
-        <span class="eyebrow">FAQ</span>
-        <h2>Common questions.</h2>
-      </div>
+      <div class="section-head"><span class="eyebrow">FAQ</span><h2>Common questions.</h2></div>
       <div class="faq-list">
-        <div class="faq-item">
-          <button class="faq-question">What kind of businesses does Xtradite Digital work with?<i data-lucide="plus"></i></button>
-          <div class="faq-answer"><p>We work with retail, ecommerce, manufacturing and consumer goods businesses, from ambitious startups to established operators, anywhere digital operations and commercial performance need to move faster.</p></div>
-        </div>
-        <div class="faq-item">
-          <button class="faq-question">Do you only advise, or do you deliver as well?<i data-lucide="plus"></i></button>
-          <div class="faq-answer"><p>Both. We build the strategy and stay to deliver it: practical consultancy, not just a deck handed over at the end of an engagement.</p></div>
-        </div>
-        <div class="faq-item">
-          <button class="faq-question">What does fractional leadership involve?<i data-lucide="plus"></i></button>
-          <div class="faq-answer"><p>Senior ecommerce and digital leadership embedded in your business on a part-time or interim basis, giving you director-level experience without a full-time hire.</p></div>
-        </div>
-        <div class="faq-item">
-          <button class="faq-question">How long do engagements typically run?<i data-lucide="plus"></i></button>
-          <div class="faq-answer"><p>Most engagements run 3 to 9 months depending on scope, with many clients retaining us on an ongoing advisory basis afterwards.</p></div>
-        </div>
-        <div class="faq-item">
-          <button class="faq-question">How do we get started?<i data-lucide="plus"></i></button>
-          <div class="faq-answer"><p>Book a consultation and we will scope the opportunity together. No obligation, no lengthy proposal process.</p></div>
-        </div>
+        <div class="faq-item"><button class="faq-question" type="button">What kind of businesses does Xtradite Digital work with?<i data-lucide="plus"></i></button><div class="faq-answer"><p>We work with retail, ecommerce, manufacturing and consumer-goods businesses, from ambitious start-ups to established operators, wherever digital operations and commercial performance need to move faster.</p></div></div>
+        <div class="faq-item"><button class="faq-question" type="button">Do you only advise, or do you deliver as well?<i data-lucide="plus"></i></button><div class="faq-answer"><p>Both. We build the strategy and stay to deliver it: practical consultancy, not a deck handed over at the end of an engagement.</p></div></div>
+        <div class="faq-item"><button class="faq-question" type="button">What does fractional leadership involve?<i data-lucide="plus"></i></button><div class="faq-answer"><p>Senior ecommerce, digital or operational leadership embedded on a part-time or interim basis, providing director-level ownership without a permanent hire.</p></div></div>
+        <div class="faq-item"><button class="faq-question" type="button">How long do engagements typically run?<i data-lucide="plus"></i></button><div class="faq-answer"><p>Most engagements run for three to nine months depending on scope, with some clients retaining ongoing advisory or delivery support afterwards.</p></div></div>
+        <div class="faq-item"><button class="faq-question" type="button">How do we get started?<i data-lucide="plus"></i></button><div class="faq-answer"><p>Book a consultation and we will scope the opportunity together, including the evidence required, expected ownership and practical next steps.</p></div></div>
       </div>
     </div>
   </section>
 
-  <section>
-    <div class="container">
-      <div class="cta-banner">
-        <h2>Ready to Accelerate Your Business?</h2>
-        <p>Transform your digital operations with practical consultancy built for measurable commercial results.</p>
-        <a href="/contact" class="btn btn-primary btn-lg">Book a Consultation <i data-lucide="arrow-right" class="btn-icon"></i></a>
-      </div>
-    </div>
-  </section>
-
-  <section class="section-tight" data-sitewide-ad-section>
-    <div class="container">
-      <aside class="sitewide-ad sitewide-ad--display" aria-label="Advertisement" hidden>
-        <span class="sitewide-ad__label">Advertisement</span>
-        <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-7308041122340160" data-ad-slot="6205733112" data-ad-format="auto" data-full-width-responsive="true"></ins>
-      </aside>
-    </div>
-  </section>
-
+  <section><div class="container"><div class="cta-banner"><h2>Ready to connect strategy to delivery?</h2><p>Build a practical route from the current constraint to measurable commercial improvement.</p><a href="/contact" class="btn btn-primary btn-lg">Book a Consultation <i data-lucide="arrow-right" class="btn-icon"></i></a></div></div></section>
+  <section class="section-tight" data-sitewide-ad-section><div class="container"><aside class="sitewide-ad sitewide-ad--display" aria-label="Advertisement" hidden><span class="sitewide-ad__label">Advertisement</span><ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-7308041122340160" data-ad-slot="6205733112" data-ad-format="auto" data-full-width-responsive="true"></ins></aside></div></section>
 </main>
 
 <footer class="site-footer">
   <div class="container">
     <div class="footer-inner">
-      <div class="footer-brand">
-        <a href="/" class="logo"><img src="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/wordmark-caps-light.png" alt="Xtradite Digital" class="logo-img"></a>
-        <p>Practical consultancy for retail, ecommerce and manufacturing businesses ready to accelerate digital-first growth.</p>
-      </div>
-      <div class="footer-col">
-        <h4>Services</h4>
-        <a href="/services/ai-automation">AI &amp; Automation</a>
-        <a href="/services/digital-strategy">Digital Strategy</a>
-        <a href="/services/ecommerce-growth">eCommerce Growth</a>
-        <a href="/services/operational-excellence">Operational Excellence</a>
-        <a href="/services/fractional-leadership">Fractional Leadership</a>
-        <a href="/services/project-delivery">Project Delivery</a>
-      </div>
-      <div class="footer-col">
-        <h4>Industries</h4>
-        <a href="/industry-detail?slug=retail">Retail</a>
-        <a href="/industry-detail?slug=ecommerce">eCommerce</a>
-        <a href="/industry-detail?slug=manufacturing">Manufacturing</a>
-        <a href="/industry-detail?slug=consumer-goods">Consumer Goods</a>
-        <a href="/industry-detail?slug=professional-services">Professional Services</a>
-        <a href="/industry-detail?slug=startups">Startups</a>
-      </div>
-      <div class="footer-col">
-        <h4>Company</h4>
-        <a href="/about">About</a>
-        <a href="/insights">Insights</a>
-        <a href="/case-studies">Case Studies</a>
-        <a href="/contact">Contact</a>
-      </div>
-      <div class="footer-col">
-        <h4>Legal</h4>
-        <a href="/legal/privacy">Privacy Policy</a>
-        <a href="/legal/cookies">Cookie Policy</a>
-        <a href="#" data-cookie-settings>Cookie Settings</a>
-        <a href="/legal/terms">Terms</a>
-      </div>
+      <div class="footer-brand"><a href="/" class="logo"><img src="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/wordmark-caps-light.png" alt="Xtradite Digital" class="logo-img"></a><p>Practical consultancy for businesses ready to connect digital strategy to implementation.</p></div>
+      <div class="footer-col"><h4>Services</h4><a href="/services/ai-automation">AI &amp; Automation</a><a href="/services/digital-strategy">Digital Strategy</a><a href="/services/ecommerce-growth">eCommerce Growth</a><a href="/services/operational-excellence">Operational Excellence</a><a href="/services/fractional-leadership">Fractional Leadership</a><a href="/services/project-delivery">Project Delivery</a></div>
+      <div class="footer-col"><h4>Industries</h4><a href="/industry-detail?slug=retail">Retail</a><a href="/industry-detail?slug=ecommerce">eCommerce</a><a href="/industry-detail?slug=manufacturing">Manufacturing</a><a href="/industry-detail?slug=consumer-goods">Consumer Goods</a><a href="/industry-detail?slug=professional-services">Professional Services</a><a href="/industry-detail?slug=startups">Start-ups</a></div>
+      <div class="footer-col"><h4>Company</h4><a href="/about">About</a><a href="/insights">Insights</a><a href="/case-studies">Case Studies</a><a href="/contact">Contact</a></div>
+      <div class="footer-col"><h4>Legal</h4><a href="/legal/privacy">Privacy Policy</a><a href="/legal/cookies">Cookie Policy</a><a href="#" data-cookie-settings>Cookie Settings</a><a href="/legal/terms">Terms</a></div>
     </div>
-    <div class="footer-bottom">
-      <span>&copy; 2026 Xtradite Digital. All rights reserved.</span>
-      <div class="footer-social">
-        <a href="#" aria-label="LinkedIn â€” add your company URL" title="Add your real LinkedIn URL here"><i data-lucide="linkedin"></i></a>
-      </div>
-    </div>
+    <div class="footer-bottom"><span>&copy; 2026 Xtradite Digital. All rights reserved.</span><div class="footer-social"><a href="#" aria-label="LinkedIn — add your company URL" title="Add your real LinkedIn URL here"><i data-lucide="linkedin"></i></a></div></div>
   </div>
 </footer>
-
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js" defer></script>
 <script src="assets/js/site.js" defer></script>
 <script type="module" src="assets/js/pages/home.js"></script>
 <script src="assets/js/adsense-units.js" defer></script>
 </body>
 </html>
-
