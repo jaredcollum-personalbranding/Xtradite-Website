@@ -3,7 +3,20 @@ const path = require("node:path");
 const { fetchPublishedBySlug } = require("./lib/supabase");
 const { SITE_URL, buildGraph, primaryEntityFor } = require("./lib/schema");
 
+const SOCIAL_IMAGE = `${SITE_URL}/assets/brand/xtradite-social-share.svg`;
+const SOCIAL_IMAGE_ALT = "Xtradite Digital — practical consultancy for measurable growth";
+const FAVICON = `${SITE_URL}/assets/brand/favicon.svg`;
+
 const PAGE_TYPES = {
+  service: {
+    table: "services",
+    template: "service-detail.html",
+    route: "services",
+    parentName: "Services",
+    title: (item) => `${item.seo_title || item.title} — Xtradite Digital`,
+    description: (item) => item.seo_description || item.summary || item.hero_subheading || `Explore Xtradite Digital's ${item.title} service.`,
+    pageType: "WebPage"
+  },
   industry: {
     table: "industries",
     template: "industry-detail.html",
@@ -57,17 +70,27 @@ function injectSeo(html, { type, item, config, canonical, title, description }) 
     ]
   });
 
+  const socialImage = type === "insight" && item.cover_image_url ? item.cover_image_url : SOCIAL_IMAGE;
   let output = html;
   output = replaceOrInsert(output, /<base\s+href=["'][^"']*["'][^>]*>/i, '<base href="/">');
   output = replaceOrInsert(output, /<title>[\s\S]*?<\/title>/i, `<title>${escapeHtml(title)}</title>`);
   output = replaceOrInsert(output, /<meta\s+name=["']description["'][^>]*>/i, `<meta name="description" content="${escapeHtml(description)}">`);
-  output = replaceOrInsert(output, /<meta\s+name=["']robots["'][^>]*>/i, '<meta name="robots" content="index, follow">');
+  output = replaceOrInsert(output, /<meta\s+name=["']robots["'][^>]*>/i, '<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">');
   output = replaceOrInsert(output, /<link\s+rel=["']canonical["'][^>]*>/i, `<link rel="canonical" href="${canonical}">`);
+  output = replaceOrInsert(output, /<link\s+rel=["']icon["'][^>]*type=["']image\/svg\+xml["'][^>]*>/i, `<link rel="icon" type="image/svg+xml" href="${FAVICON}">`);
+  output = replaceOrInsert(output, /<meta\s+name=["']theme-color["'][^>]*>/i, '<meta name="theme-color" content="#0D0D0D">');
   output = replaceOrInsert(output, /<meta\s+property=["']og:title["'][^>]*>/i, `<meta property="og:title" content="${escapeHtml(title)}">`);
   output = replaceOrInsert(output, /<meta\s+property=["']og:description["'][^>]*>/i, `<meta property="og:description" content="${escapeHtml(description)}">`);
   output = replaceOrInsert(output, /<meta\s+property=["']og:url["'][^>]*>/i, `<meta property="og:url" content="${canonical}">`);
+  output = replaceOrInsert(output, /<meta\s+property=["']og:image["'][^>]*>/i, `<meta property="og:image" content="${escapeHtml(socialImage)}">`);
+  output = replaceOrInsert(output, /<meta\s+property=["']og:image:width["'][^>]*>/i, '<meta property="og:image:width" content="1200">');
+  output = replaceOrInsert(output, /<meta\s+property=["']og:image:height["'][^>]*>/i, '<meta property="og:image:height" content="630">');
+  output = replaceOrInsert(output, /<meta\s+property=["']og:image:alt["'][^>]*>/i, `<meta property="og:image:alt" content="${SOCIAL_IMAGE_ALT}">`);
+  output = replaceOrInsert(output, /<meta\s+name=["']twitter:card["'][^>]*>/i, '<meta name="twitter:card" content="summary_large_image">');
   output = replaceOrInsert(output, /<meta\s+name=["']twitter:title["'][^>]*>/i, `<meta name="twitter:title" content="${escapeHtml(title)}">`);
   output = replaceOrInsert(output, /<meta\s+name=["']twitter:description["'][^>]*>/i, `<meta name="twitter:description" content="${escapeHtml(description)}">`);
+  output = replaceOrInsert(output, /<meta\s+name=["']twitter:image["'][^>]*>/i, `<meta name="twitter:image" content="${escapeHtml(socialImage)}">`);
+  output = replaceOrInsert(output, /<meta\s+name=["']twitter:image:alt["'][^>]*>/i, `<meta name="twitter:image:alt" content="${SOCIAL_IMAGE_ALT}">`);
   output = output.replace(/<script[^>]*type=["']application\/ld\+json["'][^>]*>[\s\S]*?<\/script>\s*/gi, "");
   output = output.replace(/<\/head>/i, `<script>window.__CONTENT_SLUG__=${JSON.stringify(item.slug)};</script>\n<script id="xd-schema-graph" data-schema="server" type="application/ld+json">${JSON.stringify(graph).replace(/</g, "\\u003c")}</script>\n</head>`);
   return output;
