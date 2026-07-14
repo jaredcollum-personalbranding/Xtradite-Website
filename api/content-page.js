@@ -58,8 +58,10 @@ function injectSeo(html, { type, item, config, canonical, title, description }) 
   });
 
   let output = html;
+  output = replaceOrInsert(output, /<base\s+href=["'][^"']*["'][^>]*>/i, '<base href="/">');
   output = replaceOrInsert(output, /<title>[\s\S]*?<\/title>/i, `<title>${escapeHtml(title)}</title>`);
   output = replaceOrInsert(output, /<meta\s+name=["']description["'][^>]*>/i, `<meta name="description" content="${escapeHtml(description)}">`);
+  output = replaceOrInsert(output, /<meta\s+name=["']robots["'][^>]*>/i, '<meta name="robots" content="index, follow">');
   output = replaceOrInsert(output, /<link\s+rel=["']canonical["'][^>]*>/i, `<link rel="canonical" href="${canonical}">`);
   output = replaceOrInsert(output, /<meta\s+property=["']og:title["'][^>]*>/i, `<meta property="og:title" content="${escapeHtml(title)}">`);
   output = replaceOrInsert(output, /<meta\s+property=["']og:description["'][^>]*>/i, `<meta property="og:description" content="${escapeHtml(description)}">`);
