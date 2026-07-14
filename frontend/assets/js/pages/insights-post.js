@@ -4,7 +4,7 @@ import { escapeHtml, relatedPostCardHtml, tagLinksHtml, renderIcons, openLightbo
 
 const root = document.getElementById("post-root");
 const notFound = document.getElementById("not-found");
-const slug = getSlugParam();
+const slug = window.__CONTENT_SLUG__ || getSlugParam();
 
 function formatDate(iso) {
   if (!iso) return "";
@@ -43,20 +43,21 @@ function setCanonical(href) {
   el.setAttribute("href", href);
 }
 
-function setJsonLd(post, title, description) {
+function setJsonLd(post, title, description, url) {
+  if (document.getElementById("xd-schema-graph")) return;
   const script = document.createElement("script");
   script.type = "application/ld+json";
   script.textContent = JSON.stringify({
     "@context": "https://schema.org",
-    "@type": "Article",
+    "@type": "BlogPosting",
     headline: title,
     description,
     datePublished: post.firstPublishedDate,
-    dateModified: post.firstPublishedDate,
+    dateModified: post.updatedAt || post.firstPublishedDate,
     author: { "@type": "Organization", name: "Xtradite Digital" },
     publisher: { "@type": "Organization", name: "Xtradite Digital" },
     keywords: (post.tags || []).join(", ") || undefined,
-    mainEntityOfPage: window.location.href,
+    mainEntityOfPage: url,
   });
   document.head.appendChild(script);
 }
@@ -64,7 +65,7 @@ function setJsonLd(post, title, description) {
 function applySeo(post) {
   const title = `${post.seoTitle || post.title} — Xtradite Digital Insights`;
   const description = post.seoDescription || post.excerpt || "";
-  const url = `${window.location.origin}${window.location.pathname}?slug=${encodeURIComponent(post.slug)}`;
+  const url = `${window.location.origin}/insights/${encodeURIComponent(post.slug)}`;
 
   document.title = title;
   setMetaByName("description", description);
@@ -76,7 +77,7 @@ function applySeo(post) {
   setMetaByName("twitter:title", post.seoTitle || post.title);
   setMetaByName("twitter:description", description);
   setCanonical(url);
-  setJsonLd(post, post.seoTitle || post.title, description);
+  setJsonLd(post, post.seoTitle || post.title, description, url);
 }
 
 async function load() {
@@ -113,8 +114,6 @@ async function load() {
   const rendered = renderRicos(post.richContent);
   bodyEl.innerHTML = rendered || renderPlainText(post.contentText) || `<p>${escapeHtml(post.excerpt || "")}</p>`;
 
-  // Related Insights — prefer posts sharing a tag with this one, then fill up to 2
-  // with other recent posts (excluding this one).
   const relatedWrap = document.getElementById("related-posts");
   if (relatedWrap) {
     try {

@@ -3,8 +3,43 @@
   "buildCommand": "npm run build",
   "outputDirectory": "frontend",
   "cleanUrls": true,
+  "functions": {
+    "api/content-page.js": {
+      "includeFiles": "frontend/{industry-detail,case-study-detail,insights-post}.html"
+    }
+  },
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "xtradite-digital.co.uk" }],
+      "destination": "https://www.xtradite-digital.co.uk/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/industry-detail",
+      "has": [{ "type": "query", "key": "slug", "value": "(?<slug>[a-z0-9-]+)" }],
+      "destination": "/industries/:slug",
+      "permanent": true
+    },
+    {
+      "source": "/case-study-detail",
+      "has": [{ "type": "query", "key": "slug", "value": "(?<slug>[a-z0-9-]+)" }],
+      "destination": "/case-studies/:slug",
+      "permanent": true
+    },
+    {
+      "source": "/insights-post",
+      "has": [{ "type": "query", "key": "slug", "value": "(?<slug>[a-z0-9-]+)" }],
+      "destination": "/insights/:slug",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     { "source": "/sitemap.xml", "destination": "/api/sitemap" },
+    { "source": "/sitemaps/:type.xml", "destination": "/api/sitemap?type=:type" },
+    { "source": "/industries/:slug", "destination": "/api/content-page?type=industry&slug=:slug" },
+    { "source": "/case-studies/:slug", "destination": "/api/content-page?type=case-study&slug=:slug" },
+    { "source": "/insights/:slug", "destination": "/api/content-page?type=insight&slug=:slug" },
     { "source": "/services/shopify-migration", "destination": "/service-detail?slug=shopify-migration" },
     { "source": "/locations", "destination": "/api/location-with-jam?path=locations" },
     { "source": "/uk", "destination": "/api/location-with-jam?path=" },
@@ -17,6 +52,21 @@
         { "key": "Content-Type", "value": "text/plain; charset=utf-8" },
         { "key": "Cache-Control", "value": "public, max-age=3600" }
       ]
+    },
+    {
+      "source": "/robots.txt",
+      "headers": [
+        { "key": "Content-Type", "value": "text/plain; charset=utf-8" },
+        { "key": "Cache-Control", "value": "public, max-age=3600" }
+      ]
+    },
+    {
+      "source": "/sitemap.xml",
+      "headers": [{ "key": "Content-Type", "value": "application/xml; charset=utf-8" }]
+    },
+    {
+      "source": "/sitemaps/:type.xml",
+      "headers": [{ "key": "Content-Type", "value": "application/xml; charset=utf-8" }]
     }
   ]
 }
