@@ -2,9 +2,9 @@ const SUPABASE_URL = process.env.XTRADITE_SUPABASE_URL || "https://bmhkdyshluilo
 const SUPABASE_KEY = process.env.XTRADITE_SUPABASE_PUBLISHABLE_KEY || "sb_publishable_Aj9nCJLFY9aMycZeQ3buTQ_-n-Q7SFK";
 
 const PUBLIC_CONTENT_SELECTS = Object.freeze({
-  services_delivery: "id,title,slug,category,icon,summary,hero_subheading,description,sort_order,created_at,updated_at,status,who_its_for,what_included,how_it_works,deliverables,tech_categories,faqs,seo_title,seo_description,related_case_studies,related_blog_posts,technology_examples",
-  industries_delivery: "id,title,slug,summary,challenge,solution,outcomes,sort_order,created_at,updated_at,status,related_services,seo_title,seo_description",
-  case_studies_delivery: "id,client,slug,industry,headline,challenge,description,metric,sort_order,created_at,updated_at,status,metrics,approach,results_detail,testimonial_quote,testimonial_author,related_services,card_summary,seo_title,seo_description,published_at,confidentiality_note,media",
+  services_delivery: "id,title,slug,category,icon,summary,hero_subheading,description,sort_order,created_at,updated_at,published_at,status,noindex,canonical_path,primary_entity,about_entities,mention_entities,who_its_for,what_included,how_it_works,deliverables,tech_categories,faqs,seo_title,seo_description,related_case_studies,related_blog_posts,technology_examples",
+  industries_delivery: "id,title,slug,summary,challenge,solution,outcomes,sort_order,created_at,updated_at,published_at,status,noindex,canonical_path,related_services,seo_title,seo_description",
+  case_studies_delivery: "id,client,slug,industry,headline,challenge,description,metric,sort_order,created_at,updated_at,status,metrics,approach,results_detail,testimonial_quote,testimonial_author,related_services,card_summary,seo_title,seo_description,published_at,confidentiality_note,media,public_approval_status,public_primary_metric_approved,canonical_path,noindex",
   blog_posts_delivery: "id,title,slug,excerpt,content_text,rich_content,cover_image_url,minutes_to_read,featured,pinned,first_published_at,created_at,updated_at,status,tags,seo_title,seo_description",
 });
 
