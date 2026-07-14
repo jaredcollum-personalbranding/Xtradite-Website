@@ -37,22 +37,11 @@ async function waitForRoute(page, route) {
 }
 
 async function keyboardAudit(page, label) {
-  const result = await page.evaluate(async () => {
-    const records = [];
-    document.body.focus();
-    for (let index = 0; index < 60; index += 1) {
-      const before = document.activeElement;
-      before?.dispatchEvent(new KeyboardEvent("keydown", { key: "Tab", bubbles: true }));
-      const event = new KeyboardEvent("keydown", { key: "Tab", bubbles: true, cancelable: true });
-      document.dispatchEvent(event);
-      await new Promise((resolve) => requestAnimationFrame(resolve));
-    }
-    return records;
-  }).catch(() => []);
-
-  // Use real Playwright keyboard events because browser focus navigation is not reproduced by synthetic events.
   const visited = [];
-  await page.locator("body").focus();
+  await page.evaluate(() => {
+    document.body.tabIndex = -1;
+    document.body.focus();
+  });
   for (let index = 0; index < 45; index += 1) {
     await page.keyboard.press("Tab");
     const state = await page.evaluate(() => {
@@ -84,7 +73,6 @@ async function keyboardAudit(page, label) {
   record(`${label}: keyboard traversal reaches interactive controls`, controls.length >= 5, `Visited ${controls.length} controls`);
   record(`${label}: keyboard focus never enters hidden or inert content`, hiddenFocus.length === 0, hiddenFocus.map((item) => item.text).join(", "));
   record(`${label}: focused controls expose a visible indicator`, missingFocusIndicator.length === 0, missingFocusIndicator.map((item) => item.text).join(", "));
-  return result;
 }
 
 async function touchTargetAudit(page, label) {
@@ -102,7 +90,7 @@ async function touchTargetAudit(page, label) {
   ];
   const results = await page.evaluate((targetSelectors) => {
     const seen = new Set();
-    return targetSelectors.flatMap((selector) => Array.from(document.querySelectorAll(selector))).map((element) => {
+    return targetSelectors.flatMap((selector) => Array.from(document.querySelectorAll(selector)).map((element) => {
       if (!(element instanceof HTMLElement)) return null;
       const rect = element.getBoundingClientRect();
       const style = getComputedStyle(element);
@@ -117,7 +105,7 @@ async function touchTargetAudit(page, label) {
         width: Math.round(rect.width),
         height: Math.round(rect.height),
       };
-    }).filter(Boolean);
+    })).filter(Boolean);
   }, selectors);
 
   const failures = results.filter((target) => target.width < 44 || target.height < 44);
