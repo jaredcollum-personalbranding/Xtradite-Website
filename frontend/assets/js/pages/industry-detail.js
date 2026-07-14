@@ -3,7 +3,7 @@ import { escapeHtml, renderIcons, getSlugParam } from "../render-helpers.js";
 
 const root = document.getElementById("industry-detail-root");
 const notFound = document.getElementById("not-found");
-const slug = getSlugParam();
+const slug = window.__CONTENT_SLUG__ || getSlugParam();
 
 function setMetaByName(name, content) {
   if (!content) return;
@@ -38,11 +38,12 @@ function setCanonical(href) {
 }
 
 function setJsonLd(title, description, url) {
+  if (document.getElementById("xd-schema-graph")) return;
   const script = document.createElement("script");
   script.type = "application/ld+json";
   script.textContent = JSON.stringify({
     "@context": "https://schema.org",
-    "@type": "WebPage",
+    "@type": "CollectionPage",
     name: title,
     description,
     url,
@@ -53,7 +54,7 @@ function setJsonLd(title, description, url) {
 function applySeo(item) {
   const title = `${item.title} — Xtradite Digital`;
   const description = item.summary || `How Xtradite Digital helps ${item.title} businesses.`;
-  const url = `${window.location.origin}/industry-detail?slug=${encodeURIComponent(item.slug)}`;
+  const url = `${window.location.origin}/industries/${encodeURIComponent(item.slug)}`;
 
   document.title = title;
   setMetaByName("description", description);
