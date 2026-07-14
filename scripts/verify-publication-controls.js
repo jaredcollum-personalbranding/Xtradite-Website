@@ -54,7 +54,7 @@ function structuredData() {
   const contentLookup = contentPage.indexOf("if (!item)");
   const contentSchema = contentPage.indexOf("injectSeo(template");
   const locationLookup = locationPage.indexOf("if (!route)");
-  const locationSchema = locationPage.indexOf("schemas(route");
+  const locationSchema = locationPage.lastIndexOf("schemas(route, crumbs");
 
   assert.ok(contentLookup >= 0 && contentSchema > contentLookup, "Content JSON-LD must be generated only after public eligibility succeeds");
   assert.ok(locationLookup >= 0 && locationSchema > locationLookup, "Location JSON-LD must be generated only after eligible route resolution succeeds");
