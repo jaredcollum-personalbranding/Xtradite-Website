@@ -1,18 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-GB">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="google-adsense-account" content="ca-pub-7308041122340160">
 
-<!-- Google Consent Mode defaults: must run before Cookiebot and Google tags -->
 <script>
   window.dataLayer = window.dataLayer || [];
-
-  function gtag() {
-    dataLayer.push(arguments);
-  }
-
+  function gtag() { dataLayer.push(arguments); }
   gtag("consent", "default", {
     ad_storage: "denied",
     ad_user_data: "denied",
@@ -23,12 +18,10 @@
     security_storage: "granted",
     wait_for_update: 500
   });
-
   gtag("set", "ads_data_redaction", true);
   gtag("set", "url_passthrough", false);
 </script>
 
-<!-- Cookiebot CMP -->
 <script
   id="Cookiebot"
   src="https://consent.cookiebot.com/uc.js"
@@ -38,18 +31,9 @@
   type="text/javascript"
 ></script>
 
-<!-- Synchronise genuine Cookiebot choices with Google Consent Mode -->
 <script>
   function loadAdSenseAfterConsent() {
-    if (
-      !window.Cookiebot ||
-      !Cookiebot.hasResponse ||
-      !Cookiebot.consent.marketing ||
-      document.getElementById("adsense-loader")
-    ) {
-      return;
-    }
-
+    if (!window.Cookiebot || !Cookiebot.hasResponse || !Cookiebot.consent.marketing || document.getElementById("adsense-loader")) return;
     const script = document.createElement("script");
     script.id = "adsense-loader";
     script.async = true;
@@ -59,14 +43,10 @@
   }
 
   function updateGoogleConsentFromCookiebot() {
-    if (!window.Cookiebot || !Cookiebot.hasResponse) {
-      return;
-    }
-
+    if (!window.Cookiebot || !Cookiebot.hasResponse) return;
     const marketingGranted = Cookiebot.consent.marketing === true;
     const statisticsGranted = Cookiebot.consent.statistics === true;
     const preferencesGranted = Cookiebot.consent.preferences === true;
-
     gtag("consent", "update", {
       ad_storage: marketingGranted ? "granted" : "denied",
       ad_user_data: marketingGranted ? "granted" : "denied",
@@ -76,12 +56,8 @@
       personalization_storage: preferencesGranted ? "granted" : "denied",
       security_storage: "granted"
     });
-
     gtag("set", "ads_data_redaction", !marketingGranted);
-
-    if (marketingGranted) {
-      loadAdSenseAfterConsent();
-    }
+    if (marketingGranted) loadAdSenseAfterConsent();
   }
 
   window.addEventListener("CookiebotOnConsentReady", updateGoogleConsentFromCookiebot);
@@ -89,47 +65,36 @@
   window.addEventListener("CookiebotOnDecline", updateGoogleConsentFromCookiebot);
 </script>
 
-<!-- Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-WYXTKGJ9JS"></script>
-<script>
-  gtag("js", new Date());
-  gtag("config", "G-WYXTKGJ9JS");
-</script>
+<script>gtag("js", new Date()); gtag("config", "G-WYXTKGJ9JS");</script>
+<script src="/assets/js/speed-insights-init.js" defer></script>
 
-<!-- Vercel Speed Insights -->
-<script src="assets/js/speed-insights-init.js" defer></script>
 <title>Service — Xtradite Digital</title>
 <meta name="description" content="Explore Xtradite Digital's services in detail.">
+<meta name="robots" content="index, follow">
 <link rel="stylesheet" href="/assets/css/tokens.css">
 <link rel="stylesheet" href="/assets/css/main.css">
 <link rel="icon" href="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/favicon-dark.ico" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/favicon-light.ico" media="(prefers-color-scheme: light)">
 <link rel="icon" href="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/favicon-light.ico">
-<link rel="icon" type="image/png" sizes="32x32" href="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/favicon-32-dark.png" media="(prefers-color-scheme: dark)">
-<link rel="icon" type="image/png" sizes="32x32" href="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/favicon-32-light.png" media="(prefers-color-scheme: light)">
-<link rel="icon" type="image/png" sizes="16x16" href="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/favicon-16-dark.png" media="(prefers-color-scheme: dark)">
-<link rel="icon" type="image/png" sizes="16x16" href="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/favicon-16-light.png" media="(prefers-color-scheme: light)">
-<link rel="apple-touch-icon" href="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/icon-tile-light.png">
 <link rel="canonical" href="https://www.xtradite-digital.co.uk/service-detail">
 <meta property="og:site_name" content="Xtradite Digital">
 <meta property="og:locale" content="en_GB">
-<meta property="og:title" content="Service â€” Xtradite Digital">
+<meta property="og:title" content="Service — Xtradite Digital">
 <meta property="og:description" content="Explore Xtradite Digital's services in detail.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://www.xtradite-digital.co.uk/service-detail">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Service â€” Xtradite Digital">
+<meta name="twitter:title" content="Service — Xtradite Digital">
 <meta name="twitter:description" content="Explore Xtradite Digital's services in detail.">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Organization", "name": "Xtradite Digital", "url": "https://www.xtradite-digital.co.uk/", "description": "UK digital consultancy helping ambitious retail, ecommerce and manufacturing businesses close operational and commercial gaps with hands-on delivery.", "areaServed": "GB", "knowsAbout": ["Digital Strategy", "AI & Automation", "eCommerce Growth", "Operational Excellence", "Fractional Leadership", "Project Delivery"]}</script>
-<!-- Vercel Web Analytics -->
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Xtradite Digital","url":"https://www.xtradite-digital.co.uk/","description":"UK digital consultancy helping retail, ecommerce and manufacturing businesses address operational and commercial constraints through practical delivery.","areaServed":"GB","knowsAbout":["Digital Strategy","AI & Automation","eCommerce Growth","Operational Excellence","Fractional Leadership","Project Delivery"]}</script>
 <script defer src="https://cdn.vercel-insights.com/v1/script.js"></script>
 </head>
 <body>
-
 <header class="site-header" id="site-header">
   <div class="container header-inner">
     <a href="/" class="logo"><img src="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/wordmark-caps-light.png" alt="Xtradite Digital" class="logo-img"></a>
-    <nav class="site-nav" id="site-nav">
+    <nav class="site-nav" id="site-nav" aria-label="Primary navigation">
       <a href="/">Home</a>
       <a href="/services" class="active">Services</a>
       <a href="/industries">Industries</a>
@@ -137,23 +102,21 @@
       <a href="/about">About</a>
       <a href="/insights">Insights</a>
       <a href="/contact">Contact</a>
-      <a href="/contact" class="btn btn-primary btn-sm header-cta-mobile">Book a Consultation</a>
     </nav>
     <a href="/contact" class="btn btn-primary btn-sm header-cta">Book a Consultation</a>
-    <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation"><span></span><span></span><span></span></button>
+    <button class="nav-toggle" id="nav-toggle" type="button" aria-label="Toggle navigation"><span></span><span></span><span></span></button>
   </div>
 </header>
 
 <main>
-
   <section class="section-tight">
     <div class="container">
-      <nav class="breadcrumb"><a href="/">Home</a> / <a href="/services">Services</a> / <span id="breadcrumb-current"></span></nav>
+      <nav class="breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a> / <a href="/services">Services</a> / <span id="breadcrumb-current"></span></nav>
 
       <div id="not-found" class="not-found" hidden>
         <h1>Service not found</h1>
-        <p>We couldn't find a service matching that link. It may have been renamed â€” browse all services instead.</p>
-        <a href="/services" class="btn btn-primary">View All Services</a>
+        <p>We couldn't find a service matching that link. It may have been renamed — browse all services instead.</p>
+        <a href="/services" class="btn btn-primary">View all services</a>
       </div>
 
       <div id="service-detail-root" hidden>
@@ -164,84 +127,85 @@
             <h1 id="service-title" style="font-size: var(--font-size-display-sm); margin-bottom: var(--space-16);"></h1>
             <p class="hero-sub" id="service-subheading" style="margin-bottom: var(--space-32);"></p>
             <div class="hero-ctas" style="justify-content: flex-start; margin-bottom: var(--space-56);">
-              <a href="/contact" id="hero-cta" class="btn btn-primary">Book a Consultation <i data-lucide="arrow-right" class="btn-icon"></i></a>
-              <a href="/case-studies" class="btn btn-secondary">Explore Case Studies</a>
+              <a href="/contact" id="hero-cta" class="btn btn-primary">Discuss this service <i data-lucide="arrow-right" class="btn-icon"></i></a>
+              <a href="/case-studies" class="btn btn-secondary">Review case studies</a>
             </div>
             <div class="richtext" id="service-description"></div>
           </div>
-          <div class="glance-card">
-            <span class="eyebrow" style="margin-bottom: 0;">At a Glance</span>
-            <div class="glance-item"><span class="glance-num">6-12wk</span><span class="glance-label">Typical delivery window</span></div>
-            <div class="glance-item"><span class="glance-num">30%+</span><span class="glance-label">Average time saved on manual tasks</span></div>
-            <div class="glance-item"><span class="glance-num">1:1</span><span class="glance-label">Embedded with your team</span></div>
-          </div>
+          <aside class="glance-card" aria-label="Engagement principles">
+            <span class="eyebrow" style="margin-bottom: 0;">Engagement principles</span>
+            <div class="glance-item"><span class="glance-num">Scope</span><span class="glance-label">Work is defined around the current problem, available evidence and delivery constraints.</span></div>
+            <div class="glance-item"><span class="glance-num">Ownership</span><span class="glance-label">Responsibilities, decisions and dependencies are made visible before implementation.</span></div>
+            <div class="glance-item"><span class="glance-num">Measures</span><span class="glance-label">Success measures and limitations are agreed before results are reported.</span></div>
+          </aside>
         </div>
 
         <div class="related-grid" id="who-what-section" style="margin-top: var(--space-64);" hidden>
-          <div class="card">
-            <span class="eyebrow">Who It's For</span>
+          <section class="card">
+            <span class="eyebrow">Who it's for</span>
             <div class="richtext" id="service-who-its-for"></div>
-          </div>
-          <div class="card">
-            <span class="eyebrow">What's Included</span>
+          </section>
+          <section class="card">
+            <span class="eyebrow">What's included</span>
             <div class="richtext" id="service-what-included"></div>
-          </div>
+          </section>
         </div>
 
-        <div id="how-it-works-section" style="margin-top: var(--space-64);" hidden>
+        <section id="deliverables-section" style="margin-top: var(--space-64);" hidden>
           <div class="section-head left">
-            <span class="eyebrow">Process</span>
-            <h2>How It Works</h2>
-          </div>
-          <div id="service-how-it-works"></div>
-        </div>
-
-        <div id="deliverables-section" style="margin-top: var(--space-64);" hidden>
-          <div class="section-head left">
-            <span class="eyebrow">Outcomes</span>
-            <h2>What You'll Receive</h2>
+            <span class="eyebrow">Deliverables</span>
+            <h2>What you'll receive</h2>
           </div>
           <div id="service-deliverables"></div>
-        </div>
+        </section>
 
-        <div id="tech-section" style="margin-top: var(--space-64);" hidden>
+        <section id="how-it-works-section" style="margin-top: var(--space-64);" hidden>
           <div class="section-head left">
-            <span class="eyebrow">Stack</span>
-            <h2>Technology &amp; Applications We Use</h2>
+            <span class="eyebrow">Delivery</span>
+            <h2>How the engagement works</h2>
           </div>
-          <div id="service-tech-grid"></div>
-        </div>
+          <div id="service-how-it-works"></div>
+        </section>
 
-        <div class="card" id="related-case-study" style="margin-top: var(--space-64);" hidden></div>
+        <section id="tech-section" style="margin-top: var(--space-64);" hidden>
+          <div class="section-head left">
+            <span class="eyebrow">Technology</span>
+            <h2>Relevant technology environments</h2>
+            <p>Examples show compatible workflow environments. A native integration is only claimed where supporting delivery evidence exists.</p>
+          </div>
+          <div class="related-grid" id="service-tech-grid"></div>
+        </section>
 
-        <div id="related-insights-section" style="margin-top: var(--space-64);" hidden>
+        <article class="card" id="related-case-study" style="margin-top: var(--space-64);" hidden></article>
+
+        <section id="related-insights-section" style="margin-top: var(--space-64);" hidden>
           <div class="section-head left">
             <span class="eyebrow">Insights</span>
-            <h2>Related Reading</h2>
+            <h2>Related reading</h2>
           </div>
           <div class="related-grid" id="related-insights"></div>
-        </div>
+        </section>
 
-        <div id="faq-section" style="margin-top: var(--space-64);" hidden>
+        <section id="faq-section" style="margin-top: var(--space-64);" hidden>
           <div class="section-head left">
             <span class="eyebrow">FAQ</span>
-            <h2>Frequently Asked Questions</h2>
+            <h2>Questions about this service</h2>
           </div>
           <div id="service-faq"></div>
-        </div>
+        </section>
       </div>
     </div>
   </section>
+
   <section>
     <div class="container">
       <div class="cta-banner">
-        <h2>Ready to Accelerate Your Business?</h2>
-        <p>Transform your digital operations with practical consultancy built for measurable commercial results.</p>
-        <a href="/contact" id="banner-cta" class="btn btn-primary btn-lg">Book a Consultation <i data-lucide="arrow-right" class="btn-icon"></i></a>
+        <h2>Discuss the constraint you need to resolve.</h2>
+        <p>Use the first conversation to clarify the problem, the evidence available and the practical next step.</p>
+        <a href="/contact" id="banner-cta" class="btn btn-primary btn-lg">Start the conversation <i data-lucide="arrow-right" class="btn-icon"></i></a>
       </div>
     </div>
   </section>
-
 
   <section class="section-tight" data-sitewide-ad-section>
     <div class="container">
@@ -251,7 +215,6 @@
       </aside>
     </div>
   </section>
-
 </main>
 
 <footer class="site-footer">
@@ -259,7 +222,7 @@
     <div class="footer-inner">
       <div class="footer-brand">
         <a href="/" class="logo"><img src="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/wordmark-caps-light.png" alt="Xtradite Digital" class="logo-img"></a>
-        <p>Practical consultancy for retail, ecommerce and manufacturing businesses ready to accelerate digital-first growth.</p>
+        <p>Practical consultancy for retail, ecommerce and manufacturing businesses addressing digital, operational and commercial constraints.</p>
       </div>
       <div class="footer-col">
         <h4>Services</h4>
@@ -272,12 +235,12 @@
       </div>
       <div class="footer-col">
         <h4>Industries</h4>
-        <a href="/industry-detail?slug=retail">Retail</a>
-        <a href="/industry-detail?slug=ecommerce">eCommerce</a>
-        <a href="/industry-detail?slug=manufacturing">Manufacturing</a>
-        <a href="/industry-detail?slug=consumer-goods">Consumer Goods</a>
-        <a href="/industry-detail?slug=professional-services">Professional Services</a>
-        <a href="/industry-detail?slug=startups">Startups</a>
+        <a href="/industries/retail">Retail</a>
+        <a href="/industries/ecommerce">eCommerce</a>
+        <a href="/industries/manufacturing">Manufacturing</a>
+        <a href="/industries/consumer-goods">Consumer Goods</a>
+        <a href="/industries/professional-services">Professional Services</a>
+        <a href="/industries/startups">Startups</a>
       </div>
       <div class="footer-col">
         <h4>Company</h4>
@@ -296,9 +259,7 @@
     </div>
     <div class="footer-bottom">
       <span>&copy; 2026 Xtradite Digital. All rights reserved.</span>
-      <div class="footer-social">
-        <a href="#" aria-label="LinkedIn â€” add your company URL" title="Add your real LinkedIn URL here"><i data-lucide="linkedin"></i></a>
-      </div>
+      <div class="footer-social"></div>
     </div>
   </div>
 </footer>
@@ -306,7 +267,6 @@
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js" defer></script>
 <script src="/assets/js/site.js" defer></script>
 <script type="module" src="/assets/js/pages/service-detail.js"></script>
-<script src="assets/js/adsense-units.js" defer></script>
+<script src="/assets/js/adsense-units.js" defer></script>
 </body>
 </html>
-
