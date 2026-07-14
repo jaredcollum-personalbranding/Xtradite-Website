@@ -140,7 +140,13 @@
     if (!item) return;
     const trigger = item.querySelector(":scope > .mega-nav-trigger");
     setMegaItemOpen(item, false);
-    if (returnFocus) trigger?.focus();
+    if (!returnFocus || !trigger) return;
+    item.dataset.suppressFocusOpen = "true";
+    trigger.focus();
+    requestAnimationFrame(() => {
+      setMegaItemOpen(item, false);
+      delete item.dataset.suppressFocusOpen;
+    });
   }
 
   function hardenMegaMenu() {
@@ -149,6 +155,13 @@
     if (!header || !nav || nav.dataset.layeringReady === "true") return;
     nav.dataset.layeringReady = "true";
     header.classList.add("has-layered-navigation");
+
+    nav.addEventListener("focusin", (event) => {
+      const item = event.target.closest(".mega-nav-item");
+      if (!item || item.dataset.suppressFocusOpen !== "true") return;
+      event.stopImmediatePropagation();
+      setMegaItemOpen(item, false);
+    }, true);
 
     nav.addEventListener("click", (event) => {
       const trigger = event.target.closest(".mega-nav-trigger");
