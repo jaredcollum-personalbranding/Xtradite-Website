@@ -63,6 +63,31 @@ function breadcrumbs(items) {
   };
 }
 
+function normaliseEntity(value) {
+  if (typeof value === "string") {
+    const name = value.trim();
+    return name ? { "@type": "Thing", name } : undefined;
+  }
+  if (!value || typeof value !== "object" || Array.isArray(value)) return undefined;
+
+  const name = typeof value.name === "string" ? value.name.trim() : "";
+  const type = typeof value["@type"] === "string"
+    ? value["@type"].trim()
+    : typeof value.type === "string"
+      ? value.type.trim()
+      : "Thing";
+  const url = typeof value.url === "string" && /^https?:\/\//i.test(value.url) ? value.url : undefined;
+  const id = typeof value["@id"] === "string" && /^https?:\/\//i.test(value["@id"]) ? value["@id"] : undefined;
+
+  if (!name && !id) return undefined;
+  return compact({ "@type": type || "Thing", "@id": id, name, url });
+}
+
+function normaliseEntityList(value) {
+  if (!Array.isArray(value)) return [];
+  return value.map(normaliseEntity).filter(Boolean);
+}
+
 function buildGraph({ canonical, title, description, pageType = "WebPage", primaryEntity, breadcrumbItems = [] }) {
   const pageId = `${canonical}#webpage`;
   const graph = [organisation(), website(), {
@@ -86,15 +111,20 @@ function buildGraph({ canonical, title, description, pageType = "WebPage", prima
 function primaryEntityFor(type, item, canonical, description) {
   const entityId = `${canonical}#primary`;
   if (type === "service") {
+    const configuredPrimary = normaliseEntity(item.primary_entity);
+    const about = normaliseEntityList(item.about_entities);
+    const mentions = normaliseEntityList(item.mention_entities);
     return compact({
       "@type": "Service",
       "@id": entityId,
       name: item.title,
-      serviceType: item.category || item.title,
+      serviceType: configuredPrimary?.name || item.category || item.title,
       description,
       url: canonical,
       provider: { "@id": ORGANISATION_ID },
       areaServed: { "@type": "Country", name: "United Kingdom" },
+      about,
+      mentions,
       mainEntityOfPage: { "@id": `${canonical}#webpage` }
     });
   }
@@ -151,5 +181,7 @@ module.exports = {
   PERSON_ID,
   buildGraph,
   primaryEntityFor,
-  compact
+  compact,
+  normaliseEntity,
+  normaliseEntityList
 };

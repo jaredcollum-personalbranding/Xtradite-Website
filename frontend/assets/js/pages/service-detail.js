@@ -8,8 +8,8 @@ import {
   deliverableListHtml,
   techLogoGridHtml,
   faqListHtml,
-  wireFaqAccordion,
 } from "../render-helpers.js";
+import { enhanceServicePage } from "./service-page-enhancements.js";
 
 const root = document.getElementById("service-detail-root");
 const notFound = document.getElementById("not-found");
@@ -18,6 +18,7 @@ const PUBLIC_SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 function isEligibleRelatedCaseStudy(item) {
   return item?.status === "published"
+    && item?.publicApprovalStatus === "approved"
     && PUBLIC_SLUG.test(item.slug || "")
     && Boolean(item.client)
     && item.noindex !== true;
@@ -208,11 +209,11 @@ async function load() {
   if (item.faqs?.length) {
     const faqWrap = document.getElementById("service-faq");
     faqWrap.innerHTML = faqListHtml(item.faqs);
-    wireFaqAccordion(faqWrap);
     document.getElementById("faq-section").hidden = false;
   }
 
   root.hidden = false;
+  enhanceServicePage();
   renderIcons();
 }
 

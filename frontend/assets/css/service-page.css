@@ -1,0 +1,206 @@
+/* Single CMS-preserving enhancement layer for service pages. */
+
+#service-detail-root,
+#service-detail-root > *,
+.detail-hero-grid > *,
+.related-grid > * {
+  min-width: 0;
+}
+
+#service-title,
+#service-detail-root h2,
+#service-detail-root h3 {
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+.service-technology-products {
+  margin-top: var(--space-16);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-body-sm);
+  line-height: 1.5;
+}
+
+.service-process {
+  display: grid;
+  gap: var(--space-12);
+  width: 100%;
+  margin-top: var(--space-32);
+}
+
+.service-process-step {
+  min-width: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-secondary);
+  overflow: clip;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
+}
+
+.service-process-step.is-active {
+  border-color: var(--color-border-hover);
+  box-shadow: var(--shadow-soft);
+}
+
+.service-process-trigger {
+  appearance: none;
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) 32px;
+  align-items: center;
+  gap: var(--space-16);
+  width: 100%;
+  min-height: 76px;
+  padding: var(--space-16) var(--space-20);
+  border: 0;
+  background: transparent;
+  color: var(--color-text-primary);
+  text-align: left;
+  cursor: pointer;
+}
+
+.service-process-trigger:focus-visible,
+.faq-question:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--color-primary) 32%, transparent);
+  outline-offset: -3px;
+}
+
+.service-process-number,
+.service-faq-number {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-primary) 12%, transparent);
+  color: var(--color-primary);
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .06em;
+}
+
+.service-process-title {
+  font-family: var(--font-display);
+  font-size: clamp(1rem, 1.6vw, 1.25rem);
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.service-process-toggle {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  font-size: 1.35rem;
+  transition: transform var(--transition-fast);
+}
+
+.service-process-trigger[aria-expanded="true"] .service-process-toggle {
+  transform: rotate(45deg);
+}
+
+.service-process-panel {
+  padding: 0 var(--space-20) var(--space-24) 84px;
+}
+
+.service-process-panel[hidden] {
+  display: none;
+}
+
+.service-process-panel p {
+  max-width: 72ch;
+  color: var(--color-text-tertiary);
+  line-height: 1.7;
+}
+
+#faq-section .faq-list {
+  width: 100%;
+  border-top: 1px solid var(--color-border);
+}
+
+#faq-section .faq-item {
+  border-bottom: 1px solid var(--color-border);
+}
+
+#faq-section .faq-question {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 28px;
+  align-items: center;
+  gap: var(--space-16);
+  width: 100%;
+  min-height: 72px;
+  padding: var(--space-16) 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-text-primary);
+  font: inherit;
+  font-weight: 700;
+  line-height: 1.35;
+  text-align: left;
+  cursor: pointer;
+}
+
+#faq-section .faq-question svg {
+  justify-self: end;
+  transition: transform var(--transition-fast);
+}
+
+#faq-section .faq-question[aria-expanded="true"] svg {
+  transform: rotate(45deg);
+}
+
+#faq-section .faq-answer {
+  padding: 0 44px var(--space-24) 60px;
+}
+
+#faq-section .faq-answer[hidden] {
+  display: none;
+}
+
+#faq-section .faq-answer p {
+  max-width: 72ch;
+  color: var(--color-text-tertiary);
+  line-height: 1.7;
+}
+
+@media (min-width: 901px) {
+  .service-process-step {
+    min-height: 120px;
+  }
+
+  .service-process-step:not(.is-active) {
+    opacity: .72;
+  }
+
+  .service-process-step.is-active {
+    transform: translateX(8px);
+  }
+}
+
+@media (max-width: 700px) {
+  .service-process-trigger {
+    grid-template-columns: 40px minmax(0, 1fr) 28px;
+    gap: var(--space-12);
+    padding-inline: var(--space-16);
+  }
+
+  .service-process-panel {
+    padding: 0 var(--space-16) var(--space-20) 68px;
+  }
+
+  #faq-section .faq-question {
+    grid-template-columns: 38px minmax(0, 1fr) 24px;
+    gap: var(--space-12);
+  }
+
+  #faq-section .faq-answer {
+    padding-inline: 50px var(--space-8);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .service-process-step,
+  .service-process-toggle,
+  #faq-section .faq-question svg {
+    transition: none;
+  }
+}
