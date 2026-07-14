@@ -1,6 +1,6 @@
 const fs = require("node:fs");
 const path = require("node:path");
-const { fetchPublishedBySlug } = require("./lib/supabase");
+const { fetchPublishedBySlug, publicSelectFor } = require("./lib/supabase");
 const { SITE_URL, buildGraph, primaryEntityFor } = require("./lib/schema");
 
 const SOCIAL_IMAGE = `${SITE_URL}/assets/brand/xtradite-social-share.svg`;
@@ -96,20 +96,26 @@ function injectSeo(html, { type, item, config, canonical, title, description }) 
   return output;
 }
 
+function sendNotFound(res) {
+  res.setHeader("X-Robots-Tag", "noindex, nofollow");
+  res.setHeader("Cache-Control", "public, max-age=0, s-maxage=60");
+  res.status(404).send("Not found");
+}
+
 module.exports = async (req, res) => {
   const type = String(req.query.type || "");
   const slug = String(req.query.slug || "").toLowerCase();
   const config = PAGE_TYPES[type];
 
   if (!config || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) {
-    res.status(404).send("Not found");
+    sendNotFound(res);
     return;
   }
 
   try {
-    const item = await fetchPublishedBySlug(config.table, slug);
+    const item = await fetchPublishedBySlug(config.table, slug, publicSelectFor(config.table));
     if (!item) {
-      res.status(404).send("Not found");
+      sendNotFound(res);
       return;
     }
 
@@ -127,3 +133,7 @@ module.exports = async (req, res) => {
     res.status(500).send("Unable to load this page");
   }
 };
+
+module.exports.PAGE_TYPES = PAGE_TYPES;
+module.exports.injectSeo = injectSeo;
+module.exports.sendNotFound = sendNotFound;
