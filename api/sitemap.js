@@ -1,75 +1,108 @@
 const { locations, services: localServices } = require("../data/uk-locations");
-const SUPABASE_URL = "https://bmhkdyshluiloorgnwoy.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_Aj9nCJLFY9aMycZeQ3buTQ_-n-Q7SFK";
-const SITE_URL = "https://www.xtradite-digital.co.uk";
+const { fetchRows } = require("./lib/supabase");
+const { SITE_URL } = require("./lib/schema");
 
 const STATIC_PATHS = [
-  { path: "/", priority: "1.0" },
-  { path: "/about", priority: "0.7" },
-  { path: "/services", priority: "0.9" },
-  { path: "/locations", priority: "0.9" },
-  { path: "/industries", priority: "0.8" },
-  { path: "/case-studies", priority: "0.8" },
-  { path: "/insights", priority: "0.7" },
-  { path: "/contact", priority: "0.8" },
-  { path: "/legal/privacy", priority: "0.3" },
-  { path: "/legal/cookies", priority: "0.3" },
-  { path: "/legal/terms", priority: "0.3" }
+  { path: "/", lastmod: null },
+  { path: "/about", lastmod: null },
+  { path: "/services", lastmod: null },
+  { path: "/locations", lastmod: null },
+  { path: "/industries", lastmod: null },
+  { path: "/case-studies", lastmod: null },
+  { path: "/insights", lastmod: null },
+  { path: "/contact", lastmod: null },
+  { path: "/legal/privacy", lastmod: null },
+  { path: "/legal/cookies", lastmod: null },
+  { path: "/legal/terms", lastmod: null }
 ];
 
-async function fetchTable(table, select) {
-  const response = await fetch(`${SUPABASE_URL}/rest/v1/${table}?select=${select}`, {
-    headers: { apikey: SUPABASE_ANON_KEY }
-  });
-  if (!response.ok) return [];
-  return response.json();
-}
-
-function urlEntry(loc, lastmod, priority) {
-  return ["  <url>", `    <loc>${loc}</loc>`, lastmod ? `    <lastmod>${lastmod}</lastmod>` : null, `    <priority>${priority}</priority>`, "  </url>"]
-    .filter(Boolean).join("\n");
-}
-
-const toDate = (value) => typeof value === "string" ? value.slice(0, 10) : undefined;
+const TYPES = new Set(["static", "services", "industries", "case-studies", "insights", "locations"]);
+const toDate = (value) => typeof value === "string" && value ? value.slice(0, 10) : undefined;
 const unique = (items) => [...new Set(items)];
-const cityPath = (l) => `/uk/${l.nationSlug}/${l.regionSlug}/${l.countySlug}/${l.slug}`;
+const cityPath = (location) => `/uk/${location.nationSlug}/${location.regionSlug}/${location.countySlug}/${location.slug}`;
 
-function locationPaths() {
-  const paths = ["/uk"];
-  unique(locations.map((l) => l.nationSlug)).forEach((nation) => paths.push(`/uk/${nation}`));
-  unique(locations.map((l) => `${l.nationSlug}/${l.regionSlug}`)).forEach((path) => paths.push(`/uk/${path}`));
-  unique(locations.map((l) => `${l.nationSlug}/${l.regionSlug}/${l.countySlug}`)).forEach((path) => paths.push(`/uk/${path}`));
+function escapeXml(value) {
+  return String(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;");
+}
+
+function urlEntry(path, lastmod) {
+  return [
+    "  <url>",
+    `    <loc>${escapeXml(`${SITE_URL}${path}`)}</loc>`,
+    lastmod ? `    <lastmod>${escapeXml(lastmod)}</lastmod>` : null,
+    "  </url>"
+  ].filter(Boolean).join("\n");
+}
+
+function locationEntries() {
+  const entries = [{ path: "/uk" }];
+  unique(locations.map((location) => location.nationSlug)).forEach((nation) => entries.push({ path: `/uk/${nation}` }));
+  unique(locations.map((location) => `${location.nationSlug}/${location.regionSlug}`)).forEach((item) => entries.push({ path: `/uk/${item}` }));
+  unique(locations.map((location) => `${location.nationSlug}/${location.regionSlug}/${location.countySlug}`)).forEach((item) => entries.push({ path: `/uk/${item}` }));
   locations.forEach((location) => {
-    paths.push(cityPath(location));
-    localServices.forEach((service) => paths.push(`${cityPath(location)}/services/${service.slug}`));
+    entries.push({ path: cityPath(location) });
+    localServices.forEach((service) => entries.push({ path: `${cityPath(location)}/services/${service.slug}` }));
   });
-  return paths;
+  return entries;
+}
+
+async function dynamicEntries(type) {
+  const configs = {
+    services: { table: "services", route: "services", select: "slug,updated_at" },
+    industries: { table: "industries", route: "industries", select: "slug,updated_at" },
+    "case-studies": { table: "case_studies", route: "case-studies", select: "slug,updated_at" },
+    insights: { table: "blog_posts", route: "insights", select: "slug,updated_at,first_published_at" }
+  };
+  const config = configs[type];
+  const rows = await fetchRows(config.table, {
+    select: config.select,
+    filters: { status: "eq.published", slug: "not.is.null" }
+  });
+  return rows
+    .filter((row) => /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(row.slug || ""))
+    .map((row) => ({
+      path: `/${config.route}/${row.slug}`,
+      lastmod: toDate(row.updated_at || row.first_published_at)
+    }));
+}
+
+function sendXml(res, xml, cache = 3600) {
+  res.setHeader("Content-Type", "application/xml; charset=utf-8");
+  res.setHeader("X-Robots-Tag", "noindex");
+  res.setHeader("Cache-Control", `public, max-age=0, s-maxage=${cache}, stale-while-revalidate=86400`);
+  res.status(200).send(xml);
 }
 
 module.exports = async (req, res) => {
-  let services = [], industries = [], caseStudies = [], posts = [];
-  try {
-    [services, industries, caseStudies, posts] = await Promise.all([
-      fetchTable("services", "slug,updated_at"),
-      fetchTable("industries", "slug,updated_at"),
-      fetchTable("case_studies", "slug,updated_at"),
-      fetchTable("blog_posts", "slug,updated_at,first_published_at")
-    ]);
-  } catch (error) {
-    console.error("sitemap: failed to fetch dynamic content", error);
+  const type = String(req.query.type || "");
+
+  if (!type) {
+    const now = new Date().toISOString().slice(0, 10);
+    const items = [...TYPES].map((name) => [
+      "  <sitemap>",
+      `    <loc>${SITE_URL}/sitemaps/${name}.xml</loc>`,
+      `    <lastmod>${now}</lastmod>`,
+      "  </sitemap>"
+    ].join("\n"));
+    sendXml(res, `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${items.join("\n")}\n</sitemapindex>\n`, 900);
+    return;
   }
 
-  const entries = [
-    ...STATIC_PATHS.map((item) => urlEntry(`${SITE_URL}${item.path}`, undefined, item.priority)),
-    ...locationPaths().map((path) => urlEntry(`${SITE_URL}${path}`, undefined, path.includes("/services/") ? "0.6" : "0.5")),
-    ...services.map((s) => urlEntry(`${SITE_URL}/services/${s.slug}`, toDate(s.updated_at), "0.8")),
-    ...industries.map((i) => urlEntry(`${SITE_URL}/industry-detail?slug=${i.slug}`, toDate(i.updated_at), "0.6")),
-    ...caseStudies.map((c) => urlEntry(`${SITE_URL}/case-study-detail?slug=${c.slug}`, toDate(c.updated_at), "0.6")),
-    ...posts.map((b) => urlEntry(`${SITE_URL}/insights-post?slug=${b.slug}`, toDate(b.updated_at || b.first_published_at), "0.6"))
-  ];
+  if (!TYPES.has(type)) {
+    res.status(404).send("Unknown sitemap");
+    return;
+  }
 
-  const xml = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + entries.join("\n") + "\n</urlset>\n";
-  res.setHeader("Content-Type", "application/xml; charset=utf-8");
-  res.setHeader("Cache-Control", "public, max-age=0, s-maxage=3600, stale-while-revalidate=86400");
-  res.status(200).send(xml);
+  try {
+    let entries;
+    if (type === "static") entries = STATIC_PATHS;
+    else if (type === "locations") entries = locationEntries();
+    else entries = await dynamicEntries(type);
+
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${entries.map((entry) => urlEntry(entry.path, entry.lastmod)).join("\n")}\n</urlset>\n`;
+    sendXml(res, xml);
+  } catch (error) {
+    console.error("sitemap generation failed", { type, message: error.message });
+    res.status(503).setHeader("Retry-After", "300").send("Sitemap temporarily unavailable");
+  }
 };
