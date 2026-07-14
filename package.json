@@ -5,7 +5,8 @@
   "private": true,
   "scripts": {
     "build:jam": "esbuild scripts/jam-metadata-entry.js --bundle --format=esm --platform=browser --target=es2020 --outfile=frontend/assets/js/jam-metadata.js",
-    "build": "npm run build:jam && node scripts/inject-jam.js"
+    "build:seo": "node scripts/inject-seo.js",
+    "build": "npm run build:jam && node scripts/inject-jam.js && npm run build:seo"
   },
   "dependencies": {
     "@jam.dev/sdk": "^1.0.1",
