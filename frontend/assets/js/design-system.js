@@ -18,7 +18,9 @@
   function upgradeFaqList(list) {
     if (!list || list.dataset.faqSystem === "true") return;
     list.dataset.faqSystem = "true";
+    if (!list.id) list.id = `faq-list-${Math.random().toString(36).slice(2, 9)}`;
     const items = Array.from(list.querySelectorAll(":scope > .faq-item"));
+    const buttons = [];
 
     const setOpen = (target, open) => {
       items.forEach((item) => {
@@ -28,6 +30,7 @@
         item.classList.toggle("open", active);
         button?.setAttribute("aria-expanded", String(active));
         panel?.setAttribute("aria-hidden", String(!active));
+        panel?.toggleAttribute("inert", !active);
       });
     };
 
@@ -37,8 +40,8 @@
       if (!original || !panel) return;
 
       const number = String(index + 1).padStart(2, "0");
-      const buttonId = original.id || `faq-question-${Math.random().toString(36).slice(2, 9)}`;
-      const panelId = panel.id || `${buttonId}-answer`;
+      const buttonId = original.id || `${list.id}-question-${index + 1}`;
+      const panelId = panel.id || `${list.id}-answer-${index + 1}`;
       const button = original.cloneNode(false);
       button.className = original.className;
       button.type = "button";
@@ -54,8 +57,21 @@
       panel.setAttribute("role", "region");
       panel.setAttribute("aria-labelledby", buttonId);
       panel.setAttribute("aria-hidden", String(!item.classList.contains("open")));
+      panel.toggleAttribute("inert", !item.classList.contains("open"));
 
       button.addEventListener("click", () => setOpen(item, !item.classList.contains("open")));
+      button.addEventListener("keydown", (event) => {
+        const current = buttons.indexOf(button);
+        let next = current;
+        if (event.key === "ArrowDown") next = (current + 1) % items.length;
+        else if (event.key === "ArrowUp") next = (current - 1 + items.length) % items.length;
+        else if (event.key === "Home") next = 0;
+        else if (event.key === "End") next = items.length - 1;
+        else return;
+        event.preventDefault();
+        buttons[next]?.focus();
+      });
+      buttons.push(button);
     });
   }
 
@@ -64,10 +80,12 @@
     tablist.dataset.tabSystem = "true";
     const tabs = Array.from(tablist.querySelectorAll('[role="tab"]'));
     if (!tabs.length) return;
+    if (!tablist.hasAttribute("aria-orientation")) tablist.setAttribute("aria-orientation", "horizontal");
 
-    const activate = (index, moveFocus = false) => {
+    const activate = (index, moveFocus = false, userInitiated = false) => {
       tabs.forEach((tab, tabIndex) => {
         const active = index === tabIndex;
+        if (tab instanceof HTMLButtonElement) tab.type = "button";
         tab.setAttribute("aria-selected", String(active));
         tab.tabIndex = active ? 0 : -1;
         const panel = document.getElementById(tab.getAttribute("aria-controls") || "");
@@ -78,11 +96,18 @@
         }
       });
       if (moveFocus) tabs[index]?.focus();
+      if (userInitiated) {
+        tablist.dispatchEvent(new CustomEvent("xtradite:tabchange", { bubbles: true, detail: { index, tab: tabs[index] } }));
+      }
     };
 
     let selected = tabs.findIndex((tab) => tab.getAttribute("aria-selected") === "true");
     if (selected < 0) selected = 0;
     activate(selected);
+
+    tabs.forEach((tab, index) => {
+      tab.addEventListener("click", () => activate(index, false, true));
+    });
 
     tablist.addEventListener("keydown", (event) => {
       const current = tabs.indexOf(document.activeElement);
@@ -94,8 +119,18 @@
       else if (event.key === "End") next = tabs.length - 1;
       else return;
       event.preventDefault();
-      activate(next, true);
+      activate(next, true, true);
     });
+  }
+
+  function closeMegaItem(item, returnFocus = false) {
+    if (!item) return;
+    const trigger = item.querySelector(":scope > .mega-nav-trigger");
+    const panel = item.querySelector(":scope > .mega-menu-panel");
+    item.classList.remove("is-open");
+    trigger?.setAttribute("aria-expanded", "false");
+    panel?.setAttribute("aria-hidden", "true");
+    if (returnFocus) trigger?.focus();
   }
 
   function hardenMegaMenu() {
@@ -107,12 +142,14 @@
 
     document.addEventListener("keydown", (event) => {
       if (event.key !== "Escape") return;
-      nav.querySelectorAll(".mega-nav-item.is-open").forEach((item) => {
-        item.classList.remove("is-open");
-        item.querySelector(":scope > .mega-nav-trigger")?.setAttribute("aria-expanded", "false");
-        item.querySelector(":scope > .mega-menu-panel")?.setAttribute("aria-hidden", "true");
-      });
+      const openItems = Array.from(nav.querySelectorAll(".mega-nav-item.is-open"));
+      openItems.forEach((item, index) => closeMegaItem(item, index === openItems.length - 1));
     });
+
+    nav.addEventListener("focusout", () => requestAnimationFrame(() => {
+      if (nav.contains(document.activeElement)) return;
+      nav.querySelectorAll(".mega-nav-item.is-open").forEach((item) => closeMegaItem(item));
+    }));
   }
 
   function prepare(root = document) {
