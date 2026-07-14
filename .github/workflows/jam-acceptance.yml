@@ -51,6 +51,9 @@ jobs:
       - name: Run eight-viewport, interaction and reduced-motion suite
         run: node scripts/run-jam-acceptance.mjs
 
+      - name: Capture complete menu and technology evidence
+        run: node scripts/capture-jam-required-screenshots.mjs
+
       - name: Run keyboard, contrast and touch-target suite
         run: node scripts/run-jam-accessibility.mjs
 
