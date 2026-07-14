@@ -175,3 +175,5 @@ The Supabase adviser review identified existing informational or warning-level i
 ## Release status
 
 The programme, all six child issues and pull request #63 are complete and merged. The GitHub acceptance suite is green. The production release is tracked against the latest `main` commit created by this record update.
+
+Production was re-triggered on 14 July 2026 after Jam recording `04988f0a-03dd-4377-8e23-665190d94bdf` showed that the live deployment was still serving the pre-merge template and desktop interaction bundle.
