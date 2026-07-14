@@ -5,6 +5,7 @@ const frontendDirectory = path.join(__dirname, "..", "frontend");
 const teamMarker = 'name="jam:team"';
 const metadataMarker = 'src="/assets/js/jam-metadata.js"';
 const designSystemMarker = 'src="/assets/js/design-system.js"';
+const brandResilienceMarker = 'src="/assets/js/brand-resilience.js"';
 
 const jamHead = `
   <meta name="jam:team" content="e8e1b81a-519b-40e4-9720-4d2182dbc6da" />
@@ -73,7 +74,10 @@ for (const file of filesRecursively(frontendDirectory, /\.(?:html?|css|js)$/i)) 
     else if (!output.includes(metadataMarker)) output = output.replace(/<\/head>/i, `  <script type="module" src="/assets/js/jam-metadata.js"></script>\n</head>`);
     const styles = styleBlockFor(output);
     if (styles) output = output.replace(/<\/head>/i, `${styles}\n</head>`);
-    if (!output.includes(designSystemMarker)) output = output.replace(/<\/body>/i, `  <script src="/assets/js/design-system.js" defer></script>\n</body>`);
+    const sharedScripts = [];
+    if (!output.includes(brandResilienceMarker)) sharedScripts.push('  <script src="/assets/js/brand-resilience.js" defer></script>');
+    if (!output.includes(designSystemMarker)) sharedScripts.push('  <script src="/assets/js/design-system.js" defer></script>');
+    if (sharedScripts.length) output = output.replace(/<\/body>/i, `${sharedScripts.join("\n")}\n</body>`);
   }
 
   if (output === source) { unchanged += 1; continue; }
