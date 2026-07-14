@@ -1,6 +1,6 @@
 # Jam refinement implementation and acceptance map
 
-This document maps GitHub issues #57–#62 to the completed implementation on `feat/jam-work-packages-57-62`. Pull request #63 remains unmerged for review.
+This document maps GitHub issues #57–#62 to the completed implementation merged through pull request #63 into `main` as commit `5f416ff85843a989ae0a3474326cedfcca279cd9`.
 
 ## #57 — Global typography, layout stability and shared CSS loading
 
@@ -122,7 +122,7 @@ The suite covers homepage, service, case-study, case-studies index and industry 
 
 ## Final acceptance results
 
-Exact tested commit: `1b44feaa5c8cb4bfa6ea2c92f06741958a5ae66e`
+Exact tested implementation commit: `1b44feaa5c8cb4bfa6ea2c92f06741958a5ae66e`
 
 GitHub Actions run: `29304413940`
 
@@ -160,15 +160,11 @@ Required screenshots include:
 
 ## Vercel acceptance
 
-The branch preview reached `READY` at implementation commit `b431419caa6b32b0d0388d6150430e8ce6dd668c`:
-
-`https://xtradite-website-a1v73712u-xtradite.vercel.app`
-
-The homepage and representative service routes returned HTTP 200 with the build-injected critical CSS present in the original HTML. Later pushes containing the final mobile-navigation inert fix and acceptance evidence were rejected by Vercel's account build-rate limiter. The exact final head was therefore validated through the same production build command and complete Playwright matrix in GitHub Actions rather than a second Vercel deployment.
+The branch preview reached `READY` and the homepage and representative service routes returned HTTP 200 with build-injected critical CSS present in the original HTML. This merged documentation update was committed to `main` to trigger the production release after the earlier account build-rate limit.
 
 ## Supabase changes and advisers
 
-No new destructive database change is introduced by PR #63. The additive technology-use-case migration was applied previously and remains the source for service technology examples.
+No new destructive database change was introduced by PR #63. The additive technology-use-case migration was applied previously and remains the source for service technology examples.
 
 The Supabase adviser review identified existing informational or warning-level items rather than migration failures:
 
@@ -176,6 +172,6 @@ The Supabase adviser review identified existing informational or warning-level i
 - Some public delivery tables and views are exposed through read-only roles for website delivery.
 - Several indexes are currently reported as unused, including the new service-technology index; these should be reassessed after production traffic rather than removed before launch.
 
-## Known limitation
+## Release status
 
-The final GitHub head does not have its own Vercel preview because of the platform build-rate limit. No source, build, browser, accessibility or Supabase migration failure remains. Pull request #63 is review-ready and intentionally unmerged.
+The programme, all six child issues and pull request #63 are complete and merged. The GitHub acceptance suite is green. The production release is tracked against the latest `main` commit created by this record update.
