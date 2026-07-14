@@ -19,6 +19,19 @@ import { refineServiceTemplate } from "./service-template-v3.js";
 const root = document.getElementById("service-detail-root");
 const notFound = document.getElementById("not-found");
 const slug = window.__CONTENT_SLUG__ || getSlugParam();
+const PUBLIC_SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+function isEligibleRelatedCaseStudy(item) {
+  return item?.status === "published" && PUBLIC_SLUG.test(item.slug || "") && Boolean(item.client);
+}
+
+function isEligibleRelatedPost(item, now = new Date()) {
+  const publicationDate = new Date(item?.firstPublishedDate || item?.firstPublishedAt || "");
+  return item?.status === "published"
+    && PUBLIC_SLUG.test(item.slug || "")
+    && Number.isFinite(publicationDate.getTime())
+    && publicationDate.getTime() <= now.getTime();
+}
 
 function ensureContentArchitectureStyles() {
   const styles = [
@@ -162,32 +175,19 @@ async function load() {
   enhanceServiceExperience(item);
   refineServiceTemplate(item);
 
-  const relatedCaseStudy = item.relatedCaseStudies?.[0];
-  const relatedSlug = relatedCaseStudy?.slug;
-  if (relatedSlug) {
-    try {
-      const cs = relatedCaseStudy;
-      const relatedWrap = document.getElementById("related-case-study");
-      if (cs && relatedWrap) {
-        relatedWrap.innerHTML = `<span class="eyebrow">Related Case Study</span><h3>${escapeHtml(cs.client)}</h3><p class="card-desc">${escapeHtml(cs.challenge || "")}</p><span class="metric">${escapeHtml(cs.metric || "")}</span><a class="card-link" href="/case-studies/${encodeURIComponent(cs.slug)}">View Case Study <i data-lucide="arrow-right"></i></a>`;
-        relatedWrap.hidden = false;
-      }
-    } catch (e) {
-      console.error(e);
+  const relatedCaseStudy = (item.relatedCaseStudies || []).find(isEligibleRelatedCaseStudy);
+  if (relatedCaseStudy) {
+    const relatedWrap = document.getElementById("related-case-study");
+    if (relatedWrap) {
+      relatedWrap.innerHTML = `<span class="eyebrow">Related Case Study</span><h3>${escapeHtml(relatedCaseStudy.client)}</h3><p class="card-desc">${escapeHtml(relatedCaseStudy.challenge || "")}</p><span class="metric">${escapeHtml(relatedCaseStudy.metric || "")}</span><a class="card-link" href="/case-studies/${encodeURIComponent(relatedCaseStudy.slug)}">View Case Study <i data-lucide="arrow-right"></i></a>`;
+      relatedWrap.hidden = false;
     }
   }
 
-  const relatedPostSlugs = item.relatedBlogPosts || [];
-  if (relatedPostSlugs.length) {
-    try {
-      const posts = relatedPostSlugs;
-      if (posts.length) {
-        document.getElementById("related-insights").innerHTML = posts.map(relatedPostCardHtml).join("");
-        document.getElementById("related-insights-section").hidden = false;
-      }
-    } catch (e) {
-      console.error(e);
-    }
+  const relatedPosts = (item.relatedBlogPosts || []).filter((post) => isEligibleRelatedPost(post));
+  if (relatedPosts.length) {
+    document.getElementById("related-insights").innerHTML = relatedPosts.map(relatedPostCardHtml).join("");
+    document.getElementById("related-insights-section").hidden = false;
   }
 
   root.hidden = false;
@@ -202,3 +202,5 @@ function showNotFound(title, message) {
 }
 
 load();
+
+export { isEligibleRelatedCaseStudy, isEligibleRelatedPost };
