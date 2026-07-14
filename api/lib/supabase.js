@@ -1,5 +1,5 @@
-const SUPABASE_URL = process.env.SUPABASE_URL || "https://bmhkdyshluiloorgnwoy.supabase.co";
-const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY || "sb_publishable_Aj9nCJLFY9aMycZeQ3buTQ_-n-Q7SFK";
+const SUPABASE_URL = process.env.XTRADITE_SUPABASE_URL || "https://bmhkdyshluiloorgnwoy.supabase.co";
+const SUPABASE_KEY = process.env.XTRADITE_SUPABASE_PUBLISHABLE_KEY || "sb_publishable_Aj9nCJLFY9aMycZeQ3buTQ_-n-Q7SFK";
 
 function encode(value) {
   return encodeURIComponent(String(value ?? ""));
@@ -13,7 +13,7 @@ async function fetchRows(table, { select = "*", filters = {}, limit } = {}) {
   if (limit) params.set("limit", String(limit));
 
   const response = await fetch(`${SUPABASE_URL}/rest/v1/${table}?${params.toString()}`, {
-    headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }
+    headers: { apikey: SUPABASE_KEY }
   });
 
   if (!response.ok) {
