@@ -112,18 +112,14 @@ function removeNamedFunction(source, functionName) {
 function removeObsoleteRuntimeRepairs(source, file) {
   if (path.basename(file) !== "site.js") return source;
 
-  let output = source.replace(
-    /\n\s*const currentScript = document\.currentScript;[\s\S]*?new URL\("\/assets\/js\/", window\.location\.origin\);\n/,
-    "\n",
-  );
-  output = removeNamedFunction(output, "loadStylesheet");
+  let output = removeNamedFunction(source, "loadStylesheet");
   output = removeNamedFunction(output, "repairKnownMojibake");
   output = output
     .replace(/^\s*loadStylesheet\([^;]+;\s*$/gm, "")
     .replace(/^\s*repairKnownMojibake\([^;]*\);\s*$/gm, "")
     .replace(/\n{3,}/g, "\n\n");
 
-  if (/loadStylesheet|repairKnownMojibake|\bscriptBase\b/.test(output)) {
+  if (/loadStylesheet|repairKnownMojibake/.test(output)) {
     throw new Error("site.js still contains obsolete runtime CSS or encoding-repair code after preparation");
   }
 
