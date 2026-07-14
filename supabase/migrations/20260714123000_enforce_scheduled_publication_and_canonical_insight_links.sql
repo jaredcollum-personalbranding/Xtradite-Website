@@ -71,6 +71,39 @@ from (values
 ) as planned(slug, planned_at)
 where b.slug = planned.slug;
 
+-- Make the publication gate authoritative at the raw-table boundary as well as in views.
+drop policy if exists "Public read blog_posts" on public.blog_posts;
+create policy "Public read blog_posts"
+on public.blog_posts for select to anon, authenticated
+using (status = 'published' and first_published_at <= now());
+
+drop policy if exists "Public read blog post tags" on public.blog_post_tags;
+create policy "Public read blog post tags"
+on public.blog_post_tags for select to anon, authenticated
+using (exists (
+  select 1
+  from public.blog_posts b
+  where b.id = blog_post_id
+    and b.status = 'published'
+    and b.first_published_at <= now()
+));
+
+drop policy if exists "Public read service blog posts" on public.service_blog_posts;
+create policy "Public read service blog posts"
+on public.service_blog_posts for select to anon, authenticated
+using (
+  exists (
+    select 1 from public.services s
+    where s.id = service_id and s.status = 'published'
+  )
+  and exists (
+    select 1 from public.blog_posts b
+    where b.id = blog_post_id
+      and b.status = 'published'
+      and b.first_published_at <= now()
+  )
+);
+
 -- Preserve the current services_delivery contract, but source related insights from the
 -- publication-gated delivery view so scheduled articles cannot leak into service pages.
 create or replace view public.services_delivery
