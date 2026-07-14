@@ -64,7 +64,7 @@ async function dynamicEntries(type) {
     services: { table: "services", route: "services", select: "slug,updated_at" },
     industries: { table: "industries", route: "industries", select: "slug,updated_at" },
     "case-studies": { table: "case_studies", route: "case-studies", select: "slug,updated_at" },
-    insights: { table: "blog_posts", route: "insights", select: "slug,updated_at,first_published_at" },
+    insights: { table: "blog_posts_delivery", route: "insights", select: "slug,updated_at,first_published_at" },
   };
   const config = configs[type];
   const rows = await fetchRows(config.table, {
