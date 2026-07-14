@@ -9,7 +9,7 @@ const FAVICON = `${SITE_URL}/assets/brand/favicon.svg`;
 
 const PAGE_TYPES = {
   service: {
-    table: "services",
+    table: "services_delivery",
     template: "service-detail.html",
     route: "services",
     parentName: "Services",
@@ -18,7 +18,7 @@ const PAGE_TYPES = {
     pageType: "WebPage"
   },
   industry: {
-    table: "industries",
+    table: "industries_delivery",
     template: "industry-detail.html",
     route: "industries",
     parentName: "Industries",
@@ -27,7 +27,7 @@ const PAGE_TYPES = {
     pageType: "CollectionPage"
   },
   "case-study": {
-    table: "case_studies",
+    table: "case_studies_delivery",
     template: "case-study-detail.html",
     route: "case-studies",
     parentName: "Case Studies",
