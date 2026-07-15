@@ -1,0 +1,52 @@
+name: Validate urgent release candidate
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out release candidate
+        uses: actions/checkout@v4
+
+      - name: Confirm application tree matches approved main commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --exit-code 5e9597d7398a432d2114be6ed44ba0cf2df61e4c -- . ':(exclude).github/workflows/release-validation.yml'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Clean locked dependency installation
+        shell: bash
+        run: |
+          mkdir -p artifacts/release-validation
+          set -o pipefail
+          npm ci --no-audit --no-fund 2>&1 | tee artifacts/release-validation/npm-ci.log
+
+      - name: Run complete production build
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run build 2>&1 | tee artifacts/release-validation/build.log
+
+      - name: Upload validation logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: urgent-release-validation-${{ github.sha }}
+          path: artifacts/release-validation
+          if-no-files-found: warn
+          retention-days: 14
