@@ -6,7 +6,7 @@ const {
   isEligibleLocation,
   isEligibleLocationService,
   isPublicBlogPost,
-} = require("../api/lib/publication-eligibility");
+} = require("../server/publication-eligibility");
 const { PUBLIC_CONTENT_SELECTS, fetchPublishedBySlug } = require("../api/lib/supabase");
 const { buildLocationEntries, normaliseSitemapRows } = require("../api/sitemap");
 const contentPage = require("../api/content-page");
