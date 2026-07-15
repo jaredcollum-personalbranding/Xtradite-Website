@@ -51,9 +51,12 @@ function sitemap() {
 function structuredData() {
   const contentPage = read("api/content-page.js");
   const locationPage = read("api/location.js");
-  const contentLookup = contentPage.indexOf("if (!item)");
-  const contentSchema = contentPage.indexOf("injectSeo(template");
-  const locationLookup = locationPage.indexOf("if (!route)");
+  const contentLookup = contentPage.search(/if\s*\(\s*!item\b/);
+  const contentSchema = Math.max(
+    contentPage.indexOf("injectSeo(primaryHtml"),
+    contentPage.indexOf("injectSeo(template")
+  );
+  const locationLookup = locationPage.search(/if\s*\(\s*!route\b/);
   const locationSchema = locationPage.lastIndexOf("schemas(route, crumbs");
 
   assert.ok(contentLookup >= 0 && contentSchema > contentLookup, "Content JSON-LD must be generated only after public eligibility succeeds");
