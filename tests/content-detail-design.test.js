@@ -4,7 +4,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 
 const { renderPrimaryContent } = require("../api/lib/content-renderer");
-const { enhanceContentDetail } = require("../api/lib/content-detail-enhancer");
+const { enhanceContentDetail } = require("../server/content-detail-enhancer");
 
 const frontend = path.join(__dirname, "..", "frontend");
 const readTemplate = (name) => fs.readFileSync(path.join(frontend, name), "utf8");
