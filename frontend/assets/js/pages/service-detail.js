@@ -14,6 +14,7 @@ import { enhanceServicePage } from "./service-page-enhancements.js";
 const root = document.getElementById("service-detail-root");
 const notFound = document.getElementById("not-found");
 const slug = window.__CONTENT_SLUG__ || getSlugParam();
+const serverRendered = window.__SERVER_RENDERED__ === true;
 const PUBLIC_SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 function isEligibleRelatedCaseStudy(item) {
@@ -79,15 +80,8 @@ function setJsonLd(item, title, description, url) {
     name: title,
     description,
     serviceType: item.category,
-    provider: {
-      "@type": "Organization",
-      name: "Xtradite Digital",
-      url: window.location.origin,
-    },
-    areaServed: {
-      "@type": "Country",
-      name: "United Kingdom",
-    },
+    provider: { "@type": "Organization", name: "Xtradite Digital", url: window.location.origin },
+    areaServed: { "@type": "Country", name: "United Kingdom" },
     url,
   });
   document.head.appendChild(script);
@@ -98,7 +92,6 @@ function applySeo(item) {
   const description = item.seoDescription || item.summary || "";
   const canonicalPath = item.canonicalPath || `/services/${encodeURIComponent(item.slug)}`;
   const url = new URL(canonicalPath, window.location.origin).href;
-
   document.title = title;
   setMetaByName("description", description);
   setMetaByProperty("og:title", item.seoTitle || item.title);
@@ -124,20 +117,23 @@ function renderRelatedCaseStudy(item) {
   const relatedCaseStudy = (item.relatedCaseStudies || []).find(isEligibleRelatedCaseStudy);
   const relatedWrap = document.getElementById("related-case-study");
   if (!relatedCaseStudy || !relatedWrap) return;
-
   const heading = relatedCaseStudy.headline || relatedCaseStudy.client;
   const summary = relatedCaseStudy.challenge || relatedCaseStudy.summary || "Read the related delivery story and the evidence currently available.";
-  relatedWrap.innerHTML = `
-    <span class="eyebrow">Related case study</span>
-    <h3>${escapeHtml(heading)}</h3>
-    <p class="card-desc">${escapeHtml(summary)}</p>
-    <a class="card-link" href="/case-studies/${encodeURIComponent(relatedCaseStudy.slug)}">
-      Read the case study <i data-lucide="arrow-right"></i>
-    </a>`;
+  relatedWrap.innerHTML = `<span class="eyebrow">Related case study</span><h3>${escapeHtml(heading)}</h3><p class="card-desc">${escapeHtml(summary)}</p><a class="card-link" href="/case-studies/${encodeURIComponent(relatedCaseStudy.slug)}">Read the case study <i data-lucide="arrow-right"></i></a>`;
   relatedWrap.hidden = false;
 }
 
+function enhanceServerRenderedPage() {
+  if (root) root.hidden = false;
+  enhanceServicePage();
+  renderIcons();
+}
+
 async function load() {
+  if (serverRendered) {
+    enhanceServerRenderedPage();
+    return;
+  }
   if (!slug) return showNotFound();
 
   let item;
@@ -145,16 +141,11 @@ async function load() {
     item = await getItemBySlug("services_delivery", "slug", slug);
   } catch (error) {
     console.error(error);
-    return showNotFound(
-      "Couldn't load this page",
-      "We couldn't reach the live content service. Please refresh, or try again in a moment.",
-    );
+    return showNotFound("Couldn't load this page", "We couldn't reach the live content service. Please refresh, or try again in a moment.");
   }
-
   if (!item) return showNotFound();
 
   applySeo(item);
-
   document.getElementById("breadcrumb-current").textContent = item.title;
   document.getElementById("service-icon").setAttribute("data-lucide", item.icon || "circle");
   document.getElementById("service-eyebrow").textContent = item.category || "Service";
@@ -168,30 +159,20 @@ async function load() {
 
   const hasAudience = renderList("service-who-its-for", item.whoItsFor);
   const hasInclusions = renderList("service-what-included", item.whatIncluded);
-  if (hasAudience || hasInclusions) {
-    document.getElementById("who-what-section").hidden = false;
-  }
+  if (hasAudience || hasInclusions) document.getElementById("who-what-section").hidden = false;
 
   if (item.deliverables?.length) {
     document.getElementById("service-deliverables").innerHTML = deliverableListHtml(item.deliverables);
     document.getElementById("deliverables-section").hidden = false;
   }
-
   if (item.howItWorks?.length) {
     document.getElementById("service-how-it-works").innerHTML = timelineHtml(item.howItWorks);
     document.getElementById("how-it-works-section").hidden = false;
   }
-
   if (item.technologyExamples?.length) {
     const technologySection = document.getElementById("tech-section");
     const technologyGrid = document.getElementById("service-tech-grid");
-    technologyGrid.innerHTML = item.technologyExamples.map((example) => `
-      <article class="card service-technology-example">
-        <span class="eyebrow">${escapeHtml(example.category || "Workflow example")}</span>
-        <h3>${escapeHtml(example.useCase || "Technology-supported workflow")}</h3>
-        <p>${escapeHtml(example.explanation || "Compatible tools are selected according to the agreed workflow and evidence requirements.")}</p>
-        ${(example.technologies || []).length ? `<p class="service-technology-products">${escapeHtml(example.technologies.map((technology) => technology.name).join(" · "))}</p>` : ""}
-      </article>`).join("");
+    technologyGrid.innerHTML = item.technologyExamples.map((example) => `<article class="card service-technology-example"><span class="eyebrow">${escapeHtml(example.category || "Workflow example")}</span><h3>${escapeHtml(example.useCase || "Technology-supported workflow")}</h3><p>${escapeHtml(example.explanation || "Compatible tools are selected according to the agreed workflow and evidence requirements.")}</p>${(example.technologies || []).length ? `<p class="service-technology-products">${escapeHtml(example.technologies.map((technology) => technology.name).join(" · "))}</p>` : ""}</article>`).join("");
     technologySection.hidden = false;
   } else if (item.techCategories?.length) {
     document.getElementById("service-tech-grid").innerHTML = techLogoGridHtml(item.techCategories);
@@ -199,16 +180,13 @@ async function load() {
   }
 
   renderRelatedCaseStudy(item);
-
   const relatedPosts = (item.relatedBlogPosts || []).filter((post) => isEligibleRelatedPost(post));
   if (relatedPosts.length) {
     document.getElementById("related-insights").innerHTML = relatedPosts.map(relatedPostCardHtml).join("");
     document.getElementById("related-insights-section").hidden = false;
   }
-
   if (item.faqs?.length) {
-    const faqWrap = document.getElementById("service-faq");
-    faqWrap.innerHTML = faqListHtml(item.faqs);
+    document.getElementById("service-faq").innerHTML = faqListHtml(item.faqs);
     document.getElementById("faq-section").hidden = false;
   }
 
@@ -225,5 +203,4 @@ function showNotFound(title, message) {
 }
 
 load();
-
 export { isEligibleRelatedCaseStudy, isEligibleRelatedPost };
