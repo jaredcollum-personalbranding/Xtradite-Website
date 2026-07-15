@@ -19,7 +19,7 @@ function lint() {
   const locationCatalogue = read("api/lib/location-catalogue.js");
   const browserCms = read("frontend/assets/js/cms.js");
   const migration = read("supabase/migrations/20260714140225_gold_seal_publication_controls.sql");
-  const deliverySecurity = read("supabase/migrations/20260715015000_harden_public_delivery_views.sql");
+  const deliverySecurity = read("supabase/migrations/20260715015215_harden_public_delivery_views.sql");
 
   requireText(serverSupabase, /PUBLIC_CONTENT_SELECTS/, "Server public field allowlists are required");
   requireText(browserCms, /PUBLIC_SELECTS/, "Browser public field allowlists are required");
@@ -68,7 +68,7 @@ function structuredData() {
 
 function migration() {
   const source = read("supabase/migrations/20260714140225_gold_seal_publication_controls.sql");
-  const deliverySecurity = read("supabase/migrations/20260715015000_harden_public_delivery_views.sql");
+  const deliverySecurity = read("supabase/migrations/20260715015215_harden_public_delivery_views.sql");
   [
     /publication_is_effective/,
     /is_indexable boolean not null default false/,
