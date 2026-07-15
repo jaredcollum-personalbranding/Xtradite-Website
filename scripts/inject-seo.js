@@ -72,7 +72,7 @@ function primaryEntity(filePath, title, description, canonical) {
 }
 
 function pageTypeFor(relative) {
-  if (relative === "about.html") return "AboutPage";
+  if (relative === "about.html") return ["AboutPage", "ProfilePage"];
   if (relative === "contact.html") return "ContactPage";
   if (["industries.html", "case-studies.html", "insights.html", "services.html"].includes(relative)) return "CollectionPage";
   if (relative === "legal/privacy.html") return "PrivacyPolicy";
