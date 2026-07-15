@@ -3,7 +3,7 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 
-const { renderPrimaryContent } = require("../api/lib/content-renderer");
+const { renderPrimaryContent, insightBody } = require("../api/lib/content-renderer");
 const { buildGraph, primaryEntityFor, additionalEntitiesFor, PERSON_ID, ORGANISATION_ID } = require("../api/lib/schema");
 const { injectSeo } = require("../api/content-page");
 
@@ -126,6 +126,24 @@ test("insight raw HTML includes author, publication date and body before JavaScr
   const article = graph["@graph"].find((entity) => entity["@type"] === "BlogPosting");
   assert.equal(article.author["@id"], PERSON_ID);
   assert.equal(article.publisher["@id"], ORGANISATION_ID);
+});
+
+test("insight renderer falls back to content_text when rich_content is Ricos JSON", () => {
+  const item = {
+    slug: "ricos-example",
+    title: "Ricos Example",
+    excerpt: "Fallback excerpt.",
+    rich_content: { nodes: [{ type: "PARAGRAPH", nodes: [] }] },
+    content_text: "Readable article text from the governed fallback.",
+    first_published_at: "2026-07-01T09:00:00.000Z"
+  };
+
+  assert.equal(insightBody(item), "Readable article text from the governed fallback.");
+  assert.equal(insightBody({ ...item, rich_content: "<p>Prepared HTML article.</p>" }), "<p>Prepared HTML article.</p>");
+
+  const html = render("insight", item, "insights-post.html", "insights", "Insights");
+  assert.match(html, /Readable article text from the governed fallback/);
+  assert.doesNotMatch(html, /\[object Object\]/);
 });
 
 test("structured graph has unique IDs and no unsupported review, rating or LocalBusiness claims", () => {
