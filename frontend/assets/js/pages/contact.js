@@ -9,8 +9,8 @@ if (form && topic) {
 }
 
 if (form) {
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
     const submitBtn = form.querySelector("button[type=submit]");
     const fields = {
       name: form.name.value.trim(),
@@ -22,12 +22,19 @@ if (form) {
     status.textContent = "Sending…";
     submitBtn.disabled = true;
     try {
-      await submitContactForm(fields);
+      const result = await submitContactForm(fields);
       status.className = "form-status success";
       status.textContent = "Thanks — we'll be in touch shortly.";
+      window.dispatchEvent(new CustomEvent("xtradite:form-submitted", {
+        detail: {
+          placement: "contact_form",
+          destination: "backend_confirmed",
+          submissionId: result?.id || result?.submissionId || undefined
+        }
+      }));
       form.reset();
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+      console.error(error);
       status.className = "form-status error";
       status.textContent = "Something went wrong sending your message — please email us directly or try again in a moment.";
     } finally {
