@@ -1,7 +1,8 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const { fetchPublishedBySlug, publicSelectFor } = require("./lib/supabase");
-const { SITE_URL, buildGraph, primaryEntityFor } = require("./lib/schema");
+const { SITE_URL, buildGraph, primaryEntityFor, additionalEntitiesFor } = require("./lib/schema");
+const { renderPrimaryContent } = require("./lib/content-renderer");
 
 const SOCIAL_IMAGE = `${SITE_URL}/assets/brand/xtradite-social-share.svg`;
 const SOCIAL_IMAGE_ALT = "Xtradite Digital — practical consultancy for measurable growth";
@@ -76,6 +77,7 @@ function injectSeo(html, { type, item, config, canonical, title, description, ro
     description,
     pageType: config.pageType,
     primaryEntity: primary,
+    additionalEntities: additionalEntitiesFor(type, item, canonical),
     breadcrumbItems: [
       { name: "Home", url: `${SITE_URL}/` },
       { name: config.parentName, url: `${SITE_URL}/${config.route}` },
@@ -105,7 +107,7 @@ function injectSeo(html, { type, item, config, canonical, title, description, ro
   output = replaceOrInsert(output, /<meta\s+name=["']twitter:image["'][^>]*>/i, `<meta name="twitter:image" content="${escapeHtml(socialImage)}">`);
   output = replaceOrInsert(output, /<meta\s+name=["']twitter:image:alt["'][^>]*>/i, `<meta name="twitter:image:alt" content="${SOCIAL_IMAGE_ALT}">`);
   output = output.replace(/<script[^>]*type=["']application\/ld\+json["'][^>]*>[\s\S]*?<\/script>\s*/gi, "");
-  output = output.replace(/<\/head>/i, `<script>window.__CONTENT_SLUG__=${JSON.stringify(item.slug)};</script>\n<script id="xd-schema-graph" data-schema="server" type="application/ld+json">${JSON.stringify(graph).replace(/</g, "\\u003c")}</script>\n</head>`);
+  output = output.replace(/<\/head>/i, `<script>window.__CONTENT_SLUG__=${JSON.stringify(item.slug)};window.__SERVER_RENDERED__=true;</script>\n<script id="xd-schema-graph" data-schema="server" type="application/ld+json">${JSON.stringify(graph).replace(/</g, "\\u003c")}</script>\n</head>`);
   return output;
 }
 
@@ -137,7 +139,8 @@ module.exports = async (req, res) => {
     const description = config.description(item);
     const robots = robotsFor(item);
     const template = fs.readFileSync(path.join(process.cwd(), "frontend", config.template), "utf8");
-    const html = injectSeo(template, { type, item, config, canonical, title, description, robots });
+    const primaryHtml = renderPrimaryContent(type, item, template);
+    const html = injectSeo(primaryHtml, { type, item, config, canonical, title, description, robots });
 
     res.setHeader("Content-Type", "text/html; charset=utf-8");
     res.setHeader("X-Robots-Tag", robots);

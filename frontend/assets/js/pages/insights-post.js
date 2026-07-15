@@ -5,6 +5,7 @@ import { escapeHtml, relatedPostCardHtml, tagLinksHtml, renderIcons, openLightbo
 const root = document.getElementById("post-root");
 const notFound = document.getElementById("not-found");
 const slug = window.__CONTENT_SLUG__ || getSlugParam();
+const serverRendered = window.__SERVER_RENDERED__ === true;
 
 function formatDate(iso) {
   if (!iso) return "";
@@ -13,34 +14,34 @@ function formatDate(iso) {
 
 function setMetaByName(name, content) {
   if (!content) return;
-  let el = document.querySelector(`meta[name="${name}"]`);
-  if (!el) {
-    el = document.createElement("meta");
-    el.setAttribute("name", name);
-    document.head.appendChild(el);
+  let element = document.querySelector(`meta[name="${name}"]`);
+  if (!element) {
+    element = document.createElement("meta");
+    element.setAttribute("name", name);
+    document.head.appendChild(element);
   }
-  el.setAttribute("content", content);
+  element.setAttribute("content", content);
 }
 
 function setMetaByProperty(property, content) {
   if (!content) return;
-  let el = document.querySelector(`meta[property="${property}"]`);
-  if (!el) {
-    el = document.createElement("meta");
-    el.setAttribute("property", property);
-    document.head.appendChild(el);
+  let element = document.querySelector(`meta[property="${property}"]`);
+  if (!element) {
+    element = document.createElement("meta");
+    element.setAttribute("property", property);
+    document.head.appendChild(element);
   }
-  el.setAttribute("content", content);
+  element.setAttribute("content", content);
 }
 
 function setCanonical(href) {
-  let el = document.querySelector('link[rel="canonical"]');
-  if (!el) {
-    el = document.createElement("link");
-    el.setAttribute("rel", "canonical");
-    document.head.appendChild(el);
+  let element = document.querySelector('link[rel="canonical"]');
+  if (!element) {
+    element = document.createElement("link");
+    element.setAttribute("rel", "canonical");
+    document.head.appendChild(element);
   }
-  el.setAttribute("href", href);
+  element.setAttribute("href", href);
 }
 
 function setJsonLd(post, title, description, url) {
@@ -54,8 +55,8 @@ function setJsonLd(post, title, description, url) {
     description,
     datePublished: post.firstPublishedDate,
     dateModified: post.updatedAt || post.firstPublishedDate,
-    author: { "@type": "Organization", name: "Xtradite Digital" },
-    publisher: { "@type": "Organization", name: "Xtradite Digital" },
+    author: { "@type": "Person", "@id": "https://www.xtradite-digital.co.uk/about/#jared-collum", name: "Jared Collum" },
+    publisher: { "@type": "Organization", "@id": "https://www.xtradite-digital.co.uk/#organisation", name: "Xtradite Digital" },
     keywords: (post.tags || []).join(", ") || undefined,
     mainEntityOfPage: url,
   });
@@ -66,7 +67,6 @@ function applySeo(post) {
   const title = `${post.seoTitle || post.title} — Xtradite Digital Insights`;
   const description = post.seoDescription || post.excerpt || "";
   const url = `${window.location.origin}/insights/${encodeURIComponent(post.slug)}`;
-
   document.title = title;
   setMetaByName("description", description);
   setMetaByProperty("og:title", post.seoTitle || post.title);
@@ -81,53 +81,49 @@ function applySeo(post) {
 }
 
 async function load() {
+  if (serverRendered) {
+    if (root) root.hidden = false;
+    renderIcons();
+    return;
+  }
   if (!slug) return showNotFound();
   const post = await getPostBySlug(slug);
   if (!post) return showNotFound();
 
   applySeo(post);
-
   document.getElementById("post-title").textContent = post.title;
   document.getElementById("post-date").textContent = formatDate(post.firstPublishedDate);
-  const readTimeEl = document.getElementById("post-read-time");
-  if (post.minutesToRead) {
-    readTimeEl.textContent = `${post.minutesToRead} min read`;
-  } else {
-    readTimeEl.remove();
-  }
+  const readTimeElement = document.getElementById("post-read-time");
+  if (post.minutesToRead) readTimeElement.textContent = `${post.minutesToRead} min read`;
+  else readTimeElement.remove();
 
-  const tagsEl = document.getElementById("post-tags");
-  if (tagsEl) tagsEl.innerHTML = tagLinksHtml(post.tags);
+  const tagsElement = document.getElementById("post-tags");
+  if (tagsElement) tagsElement.innerHTML = tagLinksHtml(post.tags);
 
   const coverWrap = document.getElementById("post-cover-wrap");
   if (coverWrap && post.coverImageUrl) {
     const coverAlt = `Whiteboard summary diagram: ${post.title}`;
-    coverWrap.innerHTML = `
-      <button type="button" class="post-cover" aria-label="Expand full-size diagram">
-        <img src="${escapeHtml(post.coverImageUrl)}" alt="${escapeHtml(coverAlt)}" loading="eager">
-        <span class="post-cover-expand"><i data-lucide="maximize-2"></i><span>View full size</span></span>
-      </button>`;
+    coverWrap.innerHTML = `<button type="button" class="post-cover" aria-label="Expand full-size diagram"><img src="${escapeHtml(post.coverImageUrl)}" alt="${escapeHtml(coverAlt)}" loading="eager"><span class="post-cover-expand"><i data-lucide="maximize-2"></i><span>View full size</span></span></button>`;
     coverWrap.querySelector(".post-cover").addEventListener("click", () => openLightbox(post.coverImageUrl, coverAlt));
   }
 
-  const bodyEl = document.getElementById("post-body");
+  const bodyElement = document.getElementById("post-body");
   const rendered = renderRicos(post.richContent);
-  bodyEl.innerHTML = rendered || renderPlainText(post.contentText) || `<p>${escapeHtml(post.excerpt || "")}</p>`;
+  bodyElement.innerHTML = rendered || renderPlainText(post.contentText) || `<p>${escapeHtml(post.excerpt || "")}</p>`;
 
   const relatedWrap = document.getElementById("related-posts");
   if (relatedWrap) {
     try {
       const { posts } = await queryPosts({ limit: 20 });
-      const others = posts.filter((p) => p.slug !== post.slug);
-      const sameTag = others.filter((p) => (p.tags || []).some((t) => (post.tags || []).includes(t)));
-      const rest = others.filter((p) => !sameTag.includes(p));
-      const related = [...sameTag, ...rest].slice(0, 2);
+      const others = posts.filter((candidate) => candidate.slug !== post.slug);
+      const sameTag = others.filter((candidate) => (candidate.tags || []).some((tag) => (post.tags || []).includes(tag)));
+      const related = [...sameTag, ...others.filter((candidate) => !sameTag.includes(candidate))].slice(0, 2);
       if (related.length) {
         relatedWrap.innerHTML = related.map(relatedPostCardHtml).join("");
         relatedWrap.parentElement.hidden = false;
       }
-    } catch (e) {
-      console.error(e); // non-critical — related posts are a bonus, not core content
+    } catch (error) {
+      console.error(error);
     }
   }
 

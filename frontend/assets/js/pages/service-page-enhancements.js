@@ -1,4 +1,5 @@
 const DESKTOP_QUERY = "(min-width: 901px)";
+const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
 
 function enhanceFaq(root) {
   const items = Array.from(root.querySelectorAll(".faq-item"));
@@ -65,7 +66,7 @@ function enhanceFaq(root) {
 }
 
 function enhanceTimeline(root) {
-  const steps = Array.from(root.querySelectorAll(".timeline-step"));
+  const steps = Array.from(root.querySelectorAll(".timeline-step, .timeline-list > li"));
   if (!steps.length || root.dataset.enhanced === "true") return;
   root.dataset.enhanced = "true";
   root.classList.add("service-process");
@@ -74,8 +75,10 @@ function enhanceTimeline(root) {
   const buttons = [];
 
   steps.forEach((step, index) => {
-    const number = step.querySelector(".step-num")?.textContent?.trim() || String(index + 1).padStart(2, "0");
-    const title = step.querySelector("h4")?.textContent?.trim() || `Step ${index + 1}`;
+    const number = step.querySelector(".step-num")?.textContent?.trim()
+      || step.querySelector(":scope > span")?.textContent?.trim()
+      || String(index + 1).padStart(2, "0");
+    const title = step.querySelector("h4,h3")?.textContent?.trim() || `Step ${index + 1}`;
     const description = step.querySelector("p")?.textContent?.trim() || "";
     const buttonId = `service-process-trigger-${index}`;
     const panelId = `service-process-panel-${index}`;
@@ -130,7 +133,13 @@ function enhanceTimeline(root) {
     observer?.disconnect();
     observer = null;
     activate(0);
-    if (!window.matchMedia(DESKTOP_QUERY).matches || window.matchMedia("(prefers-reduced-motion: reduce)").matches || !("IntersectionObserver" in window)) return;
+
+    const desktop = window.matchMedia(DESKTOP_QUERY).matches;
+    const reducedMotion = window.matchMedia(REDUCED_MOTION_QUERY).matches;
+    const manual = !desktop || reducedMotion || !("IntersectionObserver" in window);
+    root.dataset.deliveryMode = manual ? "manual" : "observed";
+    if (manual) return;
+
     observer = new IntersectionObserver((entries) => {
       const visible = entries.filter((entry) => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
       if (!visible) return;
@@ -141,7 +150,7 @@ function enhanceTimeline(root) {
   };
 
   window.matchMedia(DESKTOP_QUERY).addEventListener?.("change", configure);
-  window.matchMedia("(prefers-reduced-motion: reduce)").addEventListener?.("change", configure);
+  window.matchMedia(REDUCED_MOTION_QUERY).addEventListener?.("change", configure);
   configure();
 }
 

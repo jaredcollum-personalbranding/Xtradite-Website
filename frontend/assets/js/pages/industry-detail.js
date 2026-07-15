@@ -4,50 +4,45 @@ import { escapeHtml, renderIcons, getSlugParam } from "../render-helpers.js";
 const root = document.getElementById("industry-detail-root");
 const notFound = document.getElementById("not-found");
 const slug = window.__CONTENT_SLUG__ || getSlugParam();
+const serverRendered = window.__SERVER_RENDERED__ === true;
 
 function setMetaByName(name, content) {
   if (!content) return;
-  let el = document.querySelector(`meta[name="${name}"]`);
-  if (!el) {
-    el = document.createElement("meta");
-    el.setAttribute("name", name);
-    document.head.appendChild(el);
+  let element = document.querySelector(`meta[name="${name}"]`);
+  if (!element) {
+    element = document.createElement("meta");
+    element.setAttribute("name", name);
+    document.head.appendChild(element);
   }
-  el.setAttribute("content", content);
+  element.setAttribute("content", content);
 }
 
 function setMetaByProperty(property, content) {
   if (!content) return;
-  let el = document.querySelector(`meta[property="${property}"]`);
-  if (!el) {
-    el = document.createElement("meta");
-    el.setAttribute("property", property);
-    document.head.appendChild(el);
+  let element = document.querySelector(`meta[property="${property}"]`);
+  if (!element) {
+    element = document.createElement("meta");
+    element.setAttribute("property", property);
+    document.head.appendChild(element);
   }
-  el.setAttribute("content", content);
+  element.setAttribute("content", content);
 }
 
 function setCanonical(href) {
-  let el = document.querySelector('link[rel="canonical"]');
-  if (!el) {
-    el = document.createElement("link");
-    el.setAttribute("rel", "canonical");
-    document.head.appendChild(el);
+  let element = document.querySelector('link[rel="canonical"]');
+  if (!element) {
+    element = document.createElement("link");
+    element.setAttribute("rel", "canonical");
+    document.head.appendChild(element);
   }
-  el.setAttribute("href", href);
+  element.setAttribute("href", href);
 }
 
 function setJsonLd(title, description, url) {
   if (document.getElementById("xd-schema-graph")) return;
   const script = document.createElement("script");
   script.type = "application/ld+json";
-  script.textContent = JSON.stringify({
-    "@context": "https://schema.org",
-    "@type": "CollectionPage",
-    name: title,
-    description,
-    url,
-  });
+  script.textContent = JSON.stringify({ "@context": "https://schema.org", "@type": "CollectionPage", name: title, description, url });
   document.head.appendChild(script);
 }
 
@@ -55,7 +50,6 @@ function applySeo(item) {
   const title = `${item.title} — Xtradite Digital`;
   const description = item.summary || `How Xtradite Digital helps ${item.title} businesses.`;
   const url = `${window.location.origin}/industries/${encodeURIComponent(item.slug)}`;
-
   document.title = title;
   setMetaByName("description", description);
   setMetaByProperty("og:title", item.title);
@@ -70,12 +64,17 @@ function applySeo(item) {
 }
 
 async function load() {
+  if (serverRendered) {
+    if (root) root.hidden = false;
+    renderIcons();
+    return;
+  }
   if (!slug) return showNotFound();
   let item;
   try {
     item = await getItemBySlug("industries_delivery", "slug", slug);
-  } catch (e) {
-    console.error(e);
+  } catch (error) {
+    console.error(error);
     return showNotFound("Couldn't load this page", "We couldn't reach the live content service. Please refresh, or try again in a moment.");
   }
   if (!item) return showNotFound();
@@ -88,28 +87,11 @@ async function load() {
   document.getElementById("industry-solution").innerHTML = item.solution || "";
   document.getElementById("industry-outcomes").innerHTML = item.outcomes || "";
 
-  const serviceSlugs = item.relatedServices || [];
+  const relatedServices = item.relatedServices || [];
   const relatedWrap = document.getElementById("related-services");
-  if (serviceSlugs.length && relatedWrap) {
-    try {
-      const services = serviceSlugs;
-      if (services.length) {
-        relatedWrap.innerHTML = services
-          .map(
-            (s) => `
-          <a class="card" href="/services/${encodeURIComponent(s.slug)}">
-            <div class="card-icon"><i data-lucide="${escapeHtml(s.icon || "circle")}"></i></div>
-            <h3>${escapeHtml(s.title)}</h3>
-            <p class="card-desc">${escapeHtml(s.summary)}</p>
-            <span class="card-link">Learn More <i data-lucide="arrow-right"></i></span>
-          </a>`
-          )
-          .join("");
-        relatedWrap.parentElement.hidden = false;
-      }
-    } catch (e) {
-      console.error(e); // non-critical — related services are a bonus, not core content
-    }
+  if (relatedServices.length && relatedWrap) {
+    relatedWrap.innerHTML = relatedServices.map((service) => `<a class="card" href="/services/${encodeURIComponent(service.slug)}"><div class="card-icon"><i data-lucide="${escapeHtml(service.icon || "circle")}"></i></div><h3>${escapeHtml(service.title)}</h3><p class="card-desc">${escapeHtml(service.summary)}</p><span class="card-link">View ${escapeHtml(service.title)} <i data-lucide="arrow-right"></i></span></a>`).join("");
+    relatedWrap.parentElement.hidden = false;
   }
 
   root.hidden = false;

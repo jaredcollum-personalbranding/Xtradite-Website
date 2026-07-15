@@ -21,9 +21,9 @@ const viewports = [
 const pages = [
   { name: "homepage", path: "/", ready: "#featured-work-root" },
   { name: "service", path: "/service-detail?slug=ai-automation", ready: "#service-detail-root:not([hidden])" },
-  { name: "case-study", path: "/case-study-detail?slug=fast-growth-fashion-retailer", ready: "#case-study-detail-root:not([hidden])" },
+  { name: "case-study-unavailable", path: "/case-study-detail?slug=fast-growth-fashion-retailer", ready: "#not-found:not([hidden])" },
   { name: "case-studies", path: "/case-studies", ready: "main" },
-  { name: "industry", path: "/industry-detail?slug=retail", ready: "main" },
+  { name: "industry", path: "/industry-detail?slug=retail", ready: "#industry-detail-root:not([hidden])" },
 ];
 
 const report = {
@@ -53,8 +53,8 @@ async function screenshot(page, relativePath, options = {}) {
   await ensureDirectory(target);
   if (options.selector) {
     const locator = page.locator(options.selector).first();
-    if (await locator.count() && await locator.isVisible()) await locator.screenshot({ path: target });
-    else return false;
+    if (!(await locator.count()) || !(await locator.isVisible())) return false;
+    await locator.screenshot({ path: target });
   } else {
     await page.screenshot({ path: target, fullPage: options.fullPage !== false });
   }
@@ -78,8 +78,8 @@ function attachDiagnostics(page, label) {
 
 async function waitForReady(page, definition) {
   await page.goto(`${localBase}${definition.path}`, { waitUntil: "domcontentloaded", timeout: 45_000 });
-  await page.locator(definition.ready).first().waitFor({ state: "visible", timeout: 20_000 }).catch(() => {});
-  await page.waitForTimeout(1_500);
+  await page.locator(definition.ready).first().waitFor({ state: "visible", timeout: 15_000 });
+  await page.waitForTimeout(800);
 }
 
 async function layoutAudit(page) {
@@ -118,13 +118,9 @@ async function layoutAudit(page) {
       .filter(({ rect }) => rect.left < -2 || rect.right > viewportWidth + 2)
       .map(({ text, rect }) => ({ text, left: Math.round(rect.left), right: Math.round(rect.right) }));
 
-    const stylesheetMarkers = Array.from(document.querySelectorAll("link[data-xtradite-jam-refinement-css],link[data-xtradite-mega-menu-css],link[data-xtradite-tabs-css]"))
-      .map((element) => element.getAttributeNames().find((name) => name.startsWith("data-")));
-
     return {
       overflow: overflow.slice(0, 25),
       headingOverflow,
-      stylesheetMarkers,
       bodyScrollWidth: document.body.scrollWidth,
       viewportWidth,
     };
@@ -174,50 +170,40 @@ async function runInteractionChecks(browser) {
   const service = await context.newPage();
   attachDiagnostics(service, "interactions-service");
   await waitForReady(service, pages[1]);
-  const tablist = service.locator('[role="tablist"]').first();
-  const tabs = tablist.locator('[role="tab"]');
-  const tabCount = await tabs.count();
-  recordCheck("interactionChecks", "Service tabs are present", tabCount >= 4, `Found ${tabCount}`);
-  if (tabCount) {
-    recordCheck("interactionChecks", "First service tab is selected initially", await tabs.first().getAttribute("aria-selected") === "true");
-    await tabs.first().focus();
+  const process = service.locator("#service-how-it-works");
+  const triggers = process.locator(".service-process-trigger");
+  const triggerCount = await triggers.count();
+  recordCheck("interactionChecks", "Service process controls are present", triggerCount >= 3, `Found ${triggerCount}`);
+  if (triggerCount) {
+    recordCheck("interactionChecks", "First service process step is selected initially", await triggers.first().getAttribute("aria-expanded") === "true");
+    await triggers.first().focus();
     await service.keyboard.press("ArrowRight");
-    recordCheck("interactionChecks", "Arrow keys move service tab selection", await tabs.nth(1).getAttribute("aria-selected") === "true");
+    recordCheck("interactionChecks", "Arrow keys move service process selection", await triggers.nth(1).getAttribute("aria-expanded") === "true");
   }
-  await screenshot(service, "required/service-tabs-desktop.png", { selector: "#service-content-tabs" });
-  await screenshot(service, "required/service-timeline-desktop.png", { selector: ".service-delivery-timeline" });
-  await screenshot(service, "required/service-technology-desktop.png", { selector: ".service-v3-technology-panel" });
+  await screenshot(service, "required/service-process-desktop.png", { selector: "#how-it-works-section" });
+  await screenshot(service, "required/service-technology-desktop.png", { selector: "#tech-section" });
   const faq = service.locator(".faq-question").first();
   if (await faq.count()) {
     await faq.click();
     recordCheck("interactionChecks", "FAQ control exposes expanded state", await faq.getAttribute("aria-expanded") === "true");
     await screenshot(service, "required/faq-desktop.png", { selector: "#faq-section" });
   }
-  const openPhases = service.locator(".service-delivery-phase.is-open");
-  recordCheck("interactionChecks", "Only one service delivery phase is expanded", await openPhases.count() <= 1, `Found ${await openPhases.count()}`);
+  recordCheck("interactionChecks", "Only one service process panel is expanded", await service.locator(".service-process-step.is-active").count() <= 1);
 
-  const caseStudy = await context.newPage();
-  attachDiagnostics(caseStudy, "interactions-case-study");
-  await waitForReady(caseStudy, pages[2]);
-  await screenshot(caseStudy, "required/case-study-hero-desktop.png", { selector: ".cs-hero" });
-  await screenshot(caseStudy, "required/case-study-charts-desktop.png", { selector: "#cs-evidence-section" });
-  await screenshot(caseStudy, "required/case-study-timeline-desktop.png", { selector: "#cs-approach-section" });
-  const caseTabs = caseStudy.locator(".cs-timeline-tab");
-  if (await caseTabs.count()) {
-    recordCheck("interactionChecks", "First case-study approach stage is selected initially", await caseTabs.first().getAttribute("aria-selected") === "true");
-    await caseStudy.locator("#cs-approach-section").scrollIntoViewIfNeeded();
-    const before = await caseTabs.evaluateAll((nodes) => nodes.findIndex((node) => node.getAttribute("aria-selected") === "true"));
-    await caseStudy.waitForTimeout(1_900);
-    const after = await caseTabs.evaluateAll((nodes) => nodes.findIndex((node) => node.getAttribute("aria-selected") === "true"));
-    recordCheck("interactionChecks", "Visible case-study approach advances at 1600ms", after !== before, `Before ${before}, after ${after}`);
-  }
+  const unavailableCase = await context.newPage();
+  attachDiagnostics(unavailableCase, "interactions-case-study-unavailable");
+  await waitForReady(unavailableCase, pages[2]);
+  recordCheck("interactionChecks", "Unapproved case-study detail remains unavailable", await unavailableCase.locator("#case-study-detail-root").isHidden());
+  const leakedMetric = await unavailableCase.locator("body").textContent();
+  recordCheck("interactionChecks", "Unavailable case-study page exposes no blocked metric", !/[+-]?\d+(?:\.\d+)?%/.test(leakedMetric || ""));
+  await screenshot(unavailableCase, "required/case-study-unavailable-desktop.png", { selector: "#not-found" });
 
   const caseStudies = await context.newPage();
   attachDiagnostics(caseStudies, "interactions-case-studies");
   await waitForReady(caseStudies, pages[3]);
-  await screenshot(caseStudies, "required/case-studies-presentation-desktop.png", { selector: "[data-deck-player]" });
+  await screenshot(caseStudies, "required/case-studies-presentation-desktop.png", { selector: "main" });
 
-  await Promise.all([home.close(), service.close(), caseStudy.close(), caseStudies.close()]);
+  await Promise.all([home.close(), service.close(), unavailableCase.close(), caseStudies.close()]);
   await context.close();
 }
 
@@ -225,15 +211,12 @@ async function runReducedMotionChecks(browser) {
   const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: "reduce" });
   const service = await context.newPage();
   await waitForReady(service, pages[1]);
-  const mode = await service.locator(".service-delivery-timeline").getAttribute("data-delivery-mode").catch(() => null);
-  recordCheck("reducedMotionChecks", "Service timeline becomes manual under reduced motion", mode === "manual" || mode === "accordion", `Mode: ${mode}`);
+  const mode = await service.locator("#service-how-it-works").getAttribute("data-delivery-mode").catch(() => null);
+  recordCheck("reducedMotionChecks", "Service process remains manual under reduced motion", mode === "manual", `Mode: ${mode}`);
 
-  const caseStudy = await context.newPage();
-  await waitForReady(caseStudy, pages[2]);
-  await caseStudy.locator("#cs-approach-section").scrollIntoViewIfNeeded().catch(() => {});
-  await caseStudy.waitForTimeout(1_900);
-  const rotation = await caseStudy.locator("#cs-approach-section").getAttribute("data-auto-rotation").catch(() => null);
-  recordCheck("reducedMotionChecks", "Case-study autoplay is paused under reduced motion", rotation !== "playing", `State: ${rotation}`);
+  const unavailableCase = await context.newPage();
+  await waitForReady(unavailableCase, pages[2]);
+  recordCheck("reducedMotionChecks", "Unavailable case study stays fail-closed under reduced motion", await unavailableCase.locator("#case-study-detail-root").isHidden());
   await context.close();
 }
 
@@ -242,13 +225,13 @@ async function captureBeforeAfter(browser) {
   const comparisons = [
     ["homepage", "/", "/"],
     ["service", "/services/ai-automation", "/service-detail?slug=ai-automation"],
-    ["case-study", "/case-studies/fast-growth-fashion-retailer", "/case-study-detail?slug=fast-growth-fashion-retailer"],
+    ["case-study-unavailable", "/case-studies/fast-growth-fashion-retailer", "/case-study-detail?slug=fast-growth-fashion-retailer"],
   ];
   for (const [name, beforePath, afterPath] of comparisons) {
     const before = await context.newPage();
     try {
       await before.goto(`${productionBase}${beforePath}`, { waitUntil: "domcontentloaded", timeout: 45_000 });
-      await before.waitForTimeout(1_500);
+      await before.waitForTimeout(1_000);
       await screenshot(before, `comparison/before-${name}.png`);
     } catch (error) {
       report.failures.push(`Before screenshot for ${name} failed: ${error.message}`);
@@ -258,7 +241,7 @@ async function captureBeforeAfter(browser) {
     const after = await context.newPage();
     try {
       await after.goto(`${localBase}${afterPath}`, { waitUntil: "domcontentloaded", timeout: 45_000 });
-      await after.waitForTimeout(1_500);
+      await after.waitForTimeout(1_000);
       await screenshot(after, `comparison/after-${name}.png`);
     } finally {
       await after.close();

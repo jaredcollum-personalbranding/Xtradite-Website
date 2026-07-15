@@ -11,9 +11,6 @@ const requiredStyleMarkers = [
   "xtradite-tabs-css",
   "xtradite-mega-menu-css",
   "xtradite-enquiry-css",
-  "service-content-architecture-css",
-  "service-delivery-timeline-css",
-  "service-template-v3-css",
   "case-study-experience-css",
   "xtradite-jam-refinement-css",
 ];

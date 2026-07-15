@@ -1,0 +1,52 @@
+name: Production release quality
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-quality-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Run complete production build and release checks
+        shell: bash
+        run: |
+          mkdir -p artifacts/release-quality
+          set -o pipefail
+          npm run build 2>&1 | tee artifacts/release-quality/build.log
+
+      - name: Upload readable and machine-readable reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-release-quality-${{ github.sha }}
+          path: |
+            artifacts/release-quality
+            artifacts/seo-release-quality
+          if-no-files-found: warn
+          retention-days: 30

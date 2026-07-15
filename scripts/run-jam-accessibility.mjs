@@ -8,7 +8,7 @@ const outputDirectory = path.resolve(process.env.JAM_ARTIFACT_DIR || "artifacts/
 const routes = [
   { name: "homepage", path: "/", ready: "main" },
   { name: "service", path: "/service-detail?slug=ai-automation", ready: "#service-detail-root:not([hidden])" },
-  { name: "case-study", path: "/case-study-detail?slug=fast-growth-fashion-retailer", ready: "#case-study-detail-root:not([hidden])" },
+  { name: "case-study-unavailable", path: "/case-study-detail?slug=fast-growth-fashion-retailer", ready: "#not-found:not([hidden])" },
 ];
 
 const viewports = [
@@ -32,7 +32,7 @@ function record(name, passed, detail = "") {
 
 async function waitForRoute(page, route) {
   await page.goto(`${baseUrl}${route.path}`, { waitUntil: "domcontentloaded", timeout: 45_000 });
-  await page.locator(route.ready).first().waitFor({ state: "visible", timeout: 20_000 });
+  await page.locator(route.ready).first().waitFor({ state: "visible", timeout: 15_000 });
   await page.waitForTimeout(800);
 }
 
@@ -62,7 +62,7 @@ async function keyboardAudit(page, label) {
   }
 
   const hiddenFocus = visited.filter((item) => item.hiddenAncestor);
-  const controls = visited.filter((item) => ["a", "button", "input", "textarea", "select"].includes(item.tag));
+  const controls = visited.filter((item) => ["a", "button", "input", "textarea", "select", "summary"].includes(item.tag));
   const missingFocusIndicator = controls.filter((item) => {
     const noOutline = item.outline.startsWith("none") || item.outline.endsWith("0px");
     const noShadow = !item.boxShadow || item.boxShadow === "none";
@@ -81,9 +81,8 @@ async function touchTargetAudit(page, label) {
     ".mega-nav-trigger",
     ".nav-toggle",
     ".faq-question",
-    '[role="tab"]',
-    ".service-delivery-phase-trigger",
-    ".cs-timeline-tab",
+    "summary",
+    ".service-process-trigger",
     "[data-deck-toggle]",
     "[data-deck-prev]",
     "[data-deck-next]",
@@ -144,7 +143,7 @@ async function contrastAudit(page, label) {
       return { r: 255, g: 255, b: 255, a: 1 };
     }
 
-    const selectors = ["h1", ".hero-sub", ".section-head h2", ".section-head p", ".card h3", ".card-desc", ".mega-nav-link", ".mega-nav-trigger", ".faq-question"];
+    const selectors = ["h1", ".hero-sub", ".section-head h2", ".section-head p", ".card h3", ".card-desc", ".mega-nav-link", ".mega-nav-trigger", ".faq-question", "summary", ".service-process-trigger"];
     return selectors.flatMap((selector) => Array.from(document.querySelectorAll(selector)).slice(0, 3).map((element) => {
       if (!(element instanceof HTMLElement) || element.closest('[hidden],[inert],[aria-hidden="true"]')) return null;
       const rect = element.getBoundingClientRect();

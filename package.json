@@ -4,10 +4,11 @@
   "description": "Xtradite Digital Website",
   "private": true,
   "scripts": {
-    "test": "node --test tests/publication-controls.test.js",
+    "test": "node --test tests/*.test.js",
     "test:unit": "node --test --test-name-pattern=\"publication clock|draft and missing|location eligibility|location-service eligibility|sitemap normalisation|location sitemap|private\" tests/publication-controls.test.js",
     "test:integration": "node --test --test-name-pattern=\"server insight query|ineligible direct routes|location catalogue\" tests/publication-controls.test.js",
-    "typecheck": "node --check api/lib/publication-eligibility.js && node --check api/lib/supabase.js && node --check api/lib/location-catalogue.js && node --check api/lib/schema/index.js && node --check api/content-page.js && node --check api/sitemap.js && node --check scripts/verify-publication-controls.js && node --check scripts/verify-service-evidence-integrity.js && node --check scripts/verify-case-study-evidence-gate.js && node --check scripts/verify-service-template-consolidation.js && node --check scripts/verify-jam-remediation.js && esbuild frontend/assets/js/cms.js frontend/assets/js/pages/service-detail.js frontend/assets/js/pages/case-study-detail.js --bundle --format=esm --platform=browser --external:https://* --outdir=/tmp/xtradite-publication-typecheck --log-level=error",
+    "test:rendering": "node --test tests/rendering-schema.test.js tests/seo-release-quality.test.js tests/about-profile.test.js",
+    "typecheck": "node --check api/lib/publication-eligibility.js && node --check api/lib/supabase.js && node --check api/lib/location-catalogue.js && node --check api/lib/content-renderer.js && node --check api/lib/schema/index.js && node --check api/content-page.js && node --check api/indexnow.js && node --check api/indexnow-key.js && node --check api/sitemap.js && node --check scripts/inject-analytics.js && node --check scripts/monitor-seo-endpoints.js && node --check scripts/seo-release-quality.js && node --check scripts/verify-publication-controls.js && node --check scripts/verify-service-evidence-integrity.js && node --check scripts/verify-case-study-evidence-gate.js && node --check scripts/verify-service-template-consolidation.js && node --check scripts/verify-jam-remediation.js && esbuild frontend/assets/js/cms.js frontend/assets/js/analytics-events.js frontend/assets/js/menu-state-preserver.js frontend/assets/js/pages/contact.js frontend/assets/js/pages/service-detail.js frontend/assets/js/pages/industry-detail.js frontend/assets/js/pages/case-study-detail.js frontend/assets/js/pages/insights-post.js --bundle --format=esm --platform=browser --external:https://* --outdir=/tmp/xtradite-publication-typecheck --log-level=error",
     "lint": "node scripts/verify-publication-controls.js lint",
     "check:routes": "node scripts/verify-publication-controls.js routes",
     "check:sitemap": "node scripts/verify-publication-controls.js sitemap",
@@ -17,11 +18,14 @@
     "check:case-study-evidence": "node scripts/verify-case-study-evidence-gate.js",
     "check:service-template": "node scripts/verify-service-template-consolidation.js",
     "check:jam-remediation": "node scripts/verify-jam-remediation.js",
-    "verify": "npm run test:unit && npm run test:integration && npm run typecheck && npm run lint && npm run check:routes && npm run check:sitemap && npm run check:structured-data && npm run check:migration && npm run check:service-evidence && npm run check:case-study-evidence && npm run check:service-template && npm run check:jam-remediation",
+    "check:release-quality": "node scripts/seo-release-quality.js",
+    "monitor:seo": "node scripts/monitor-seo-endpoints.js",
+    "verify": "npm run test:unit && npm run test:integration && npm run test:rendering && npm run typecheck && npm run lint && npm run check:routes && npm run check:sitemap && npm run check:structured-data && npm run check:migration && npm run check:service-evidence && npm run check:case-study-evidence && npm run check:service-template && npm run check:jam-remediation",
     "build:jam": "esbuild scripts/jam-metadata-entry.js --bundle --format=esm --platform=browser --target=es2020 --outfile=frontend/assets/js/jam-metadata.js",
     "build:seo": "node scripts/inject-seo.js",
+    "build:analytics": "node scripts/inject-analytics.js",
     "validate:jam": "node scripts/validate-jam-foundation.js",
-    "build": "npm run verify && npm run build:jam && node scripts/inject-jam.js && npm run build:seo && npm run validate:jam"
+    "build": "npm run verify && npm run build:jam && node scripts/inject-jam.js && npm run build:seo && npm run build:analytics && npm run check:release-quality && npm run validate:jam"
   },
   "dependencies": {
     "@jam.dev/sdk": "^1.0.1",

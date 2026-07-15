@@ -40,6 +40,25 @@ function organisation() {
   };
 }
 
+function person() {
+  return {
+    "@type": "Person",
+    "@id": PERSON_ID,
+    name: "Jared Collum",
+    jobTitle: "Founder and Digital Consultant",
+    url: `${SITE_URL}/about/`,
+    worksFor: { "@id": ORGANISATION_ID },
+    knowsAbout: [
+      "Digital strategy",
+      "Ecommerce",
+      "Customer lifecycle management",
+      "Analytics",
+      "AI enablement and automation",
+      "Digital operations"
+    ]
+  };
+}
+
 function website() {
   return {
     "@type": "WebSite",
@@ -88,9 +107,89 @@ function normaliseEntityList(value) {
   return value.map(normaliseEntity).filter(Boolean);
 }
 
-function buildGraph({ canonical, title, description, pageType = "WebPage", primaryEntity, breadcrumbItems = [] }) {
+function pick(object, ...keys) {
+  for (const key of keys) {
+    if (object && object[key] !== undefined && object[key] !== null) return object[key];
+  }
+  return undefined;
+}
+
+function eligibleRelatedCaseStudy(item) {
+  return pick(item, "status") === "published"
+    && pick(item, "public_approval_status", "publicApprovalStatus") === "approved"
+    && pick(item, "noindex") !== true
+    && Boolean(pick(item, "slug"));
+}
+
+function faqEntity(items, canonical) {
+  if (!Array.isArray(items)) return undefined;
+  const mainEntity = items.map((item) => {
+    const question = pick(item, "question", "title", "q");
+    const answer = pick(item, "answer", "response", "description", "a");
+    if (!question || !answer) return undefined;
+    return {
+      "@type": "Question",
+      name: String(question),
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: String(answer).replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim()
+      }
+    };
+  }).filter(Boolean);
+  if (!mainEntity.length) return undefined;
+  return { "@type": "FAQPage", "@id": `${canonical}#faq`, mainEntity };
+}
+
+function additionalEntitiesFor(type, item, canonical) {
+  const entities = [];
+  if (type === "service") {
+    const faq = faqEntity(item.faqs, canonical);
+    if (faq) entities.push(faq);
+
+    const related = Array.isArray(item.related_case_studies)
+      ? item.related_case_studies.filter(eligibleRelatedCaseStudy)
+      : [];
+    related.forEach((caseStudy) => {
+      entities.push({
+        "@type": ["Article", "CreativeWork"],
+        "@id": `${SITE_URL}/case-studies/${encodeURIComponent(caseStudy.slug)}#primary`,
+        url: `${SITE_URL}/case-studies/${encodeURIComponent(caseStudy.slug)}`,
+        name: caseStudy.headline || caseStudy.client
+      });
+    });
+  }
+
+  if (type === "industry" && Array.isArray(item.related_services) && item.related_services.length) {
+    const itemListElement = item.related_services.map((service, index) => {
+      if (!service?.slug || !service?.title) return undefined;
+      return {
+        "@type": "ListItem",
+        position: index + 1,
+        item: {
+          "@type": "Service",
+          "@id": `${SITE_URL}/services/${encodeURIComponent(service.slug)}#primary`,
+          url: `${SITE_URL}/services/${encodeURIComponent(service.slug)}`,
+          name: service.title
+        }
+      };
+    }).filter(Boolean);
+    if (itemListElement.length) entities.push({
+      "@type": "ItemList",
+      "@id": `${canonical}#related-services`,
+      name: `Services relevant to ${item.title}`,
+      itemListElement
+    });
+  }
+
+  return entities;
+}
+
+function buildGraph({ canonical, title, description, pageType = "WebPage", primaryEntity, additionalEntities = [], breadcrumbItems = [] }) {
   const pageId = `${canonical}#webpage`;
-  const graph = [organisation(), website(), {
+  const personNode = primaryEntity?.["@id"] === PERSON_ID
+    ? compact({ ...person(), ...primaryEntity })
+    : person();
+  const graph = [organisation(), personNode, website(), {
     "@type": pageType,
     "@id": pageId,
     url: canonical,
@@ -103,7 +202,8 @@ function buildGraph({ canonical, title, description, pageType = "WebPage", prima
   }];
 
   if (breadcrumbItems.length > 1) graph.push({ ...breadcrumbs(breadcrumbItems), "@id": `${canonical}#breadcrumb` });
-  if (primaryEntity) graph.push(primaryEntity);
+  if (primaryEntity && primaryEntity["@id"] !== PERSON_ID) graph.push(primaryEntity);
+  if (Array.isArray(additionalEntities)) graph.push(...additionalEntities);
 
   return compact({ "@context": "https://schema.org", "@graph": graph });
 }
@@ -125,6 +225,11 @@ function primaryEntityFor(type, item, canonical, description) {
       areaServed: { "@type": "Country", name: "United Kingdom" },
       about,
       mentions,
+      subjectOf: Array.isArray(item.related_case_studies)
+        ? item.related_case_studies.filter(eligibleRelatedCaseStudy).map((caseStudy) => ({
+            "@id": `${SITE_URL}/case-studies/${encodeURIComponent(caseStudy.slug)}#primary`
+          }))
+        : [],
       mainEntityOfPage: { "@id": `${canonical}#webpage` }
     });
   }
@@ -179,8 +284,12 @@ module.exports = {
   ORGANISATION_ID,
   WEBSITE_ID,
   PERSON_ID,
+  organisation,
+  person,
+  website,
   buildGraph,
   primaryEntityFor,
+  additionalEntitiesFor,
   compact,
   normaliseEntity,
   normaliseEntityList
