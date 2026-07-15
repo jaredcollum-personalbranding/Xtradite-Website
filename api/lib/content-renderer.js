@@ -38,8 +38,26 @@ function escapeRegExp(value) {
 
 function replaceInner(html, id, content) {
   const escapedId = escapeRegExp(id);
-  const pattern = new RegExp(`(<([a-z][\\w:-]*)\\b[^>]*\\bid=["']${escapedId}["'][^>]*>)[\\s\\S]*?(<\\/\\2>)`, "i");
-  return pattern.test(html) ? html.replace(pattern, `$1${content}$3`) : html;
+  const openingPattern = new RegExp(`<([a-z][\\w:-]*)\\b[^>]*\\bid=["']${escapedId}["'][^>]*>`, "i");
+  const opening = openingPattern.exec(html);
+  if (!opening) return html;
+
+  const tag = opening[1];
+  const contentStart = opening.index + opening[0].length;
+  const tokenPattern = new RegExp(`<\\/?${escapeRegExp(tag)}\\b[^>]*>`, "gi");
+  tokenPattern.lastIndex = contentStart;
+  let depth = 1;
+  let token;
+
+  while ((token = tokenPattern.exec(html))) {
+    if (token[0].startsWith("</")) depth -= 1;
+    else if (!token[0].endsWith("/>")) depth += 1;
+    if (depth === 0) {
+      return `${html.slice(0, contentStart)}${content}${html.slice(token.index)}`;
+    }
+  }
+
+  return html;
 }
 
 function reveal(html, id) {
@@ -126,6 +144,11 @@ function eligibleInsight(item, now = new Date()) {
   const status = pick(item, "status");
   const publishedAt = new Date(pick(item, "first_published_at", "firstPublishedAt", "firstPublishedDate") || "");
   return status === "published" && Number.isFinite(publishedAt.getTime()) && publishedAt <= now && Boolean(pick(item, "slug"));
+}
+
+function insightBody(item) {
+  if (typeof item.rich_content === "string" && item.rich_content.trim()) return item.rich_content;
+  return item.content_text || item.excerpt || "";
 }
 
 function renderService(html, item) {
@@ -272,8 +295,7 @@ function renderInsight(html, item) {
   if (item.minutes_to_read) output = setText(output, "post-read-time", `${item.minutes_to_read} min read`);
   const tags = array(item.tags);
   if (tags.length) output = replaceInner(output, "post-tags", tags.map((tag) => `<span class="tag">${escapeHtml(tag)}</span>`).join(""));
-  const body = item.rich_content || item.content_text || item.excerpt || "";
-  output = setRich(output, "post-body", body);
+  output = setRich(output, "post-body", insightBody(item));
   if (item.cover_image_url) output = replaceInner(output, "post-cover-wrap", `<img src="${escapeHtml(item.cover_image_url)}" alt="" loading="eager">`);
   output = output.replace("<span>Xtradite Digital Team</span>", `<a href="${PERSON_ID.replace("https://www.xtradite-digital.co.uk", "")}">Jared Collum</a>`);
   output = reveal(output, "post-root");
@@ -294,5 +316,6 @@ module.exports = {
   renderPrimaryContent,
   faqHtml,
   eligibleCaseStudy,
-  eligibleInsight
+  eligibleInsight,
+  insightBody
 };
