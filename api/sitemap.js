@@ -1,6 +1,6 @@
 const { fetchRows } = require("./lib/supabase");
 const { loadLocationCatalogue } = require("./lib/location-catalogue");
-const { isValidSlug } = require("./lib/publication-eligibility");
+const { isValidSlug } = require("../server/publication-eligibility");
 const { SITE_URL } = require("./lib/schema");
 
 const STATIC_PATHS = [
