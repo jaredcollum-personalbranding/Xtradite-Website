@@ -37,7 +37,7 @@ Production project `bmhkdyshluiloorgnwoy` reports these applied migrations, in o
 19. `20260714140225_gold_seal_publication_controls`
 20. `20260714181000_case_study_evidence_publication_gate`
 21. `20260714181803_service_delivery_governance_fields`
-22. `20260715015000_harden_public_delivery_views`
+22. `20260715015215_harden_public_delivery_views`
 
 The final migration is included in PR #76 and has been applied to the connected production project. It makes the four filtered delivery views the sole anonymous/authenticated content contract, grants them `SELECT` only, and removes public privileges from their underlying CMS and evidence tables.
 
