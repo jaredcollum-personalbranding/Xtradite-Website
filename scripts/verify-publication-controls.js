@@ -58,10 +58,7 @@ function structuredData() {
   const contentPage = read("api/content-page.js");
   const locationPage = read("api/location.js");
   const contentLookup = contentPage.search(/if\s*\(\s*!item\b/);
-  const contentSchema = Math.max(
-    contentPage.indexOf("injectSeo(primaryHtml"),
-    contentPage.indexOf("injectSeo(template")
-  );
+  const contentSchema = contentPage.lastIndexOf("injectSeo(");
   const locationLookup = locationPage.search(/if\s*\(\s*!route\b/);
   const locationSchema = locationPage.lastIndexOf("schemas(route, crumbs");
 
