@@ -1,0 +1,118 @@
+name: One-time merged PR branch pruning
+
+on:
+  pull_request:
+    branches:
+      - chore/branch-and-pipeline-cleanup
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  prune:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Delete merged and superseded branches
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          default_branch="$(gh api "repos/${GITHUB_REPOSITORY}" --jq '.default_branch')"
+          current_branch="chore/prune-merged-pr-branches"
+          active_cleanup_branch="chore/branch-and-pipeline-cleanup"
+
+          mapfile -t branches < <(
+            gh api --paginate "repos/${GITHUB_REPOSITORY}/branches?per_page=100" --jq '.[].name'
+          )
+          mapfile -t open_pr_heads < <(
+            gh api --paginate "repos/${GITHUB_REPOSITORY}/pulls?state=open&per_page=100" --jq '.[].head.ref'
+          )
+          mapfile -t merged_pr_heads < <(
+            gh api --paginate "repos/${GITHUB_REPOSITORY}/pulls?state=closed&per_page=100" \
+              --jq '.[] | select(.merged_at != null) | .head.ref'
+          )
+
+          superseded_branches=(
+            "fix/cookiebot-consent-adsense"
+            "agent/supabase-location-source"
+            "fix/sitewide-header-footer-assets"
+          )
+
+          contains() {
+            local needle="$1"
+            shift
+            local value
+            for value in "$@"; do
+              [[ "$value" == "$needle" ]] && return 0
+            done
+            return 1
+          }
+
+          deleted=()
+          retained=()
+          failed=()
+
+          for branch in "${branches[@]}"; do
+            if [[ "$branch" == "$default_branch" || "$branch" == "$current_branch" || "$branch" == "$active_cleanup_branch" ]]; then
+              retained+=("$branch — protected")
+              continue
+            fi
+
+            if contains "$branch" "${open_pr_heads[@]}"; then
+              retained+=("$branch — open pull request")
+              continue
+            fi
+
+            reason=""
+            if contains "$branch" "${merged_pr_heads[@]}"; then
+              reason="GitHub pull request is merged"
+            elif contains "$branch" "${superseded_branches[@]}"; then
+              reason="closed and explicitly superseded"
+            fi
+
+            if [[ -z "$reason" ]]; then
+              retained+=("$branch — no merged or superseded PR record")
+              continue
+            fi
+
+            if gh api -X DELETE "repos/${GITHUB_REPOSITORY}/git/refs/heads/${branch}" >/dev/null; then
+              deleted+=("$branch — $reason")
+            else
+              failed+=("$branch — deletion failed")
+            fi
+          done
+
+          mapfile -t remaining < <(
+            gh api --paginate "repos/${GITHUB_REPOSITORY}/branches?per_page=100" --jq '.[].name'
+          )
+
+          {
+            echo "## Authoritative branch-pruning result"
+            echo
+            echo "### Deleted (${#deleted[@]})"
+            if (( ${#deleted[@]} == 0 )); then echo '- None'; else printf -- '- %s\n' "${deleted[@]}"; fi
+            echo
+            echo "### Retained during pruning (${#retained[@]})"
+            printf -- '- %s\n' "${retained[@]}"
+            echo
+            echo "### Branches remaining before temporary branch removal (${#remaining[@]})"
+            printf -- '- %s\n' "${remaining[@]}"
+            if (( ${#failed[@]} > 0 )); then
+              echo
+              echo "### Failed (${#failed[@]})"
+              printf -- '- %s\n' "${failed[@]}"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          echo "Deleted ${#deleted[@]}; remaining ${#remaining[@]}; failures ${#failed[@]}."
+          (( ${#failed[@]} == 0 ))
+
+      - name: Remove temporary pruning branch
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X DELETE "repos/${GITHUB_REPOSITORY}/git/refs/heads/chore/prune-merged-pr-branches"
