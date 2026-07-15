@@ -33,32 +33,12 @@ jobs:
       - name: Install locked dependencies
         run: npm ci --no-audit --no-fund
 
-      - name: Unit tests
-        run: npm run test:unit
-      - name: Integration tests
-        run: npm run test:integration
-      - name: Rendering tests
-        run: npm run test:rendering
-      - name: Typecheck
-        run: npm run typecheck
-      - name: Lint publication controls
-        run: npm run lint
-      - name: Route controls
-        run: npm run check:routes
-      - name: Sitemap controls
-        run: npm run check:sitemap
-      - name: Structured data controls
-        run: npm run check:structured-data
-      - name: Migration controls
-        run: npm run check:migration
-      - name: Service evidence controls
-        run: npm run check:service-evidence
-      - name: Case study evidence controls
-        run: npm run check:case-study-evidence
-      - name: Service template controls
-        run: npm run check:service-template
-      - name: Jam remediation controls
-        run: npm run check:jam-remediation
+      - name: Run complete production build and release checks
+        shell: bash
+        run: |
+          mkdir -p artifacts/release-quality
+          set -o pipefail
+          npm run build 2>&1 | tee artifacts/release-quality/build.log
 
       - name: Upload readable and machine-readable reports
         if: always()
