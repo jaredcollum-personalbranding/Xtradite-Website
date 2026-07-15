@@ -21,7 +21,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          git diff --exit-code 5e9597d7398a432d2114be6ed44ba0cf2df61e4c -- . ':(exclude).github/workflows/release-validation.yml'
+          git diff --exit-code 5e9597d7398a432d2114be6ed44ba0cf2df61e4c -- . \
+            ':(exclude).github/workflows/release-validation.yml' \
+            ':(exclude)RELEASE_VALIDATION.md'
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
