@@ -3,6 +3,7 @@ const path = require("node:path");
 const { fetchPublishedBySlug, publicSelectFor } = require("./lib/supabase");
 const { SITE_URL, buildGraph, primaryEntityFor, additionalEntitiesFor } = require("./lib/schema");
 const { renderPrimaryContent } = require("./lib/content-renderer");
+const { enhanceContentDetail } = require("./lib/content-detail-enhancer");
 
 const SOCIAL_IMAGE = `${SITE_URL}/assets/brand/xtradite-social-share.svg`;
 const SOCIAL_IMAGE_ALT = "Xtradite Digital — practical consultancy for measurable growth";
@@ -140,7 +141,8 @@ module.exports = async (req, res) => {
     const robots = robotsFor(item);
     const template = fs.readFileSync(path.join(process.cwd(), "frontend", config.template), "utf8");
     const primaryHtml = renderPrimaryContent(type, item, template);
-    const html = injectSeo(primaryHtml, { type, item, config, canonical, title, description, robots });
+    const designedHtml = enhanceContentDetail(type, item, primaryHtml);
+    const html = injectSeo(designedHtml, { type, item, config, canonical, title, description, robots });
 
     res.setHeader("Content-Type", "text/html; charset=utf-8");
     res.setHeader("X-Robots-Tag", robots);
