@@ -2,7 +2,7 @@
 
 ## Scope
 
-This is a read-only reconciliation for issues #36, #39 and #40. No Vercel production deployment, Supabase schema, data, role grant or editorial approval state was changed during the audit.
+This reconciliation covers issues #36, #39 and #40. No Vercel production deployment, editorial content record or approval state was changed. One least-privilege Supabase migration was applied after browser acceptance exposed a broken delivery-view permission contract.
 
 ## GitHub and Vercel
 
@@ -37,8 +37,18 @@ Production project `bmhkdyshluiloorgnwoy` reports these applied migrations, in o
 19. `20260714140225_gold_seal_publication_controls`
 20. `20260714181000_case_study_evidence_publication_gate`
 21. `20260714181803_service_delivery_governance_fields`
+22. `20260715015000_harden_public_delivery_views`
 
-The current release branch expects the final publication, evidence and service-governance migrations listed above. No new migration is included in PR #76.
+The final migration is included in PR #76 and has been applied to the connected production project. It makes the four filtered delivery views the sole anonymous/authenticated content contract, grants them `SELECT` only, and removes public privileges from their underlying CMS and evidence tables.
+
+Validation under `SET ROLE anon` returns:
+
+- 6 services;
+- 6 industries;
+- 13 currently eligible insights;
+- 0 case studies.
+
+The verified public grants on the four delivery views are `SELECT` only. No public grant remains on the corresponding services, industries, case studies or blog-post base tables.
 
 ## Governed content state
 
@@ -56,18 +66,18 @@ The governed sitemap view currently contains:
 - 13 currently eligible insights;
 - 0 case studies.
 
-All six case studies remain `changes_required` and all six have `public_primary_metric_approved = false`. The frontend and sitemap must continue to fail closed irrespective of the legacy `published` field.
+All six case studies remain `changes_required` and all six have `public_primary_metric_approved = false`. The frontend and sitemap continue to fail closed irrespective of the legacy `published` field.
 
 ## Supabase advisers
 
 ### Security
 
-The adviser reports:
+The initial adviser run reported:
 
 - one informational finding: `content_reviews` has RLS enabled with no policy;
-- GraphQL exposure warnings for tables and delivery views that currently grant `SELECT` to `anon` or `authenticated`.
+- GraphQL exposure warnings for tables and delivery views with public grants.
 
-Some delivery views are intentionally public website contracts. Base-table and governance-table grants require a separate least-privilege review before any revocation, because a broad automated revoke could break live content delivery. PR #76 narrows application queries with public field allowlists but does not alter production grants.
+The delivery-view migration removes public base-table access and limits the governed delivery views to `SELECT`. Security-definer delivery views are intentional: each view has an explicit public projection and its own publication/evidence filters. The remaining governance-table and `content_reviews` findings require a separate policy review rather than an automatic broad grant change.
 
 Remediation references:
 
