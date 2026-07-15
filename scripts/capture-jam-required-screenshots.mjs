@@ -15,7 +15,7 @@ const captured = [];
 try {
   const home = await context.newPage();
   await home.goto(`${baseUrl}/`, { waitUntil: "domcontentloaded", timeout: 45_000 });
-  await home.locator("#featured-work-root").waitFor({ state: "visible", timeout: 20_000 });
+  await home.locator("#featured-work-root").waitFor({ state: "visible", timeout: 15_000 });
   const trigger = home.locator(".mega-nav-trigger").first();
   await trigger.click();
   await home.locator('.mega-menu-panel[aria-hidden="false"]').first().waitFor({ state: "visible", timeout: 5_000 });
@@ -25,16 +25,28 @@ try {
 
   const service = await context.newPage();
   await service.goto(`${baseUrl}/service-detail?slug=ai-automation`, { waitUntil: "domcontentloaded", timeout: 45_000 });
-  await service.locator("#service-detail-root:not([hidden])").waitFor({ state: "visible", timeout: 20_000 });
-  const technologyTab = service.locator('[role="tab"]', { hasText: /technology/i }).first();
-  if (!await technologyTab.count()) throw new Error("Technology tab was not found");
-  await technologyTab.click();
-  const technologyPanel = service.locator(".service-v3-technology-panel").first();
-  await technologyPanel.waitFor({ state: "visible", timeout: 5_000 });
-  await technologyPanel.scrollIntoViewIfNeeded();
-  await technologyPanel.screenshot({ path: path.join(screenshotsRoot, "service-technology-desktop.png") });
+  await service.locator("#service-detail-root:not([hidden])").waitFor({ state: "visible", timeout: 15_000 });
+
+  const processSection = service.locator("#how-it-works-section").first();
+  await processSection.waitFor({ state: "visible", timeout: 5_000 });
+  await processSection.scrollIntoViewIfNeeded();
+  await processSection.screenshot({ path: path.join(screenshotsRoot, "service-process-desktop.png") });
+  captured.push("required/service-process-desktop.png");
+
+  const technologySection = service.locator("#tech-section").first();
+  await technologySection.waitFor({ state: "visible", timeout: 5_000 });
+  await technologySection.scrollIntoViewIfNeeded();
+  await technologySection.screenshot({ path: path.join(screenshotsRoot, "service-technology-desktop.png") });
   captured.push("required/service-technology-desktop.png");
   await service.close();
+
+  const unavailableCase = await context.newPage();
+  await unavailableCase.goto(`${baseUrl}/case-study-detail?slug=fast-growth-fashion-retailer`, { waitUntil: "domcontentloaded", timeout: 45_000 });
+  const unavailable = unavailableCase.locator("#not-found:not([hidden])").first();
+  await unavailable.waitFor({ state: "visible", timeout: 15_000 });
+  await unavailable.screenshot({ path: path.join(screenshotsRoot, "case-study-unavailable-desktop.png") });
+  captured.push("required/case-study-unavailable-desktop.png");
+  await unavailableCase.close();
 } finally {
   await context.close();
   await browser.close();
