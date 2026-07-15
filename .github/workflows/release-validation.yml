@@ -1,60 +1,21 @@
-name: Validate urgent release candidate
+name: Remove temporary release validation branch
 
 on:
   pull_request:
     branches:
       - main
-  workflow_dispatch:
+    types:
+      - closed
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  validate:
+  cleanup:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
     steps:
-      - name: Check out release candidate head
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
-          fetch-depth: 0
-
-      - name: Confirm application tree matches approved main commit
-        shell: bash
-        run: |
-          set -euo pipefail
-          unexpected="$(git diff --name-only 5e9597d7398a432d2114be6ed44ba0cf2df61e4c HEAD | grep -Ev '^(\.github/workflows/release-validation\.yml|RELEASE_VALIDATION\.md)$' || true)"
-          if [[ -n "$unexpected" ]]; then
-            echo "Unexpected application differences from the approved release commit:"
-            printf '%s\n' "$unexpected"
-            exit 1
-          fi
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          cache: npm
-
-      - name: Clean locked dependency installation
-        shell: bash
-        run: |
-          mkdir -p artifacts/release-validation
-          set -o pipefail
-          npm ci --no-audit --no-fund 2>&1 | tee artifacts/release-validation/npm-ci.log
-
-      - name: Run complete production build
-        shell: bash
-        run: |
-          set -o pipefail
-          npm run build 2>&1 | tee artifacts/release-validation/build.log
-
-      - name: Upload validation logs
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: urgent-release-validation-${{ github.sha }}
-          path: artifacts/release-validation
-          if-no-files-found: warn
-          retention-days: 14
+      - name: Delete temporary validation branch
+        if: github.event.pull_request.head.ref == 'release/validate-5e9597d'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X DELETE "repos/${GITHUB_REPOSITORY}/git/refs/heads/release/validate-5e9597d"
