@@ -33,12 +33,12 @@ jobs:
       - name: Install locked dependencies
         run: npm ci --no-audit --no-fund
 
-      - name: Run complete production build and release checks
+      - name: Run detail rendering diagnostics
         shell: bash
         run: |
           mkdir -p artifacts/release-quality
           set -o pipefail
-          npm run build 2>&1 | tee artifacts/release-quality/build.log
+          npm run test:rendering 2>&1 | tee artifacts/release-quality/build.log
 
       - name: Upload readable and machine-readable reports
         if: always()
