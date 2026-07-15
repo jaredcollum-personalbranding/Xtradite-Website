@@ -3,7 +3,7 @@ const path = require("node:path");
 const { fetchPublishedBySlug, publicSelectFor } = require("./lib/supabase");
 const { SITE_URL, buildGraph, primaryEntityFor, additionalEntitiesFor } = require("./lib/schema");
 const { renderPrimaryContent } = require("./lib/content-renderer");
-const { enhanceContentDetail } = require("./lib/content-detail-enhancer");
+const { enhanceContentDetail } = require("../server/content-detail-enhancer");
 
 const SOCIAL_IMAGE = `${SITE_URL}/assets/brand/xtradite-social-share.svg`;
 const SOCIAL_IMAGE_ALT = "Xtradite Digital — practical consultancy for measurable growth";
