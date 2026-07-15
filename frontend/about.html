@@ -4,15 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="google-adsense-account" content="ca-pub-7308041122340160">
-
-<!-- Google Consent Mode defaults: must run before Cookiebot and Google tags -->
 <script>
   window.dataLayer = window.dataLayer || [];
-
-  function gtag() {
-    dataLayer.push(arguments);
-  }
-
+  function gtag() { dataLayer.push(arguments); }
   gtag("consent", "default", {
     ad_storage: "denied",
     ad_user_data: "denied",
@@ -23,33 +17,13 @@
     security_storage: "granted",
     wait_for_update: 500
   });
-
   gtag("set", "ads_data_redaction", true);
   gtag("set", "url_passthrough", false);
 </script>
-
-<!-- Cookiebot CMP -->
-<script
-  id="Cookiebot"
-  src="https://consent.cookiebot.com/uc.js"
-  data-cbid="07680bbc-6c7e-4a44-9d8b-a2ff6766646c"
-  data-blockingmode="auto"
-  data-framework="IAB"
-  type="text/javascript"
-></script>
-
-<!-- Synchronise genuine Cookiebot choices with Google Consent Mode -->
+<script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="07680bbc-6c7e-4a44-9d8b-a2ff6766646c" data-blockingmode="auto" data-framework="IAB" type="text/javascript"></script>
 <script>
   function loadAdSenseAfterConsent() {
-    if (
-      !window.Cookiebot ||
-      !Cookiebot.hasResponse ||
-      !Cookiebot.consent.marketing ||
-      document.getElementById("adsense-loader")
-    ) {
-      return;
-    }
-
+    if (!window.Cookiebot || !Cookiebot.hasResponse || !Cookiebot.consent.marketing || document.getElementById("adsense-loader")) return;
     const script = document.createElement("script");
     script.id = "adsense-loader";
     script.async = true;
@@ -57,16 +31,11 @@
     script.crossOrigin = "anonymous";
     document.head.appendChild(script);
   }
-
   function updateGoogleConsentFromCookiebot() {
-    if (!window.Cookiebot || !Cookiebot.hasResponse) {
-      return;
-    }
-
+    if (!window.Cookiebot || !Cookiebot.hasResponse) return;
     const marketingGranted = Cookiebot.consent.marketing === true;
     const statisticsGranted = Cookiebot.consent.statistics === true;
     const preferencesGranted = Cookiebot.consent.preferences === true;
-
     gtag("consent", "update", {
       ad_storage: marketingGranted ? "granted" : "denied",
       ad_user_data: marketingGranted ? "granted" : "denied",
@@ -76,57 +45,36 @@
       personalization_storage: preferencesGranted ? "granted" : "denied",
       security_storage: "granted"
     });
-
     gtag("set", "ads_data_redaction", !marketingGranted);
-
-    if (marketingGranted) {
-      loadAdSenseAfterConsent();
-    }
+    if (marketingGranted) loadAdSenseAfterConsent();
   }
-
   window.addEventListener("CookiebotOnConsentReady", updateGoogleConsentFromCookiebot);
   window.addEventListener("CookiebotOnAccept", updateGoogleConsentFromCookiebot);
   window.addEventListener("CookiebotOnDecline", updateGoogleConsentFromCookiebot);
 </script>
-
-<!-- Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-WYXTKGJ9JS"></script>
-<script>
-  gtag("js", new Date());
-  gtag("config", "G-WYXTKGJ9JS");
-</script>
-
-<!-- Vercel Speed Insights -->
-<script src="assets/js/speed-insights-init.js" defer></script>
-<title>About — Xtradite Digital</title>
-<meta name="description" content="Xtradite Digital is a UK-based digital consultancy built for hands-on delivery, not strategy decks.">
-<link rel="stylesheet" href="assets/css/tokens.css">
-<link rel="stylesheet" href="assets/css/main.css">
-<link rel="stylesheet" href="assets/css/adsense.css">
-<link rel="icon" href="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/favicon-dark.ico" media="(prefers-color-scheme: dark)">
-<link rel="icon" href="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/favicon-light.ico" media="(prefers-color-scheme: light)">
+<script>gtag("js", new Date()); gtag("config", "G-WYXTKGJ9JS");</script>
+<script src="/assets/js/speed-insights-init.js" defer></script>
+<title>About Jared Collum and Xtradite Digital</title>
+<meta name="description" content="Jared Collum is the founder of Xtradite Digital, a UK ecommerce and digital operations consultancy focused on practical implementation.">
+<link rel="stylesheet" href="/assets/css/tokens.css">
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="stylesheet" href="/assets/css/adsense.css">
 <link rel="icon" href="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/favicon-light.ico">
-<link rel="icon" type="image/png" sizes="32x32" href="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/favicon-32-dark.png" media="(prefers-color-scheme: dark)">
-<link rel="icon" type="image/png" sizes="32x32" href="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/favicon-32-light.png" media="(prefers-color-scheme: light)">
-<link rel="icon" type="image/png" sizes="16x16" href="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/favicon-16-dark.png" media="(prefers-color-scheme: dark)">
-<link rel="icon" type="image/png" sizes="16x16" href="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/favicon-16-light.png" media="(prefers-color-scheme: light)">
-<link rel="apple-touch-icon" href="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/icon-tile-light.png">
 <link rel="canonical" href="https://www.xtradite-digital.co.uk/about">
 <meta property="og:site_name" content="Xtradite Digital">
 <meta property="og:locale" content="en_GB">
-<meta property="og:title" content="About â€” Xtradite Digital">
-<meta property="og:description" content="Xtradite Digital is a UK-based digital consultancy built for hands-on delivery, not strategy decks.">
-<meta property="og:type" content="website">
+<meta property="og:title" content="About Jared Collum and Xtradite Digital">
+<meta property="og:description" content="A practical ecommerce and digital operations consultancy founded by Jared Collum.">
+<meta property="og:type" content="profile">
 <meta property="og:url" content="https://www.xtradite-digital.co.uk/about">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="About â€” Xtradite Digital">
-<meta name="twitter:description" content="Xtradite Digital is a UK-based digital consultancy built for hands-on delivery, not strategy decks.">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Organization", "name": "Xtradite Digital", "url": "https://www.xtradite-digital.co.uk/", "description": "UK digital consultancy helping ambitious retail, ecommerce and manufacturing businesses close operational and commercial gaps with hands-on delivery.", "areaServed": "GB", "knowsAbout": ["Digital Strategy", "AI & Automation", "eCommerce Growth", "Operational Excellence", "Fractional Leadership", "Project Delivery"]}</script>
-<!-- Vercel Web Analytics -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="About Jared Collum and Xtradite Digital">
+<meta name="twitter:description" content="A practical ecommerce and digital operations consultancy founded by Jared Collum.">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Person","@id":"https://www.xtradite-digital.co.uk/about/#jared-collum","name":"Jared Collum","jobTitle":"Founder and Digital Consultant","url":"https://www.xtradite-digital.co.uk/about/","worksFor":{"@id":"https://www.xtradite-digital.co.uk/#organisation"}}</script>
 <script defer src="https://cdn.vercel-insights.com/v1/script.js"></script>
 </head>
 <body>
-
 <header class="site-header" id="site-header">
   <div class="container header-inner">
     <a href="/" class="logo"><img src="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/wordmark-caps-light.png" alt="Xtradite Digital" class="logo-img"></a>
@@ -144,46 +92,37 @@
     <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation"><span></span><span></span><span></span></button>
   </div>
 </header>
-
 <main>
-
   <section class="hero left-aligned">
     <div class="container">
-      <span class="eyebrow">About Xtradite Digital</span>
-      <h1>Built on 15+ years of actually delivering â€” not just advising.</h1>
-      <p class="hero-sub">I'm Jared Collum, founder of Xtradite Digital. Over 15+ years I've worked inside retail, ecommerce and manufacturing businesses â€” not presenting recommendations from the outside, but owning the growth P&amp;L and rebuilding the systems, teams and channels myself. Xtradite Digital exists to bring that same hands-on delivery to every engagement: no lengthy strategy decks, no handoff after the recommendations land â€” I stay and build the thing.</p>
+      <span class="eyebrow">Jared Collum · Founder</span>
+      <h1>Practical ecommerce and digital operations leadership.</h1>
+      <p class="hero-sub">I founded Xtradite Digital to help organisations move from diagnosis to implementation without losing accountability between strategy, technology and day-to-day operations.</p>
       <div class="hero-ctas">
-        <a href="/contact" class="btn btn-primary btn-lg">Book a Consultation <i data-lucide="arrow-right" class="btn-icon"></i></a>
+        <a href="/contact" class="btn btn-primary btn-lg">Discuss the work <i data-lucide="arrow-right" class="btn-icon"></i></a>
+        <a href="/insights" class="btn btn-secondary btn-lg">Read published insights</a>
       </div>
     </div>
   </section>
 
-  <div class="container">
-    <div class="stats-strip">
-      <div class="stat-item"><span class="stat-number" data-count-to="15+">0</span><span class="stat-label">Years Experience</span></div>
-      <div class="stat-item"><span class="stat-number" data-count-to="Â£50M+">0</span><span class="stat-label">Revenue Influenced</span></div>
-      <div class="stat-item"><span class="stat-number" data-count-to="100+">0</span><span class="stat-label">Projects Delivered</span></div>
-      <div class="stat-item"><span class="stat-number">UK</span><span class="stat-label">Based Consultancy</span></div>
-    </div>
-  </div>
-
   <section class="section-tight">
     <div class="container">
       <div class="section-head left">
-        <span class="eyebrow">The Founder</span>
-        <h2>Fifteen years of hands-on delivery, one consultancy built the same way.</h2>
+        <span class="eyebrow">Profile</span>
+        <h2>Operator experience applied as a consultancy.</h2>
       </div>
       <div class="founder-grid">
-        <div>
-          <p>I'm Jared Collum. Before founding Xtradite Digital, I spent over a decade as an embedded operator inside retail, ecommerce and subscription businesses â€” owning the growth P&amp;L myself, not advising on it from outside. Scaling Club L London to a ~Â£40M+ run-rate, leading WoolOvers through a COVID-era pivot, building measurement infrastructure for brands like Castore and Sweaty Betty.</p>
-          <p>Xtradite Digital is a continuation of that, not a reinvention â€” the same hands-on approach, as a consultancy. I still hold an active operating role at PROMIXX today, because staying close to a live P&amp;L is what keeps the advice grounded.</p>
+        <div class="richtext">
+          <p>My background covers ecommerce leadership, customer lifecycle management, analytics, digital operations and implementation across retail, consumer and subscription businesses.</p>
+          <p>Xtradite Digital engagements are structured around clear ownership, governed evidence and practical delivery. Recommendations are separated from approved facts, and public claims are not published without an attributable source and review status.</p>
+          <p>I am based in Brighton and work with UK and international teams remotely, with on-site collaboration arranged where it materially improves discovery, alignment or delivery.</p>
         </div>
-        <div class="founder-facts">
-          <div class="fact-row"><span class="fact-label">Founded</span><span class="fact-value">December 2024</span></div>
-          <div class="fact-row"><span class="fact-label">Based</span><span class="fact-value">Brighton, UK â€” remote, every timezone</span></div>
-          <div class="fact-row"><span class="fact-label">Currently also</span><span class="fact-value">Head of Ecommerce &amp; Performance Growth, PROMIXX</span></div>
-          <div class="fact-row"><span class="fact-label">Focus</span><span class="fact-value">Growth P&amp;L Â· Performance Marketing Â· European Scaling</span></div>
-        </div>
+        <dl class="founder-facts">
+          <div class="fact-row"><dt class="fact-label">Role</dt><dd class="fact-value">Founder and Digital Consultant</dd></div>
+          <div class="fact-row"><dt class="fact-label">Based</dt><dd class="fact-value">Brighton, United Kingdom</dd></div>
+          <div class="fact-row"><dt class="fact-label">Professional status</dt><dd class="fact-value">Shopify Technical Partner · Klaviyo Partner</dd></div>
+          <div class="fact-row"><dt class="fact-label">Focus</dt><dd class="fact-value">Ecommerce · CRM · Analytics · Operations · AI enablement</dd></div>
+        </dl>
       </div>
     </div>
   </section>
@@ -191,202 +130,70 @@
   <section class="section-alt">
     <div class="container">
       <div class="section-head left">
-        <span class="eyebrow">Track Record</span>
-        <h2>Real engagements, real results.</h2>
-        <p>Three engagements below are Xtradite Digital's own client work. The rest are the operator roles â€” named openly, with real dates â€” that built the track record.</p>
+        <span class="eyebrow">Areas of expertise</span>
+        <h2>Work spanning commercial, technical and operational delivery.</h2>
       </div>
-
-      <h3 class="track-record-subhead">As Xtradite Digital</h3>
       <div class="grid-3">
-        <div class="card case-card service-card card-featured">
-          <div class="card-icon"><i data-lucide="heart-pulse"></i></div>
-          <span class="tag">Healthcare / Telehealth</span>
-          <h3>GenderGP</h3>
-          <p class="card-desc">Patient community platform built from zero, plus data-protection ownership for the regulated telehealth build.</p>
-          <span class="metric">Live in production</span>
-        </div>
-        <div class="card case-card service-card card-featured">
-          <div class="card-icon"><i data-lucide="coffee"></i></div>
-          <span class="tag">Subscription Coffee</span>
-          <h3>Old Spike Roastery</h3>
-          <p class="card-desc">Rebuilt the email flow and segmentation architecture, plus new B2B and wholesale channels.</p>
-          <span class="metric">Flows â†’ majority of email revenue</span>
-        </div>
-        <div class="card case-card service-card card-featured">
-          <div class="card-icon"><i data-lucide="package"></i></div>
-          <span class="tag">Subscription DTC</span>
-          <h3>Serious Tissues</h3>
-          <p class="card-desc">Rebuilt the subscription lifecycle in Klaviyo â€” Â£169k in annualised flow value.</p>
-          <span class="metric">+65% YoY flow revenue</span>
-        </div>
-      </div>
-
-      <h3 class="track-record-subhead track-record-subhead-spaced">Currently, alongside Xtradite Digital</h3>
-      <div class="card service-card banner-card">
-        <div class="card-icon"><i data-lucide="dumbbell"></i></div>
-        <div class="banner-card-body">
-          <span class="card-category">PROMIXX â€” Head of Ecommerce &amp; Performance Growth â€” Feb 2026â€“Present</span>
-          <p class="card-desc">Owns the DTC and marketplace growth P&amp;L across 13 territories and seven languages, holding agencies to TACoS and ACoS targets. Not an Xtradite Digital engagement â€” a live operating role held at the same time.</p>
-          <div class="mini-stats">
-            <div class="mini-stat"><span class="mini-stat-number">26%</span><span class="mini-stat-label">Net Margin</span></div>
-            <div class="mini-stat"><span class="mini-stat-number">15-mo low</span><span class="mini-stat-label">Blended TACoS</span></div>
-            <div class="mini-stat"><span class="mini-stat-number">Sub-17%</span><span class="mini-stat-label">Launch ACoS</span></div>
-          </div>
-        </div>
-      </div>
-
-      <h3 class="track-record-subhead track-record-subhead-spaced">Career roles before Xtradite Digital</h3>
-      <div class="timeline">
-        <div class="timeline-step">
-          <span class="step-num">2012â€“19</span>
-          <h4>Early career</h4>
-          <p>Convergys, Domestic &amp; General, OutOfOffice.com â€” team leadership, campaigns and doubling a travel platform's revenue.</p>
-        </div>
-        <div class="timeline-step">
-          <span class="step-num">2020â€“21</span>
-          <h4>WoolOvers</h4>
-          <p>Head of Customer Experience. COVID-era DTC pivot â€” <strong>700% YoY</strong> peak revenue, +30% new customers.</p>
-        </div>
-        <div class="timeline-step">
-          <span class="step-num">2021â€“23</span>
-          <h4>Club L London</h4>
-          <p>Head of CX Strategy. <strong>+200% YoY</strong> to a ~Â£40M+ run-rate; c.Â£2M carrier savings negotiated.</p>
-        </div>
-        <div class="timeline-step">
-          <span class="step-num">2023â€“24</span>
-          <h4>Fabric Analytics</h4>
-          <p>Client Lead. GA4/GTM/BigQuery for Castore, Sweaty Betty, The Modern Milkman â€” <strong>100%</strong> client retention.</p>
-        </div>
-        <div class="timeline-step">
-          <span class="step-num">2024â€“25</span>
-          <h4>Per-Scent</h4>
-          <p>Head of Ecommerce. Impression share <strong>32% â†’ 98%</strong> in four weeks; CVR +10%.</p>
-        </div>
+        <article class="card service-card"><div class="card-icon"><i data-lucide="shopping-bag"></i></div><h3>Ecommerce architecture</h3><p class="card-desc">Shopify delivery, migrations, catalogue governance, subscriptions, marketplaces and operational workflows.</p></article>
+        <article class="card service-card"><div class="card-icon"><i data-lucide="messages-square"></i></div><h3>CRM and lifecycle</h3><p class="card-desc">Customer journeys, segmentation, consent-aware measurement and delivery across platforms including Klaviyo and Braze.</p></article>
+        <article class="card service-card"><div class="card-icon"><i data-lucide="bar-chart-3"></i></div><h3>Measurement</h3><p class="card-desc">GA4, GTM, reporting design, conversion controls and decision-ready performance analysis.</p></article>
+        <article class="card service-card"><div class="card-icon"><i data-lucide="workflow"></i></div><h3>Operating models</h3><p class="card-desc">Ownership, process design, prioritisation, cross-functional delivery and controls that remain usable after launch.</p></article>
+        <article class="card service-card"><div class="card-icon"><i data-lucide="bot"></i></div><h3>AI enablement</h3><p class="card-desc">Governed automation and AI-assisted workflows designed around a defined business process rather than novelty.</p></article>
+        <article class="card service-card"><div class="card-icon"><i data-lucide="clipboard-check"></i></div><h3>Programme delivery</h3><p class="card-desc">Turning requirements into sequenced implementation, acceptance evidence, launch controls and accountable handover.</p></article>
       </div>
     </div>
   </section>
 
   <section>
     <div class="container">
-      <div class="section-head">
-        <span class="eyebrow">How I Work</span>
-        <h2>Five principles, each backed by a real engagement.</h2>
+      <div class="section-head left">
+        <span class="eyebrow">Career context</span>
+        <h2>Leadership experience across ecommerce and digital operations.</h2>
+        <p>Previous roles and consultancy work include ecommerce, strategy, analytics and customer experience leadership. Named outcomes are published only where evidence and permission support them.</p>
       </div>
-      <div class="grid-3">
-        <div class="card service-card">
-          <div class="card-icon"><i data-lucide="users"></i></div>
-          <h3>I embed, not just advise</h3>
-          <p class="card-desc">GenderGP and Old Spike Roastery were both scoped through to a live result, not a handoff after the recommendations.</p>
-        </div>
-        <div class="card service-card">
-          <div class="card-icon"><i data-lucide="flask-conical"></i></div>
-          <h3>I test before I recommend</h3>
-          <p class="card-desc">Per-Scent's testing programme took product impression share from 32% to 98% in four weeks. Evidence before conviction.</p>
-        </div>
-        <div class="card service-card">
-          <div class="card-icon"><i data-lucide="shield"></i></div>
-          <h3>I protect margin, not just headline growth</h3>
-          <p class="card-desc">At PROMIXX, TACoS hit a 15-month low while net margin reached 26%. Growth that doesn't cost margin to get.</p>
-        </div>
-        <div class="card service-card">
-          <div class="card-icon"><i data-lucide="zap"></i></div>
-          <h3>I use AI as a lever, not a headline</h3>
-          <p class="card-desc">Claude, Make and Zapier are part of how Xtradite Digital actually runs â€” turning messy backlogs into structured systems fast.</p>
-        </div>
-        <div class="card service-card">
-          <div class="card-icon"><i data-lucide="check-circle-2"></i></div>
-          <h3>I finish what I start</h3>
-          <p class="card-desc">GenderGP went live. Serious Tissues shipped in full. Club L London's 50-plus person team got a complete restructure.</p>
-        </div>
+      <div class="timeline">
+        <div class="timeline-step"><span class="step-num">01</span><h3>Ecommerce leadership</h3><p>Commercial ownership across DTC, marketplaces, international growth and customer operations.</p></div>
+        <div class="timeline-step"><span class="step-num">02</span><h3>Analytics and implementation</h3><p>Measurement design, conversion analysis and technical delivery for ecommerce organisations.</p></div>
+        <div class="timeline-step"><span class="step-num">03</span><h3>Consultancy delivery</h3><p>Hands-on programmes covering Shopify, CRM, operating models, governance and automation.</p></div>
       </div>
     </div>
   </section>
 
-  <section class="section-alt">
+  <section class="section-alt" aria-labelledby="author-insights-title">
     <div class="container">
-      <div class="section-head">
-        <span class="eyebrow">Client Feedback</span>
-        <h2>Real testimonials, coming soon.</h2>
-        <p>Three engagements delivered so far. Real, sign-off client quotes will appear here as those relationships allow â€” nothing placeholder, nothing invented.</p>
+      <div class="section-head left">
+        <span class="eyebrow">Published work</span>
+        <h2 id="author-insights-title">Insights by Jared Collum.</h2>
+        <p>The insights archive covers ecommerce, digital operations, measurement, customer lifecycle management and practical AI adoption.</p>
       </div>
+      <a href="/insights" class="btn btn-secondary">View the insights archive <i data-lucide="arrow-right" class="btn-icon"></i></a>
     </div>
   </section>
 
   <section>
     <div class="container">
       <div class="cta-banner">
-        <h2>Ready to Accelerate Your Business?</h2>
-        <p>Transform your digital operations with practical consultancy built for measurable commercial results.</p>
+        <h2>Discuss the operational constraint you need to resolve.</h2>
+        <p>Use the first conversation to clarify the current position, available evidence and practical next step.</p>
         <a href="/contact" class="btn btn-primary btn-lg">Book a Consultation <i data-lucide="arrow-right" class="btn-icon"></i></a>
       </div>
     </div>
   </section>
-
-
-  <section class="section-tight" data-sitewide-ad-section>
-    <div class="container">
-      <aside class="sitewide-ad sitewide-ad--display" aria-label="Advertisement" hidden>
-        <span class="sitewide-ad__label">Advertisement</span>
-        <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-7308041122340160" data-ad-slot="6205733112" data-ad-format="auto" data-full-width-responsive="true"></ins>
-      </aside>
-    </div>
-  </section>
-
 </main>
-
 <footer class="site-footer">
   <div class="container">
     <div class="footer-inner">
-      <div class="footer-brand">
-        <a href="/" class="logo"><img src="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/wordmark-caps-light.png" alt="Xtradite Digital" class="logo-img"></a>
-        <p>Practical consultancy for retail, ecommerce and manufacturing businesses ready to accelerate digital-first growth.</p>
-      </div>
-      <div class="footer-col">
-        <h4>Services</h4>
-        <a href="/services/ai-automation">AI &amp; Automation</a>
-        <a href="/services/digital-strategy">Digital Strategy</a>
-        <a href="/services/ecommerce-growth">eCommerce Growth</a>
-        <a href="/services/operational-excellence">Operational Excellence</a>
-        <a href="/services/fractional-leadership">Fractional Leadership</a>
-        <a href="/services/project-delivery">Project Delivery</a>
-      </div>
-      <div class="footer-col">
-        <h4>Industries</h4>
-        <a href="/industry-detail?slug=retail">Retail</a>
-        <a href="/industry-detail?slug=ecommerce">eCommerce</a>
-        <a href="/industry-detail?slug=manufacturing">Manufacturing</a>
-        <a href="/industry-detail?slug=consumer-goods">Consumer Goods</a>
-        <a href="/industry-detail?slug=professional-services">Professional Services</a>
-        <a href="/industry-detail?slug=startups">Startups</a>
-      </div>
-      <div class="footer-col">
-        <h4>Company</h4>
-        <a href="/about">About</a>
-        <a href="/insights">Insights</a>
-        <a href="/case-studies">Case Studies</a>
-        <a href="/contact">Contact</a>
-      </div>
-      <div class="footer-col">
-        <h4>Legal</h4>
-        <a href="/legal/privacy">Privacy Policy</a>
-        <a href="/legal/cookies">Cookie Policy</a>
-        <a href="#" data-cookie-settings>Cookie Settings</a>
-        <a href="/legal/terms">Terms</a>
-      </div>
+      <div class="footer-brand"><a href="/" class="logo"><img src="https://bmhkdyshluiloorgnwoy.supabase.co/storage/v1/object/public/rich-media/Branding/wordmark-caps-light.png" alt="Xtradite Digital" class="logo-img"></a><p>Practical consultancy for ecommerce and digital operations.</p></div>
+      <div class="footer-col"><h4>Services</h4><a href="/services/ai-automation">AI &amp; Automation</a><a href="/services/digital-strategy">Digital Strategy</a><a href="/services/ecommerce-growth">eCommerce Growth</a><a href="/services/operational-excellence">Operational Excellence</a><a href="/services/fractional-leadership">Fractional Leadership</a><a href="/services/project-delivery">Project Delivery</a></div>
+      <div class="footer-col"><h4>Industries</h4><a href="/industries/retail">Retail</a><a href="/industries/ecommerce">eCommerce</a><a href="/industries/manufacturing">Manufacturing</a><a href="/industries/consumer-goods">Consumer Goods</a><a href="/industries/professional-services">Professional Services</a><a href="/industries/startups">Startups</a></div>
+      <div class="footer-col"><h4>Company</h4><a href="/about">About</a><a href="/insights">Insights</a><a href="/case-studies">Case Studies</a><a href="/contact">Contact</a></div>
+      <div class="footer-col"><h4>Legal</h4><a href="/legal/privacy">Privacy Policy</a><a href="/legal/cookies">Cookie Policy</a><a href="#" data-cookie-settings>Cookie Settings</a><a href="/legal/terms">Terms</a></div>
     </div>
-    <div class="footer-bottom">
-      <span>&copy; 2026 Xtradite Digital. All rights reserved.</span>
-      <div class="footer-social">
-        <a href="#" aria-label="LinkedIn â€” add your company URL" title="Add your real LinkedIn URL here"><i data-lucide="linkedin"></i></a>
-      </div>
-    </div>
+    <div class="footer-bottom"><span>&copy; 2026 Xtradite Digital. All rights reserved.</span></div>
   </div>
 </footer>
-
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js" defer></script>
-<script src="assets/js/site.js" defer></script>
-
-<script src="assets/js/adsense-units.js" defer></script>
+<script src="/assets/js/site.js" defer></script>
+<script src="/assets/js/adsense-units.js" defer></script>
 </body>
 </html>
-
