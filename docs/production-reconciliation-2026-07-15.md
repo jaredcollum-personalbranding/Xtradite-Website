@@ -2,7 +2,7 @@
 
 ## Scope
 
-This reconciliation covers issues #36, #39 and #40. No Vercel production deployment, editorial content record or approval state was changed. One least-privilege Supabase migration was applied after browser acceptance exposed a broken delivery-view permission contract.
+This reconciliation covers issues #36, #39 and #40. No Vercel production deployment, editorial content record or approval state was changed. Two least-privilege Supabase migrations were applied after browser acceptance and review exposed incomplete delivery-view permission handling.
 
 ## GitHub and Vercel
 
@@ -38,17 +38,21 @@ Production project `bmhkdyshluiloorgnwoy` reports these applied migrations, in o
 20. `20260714181000_case_study_evidence_publication_gate`
 21. `20260714181803_service_delivery_governance_fields`
 22. `20260715015215_harden_public_delivery_views`
+23. `20260715021229_harden_remaining_public_delivery_views`
 
-The final migration is included in PR #76 and has been applied to the connected production project. It makes the four filtered delivery views the sole anonymous/authenticated content contract, grants them `SELECT` only, and removes public privileges from their underlying CMS and evidence tables.
+The migrations are included in PR #76 and have been applied to the connected production project. The first converts the four content delivery views to filtered owner-executed read contracts. The second converts the sitemap and both location delivery views before removing direct public privileges from CMS, evidence and location source tables. The migration files are ordered so a fresh environment does not lose sitemap or location access between versions.
 
 Validation under `SET ROLE anon` returns:
 
 - 6 services;
 - 6 industries;
 - 13 currently eligible insights;
-- 0 case studies.
+- 0 case studies;
+- 25 governed sitemap rows;
+- 0 eligible location routes;
+- 0 eligible location-service routes.
 
-The verified public grants on the four delivery views are `SELECT` only. No public grant remains on the corresponding services, industries, case studies or blog-post base tables.
+The zero location counts reflect the current governed content state, not a permission failure. All seven public delivery views execute successfully and grant `SELECT` only. No public grant remains on their corresponding source tables.
 
 ## Governed content state
 
@@ -72,16 +76,12 @@ All six case studies remain `changes_required` and all six have `public_primary_
 
 ### Security
 
-The initial adviser run reported:
-
-- one informational finding: `content_reviews` has RLS enabled with no policy;
-- GraphQL exposure warnings for tables and delivery views with public grants.
-
-The delivery-view migration removes public base-table access and limits the governed delivery views to `SELECT`. Security-definer delivery views are intentional: each view has an explicit public projection and its own publication/evidence filters. The remaining governance-table and `content_reviews` findings require a separate policy review rather than an automatic broad grant change.
+The adviser reports the intentional security-definer delivery views, one informational `content_reviews` RLS finding, and remaining GraphQL exposure warnings outside the seven public projections. The seven views are deliberate, fixed-field, publication-filtered read contracts. Their source tables no longer grant public privileges. Remaining governance-table findings require a separate policy review rather than an automatic revoke that could interrupt internal workflows.
 
 Remediation references:
 
 - https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy
+- https://supabase.com/docs/guides/database/database-linter?lint=0010_security_definer_view
 - https://supabase.com/docs/guides/database/database-linter?lint=0026_pg_graphql_anon_table_exposed
 - https://supabase.com/docs/guides/database/database-linter?lint=0027_pg_graphql_authenticated_table_exposed
 
