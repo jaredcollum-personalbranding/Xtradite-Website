@@ -21,16 +21,11 @@ function occurrences(source, expression) {
   return [...source.matchAll(expression)].map((match) => match[1] ?? match[0]);
 }
 
-function routeFor(file) {
-  const relative = path.relative(FRONTEND, file).replace(/\\/g, "/");
-  if (relative === "index.html") return "/";
-  return `/${relative.replace(/\/index\.html$/i, "").replace(/\.html?$/i, "")}`;
-}
-
 function localAssetFailures(source, fileName) {
   const failures = [];
   const urls = occurrences(source, /(?:src|href)=["'](\/[^"'#?]+\.(?:css|js|mjs|png|jpe?g|webp|svg|ico|woff2?))["']/gi);
   for (const url of urls) {
+    if (/[{}]/.test(url)) continue;
     const target = path.join(FRONTEND, decodeURIComponent(url.replace(/^\//, "")));
     if (!fs.existsSync(target)) failures.push({ rule: "local-asset", message: `${fileName}: missing ${url}` });
   }
@@ -51,9 +46,7 @@ function validateHtml(source, fileName = "fixture.html", { checkAssets = false }
 
   const h1s = occurrences(source, /<h1\b[^>]*>([\s\S]*?)<\/h1>/gi);
   if (!h1s.length) add("h1", "missing H1 element");
-  if (!dynamic && h1s.filter((value) => value.replace(/<[^>]*>/g, "").trim()).length !== 1) {
-    add("h1", "expected one non-empty static-page H1");
-  }
+  if (!dynamic && h1s.filter((value) => value.replace(/<[^>]*>/g, "").trim()).length !== 1) add("h1", "expected one non-empty static-page H1");
 
   const canonicals = occurrences(source, /<link\s+rel=["']canonical["'][^>]*href=["']([^"']+)["'][^>]*>/gi);
   if (canonicals.length !== 1) add("canonical", `expected one canonical, found ${canonicals.length}`);
@@ -69,9 +62,7 @@ function validateHtml(source, fileName = "fixture.html", { checkAssets = false }
   }
 
   const ogUrls = occurrences(source, /<meta\s+property=["']og:url["'][^>]*content=["']([^"']+)["'][^>]*>/gi);
-  if (!dynamic && canonicals.length === 1 && ogUrls.length === 1 && canonicals[0] !== ogUrls[0]) {
-    add("og-url", `Open Graph URL does not match canonical (${ogUrls[0]} vs ${canonicals[0]})`);
-  }
+  if (!dynamic && canonicals.length === 1 && ogUrls.length === 1 && canonicals[0] !== ogUrls[0]) add("og-url", `Open Graph URL does not match canonical (${ogUrls[0]} vs ${canonicals[0]})`);
 
   const idDefinitions = new Map();
   const jsonBlocks = occurrences(source, /<script\b[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi);
@@ -111,11 +102,7 @@ function markdown(report) {
 
 function run() {
   const htmlFiles = files(FRONTEND, /\.html?$/i);
-  const failures = htmlFiles.flatMap((file) => validateHtml(
-    fs.readFileSync(file, "utf8"),
-    path.relative(FRONTEND, file),
-    { checkAssets: true }
-  ));
+  const failures = htmlFiles.flatMap((file) => validateHtml(fs.readFileSync(file, "utf8"), path.relative(FRONTEND, file), { checkAssets: true }));
   const report = { checkedAt: new Date().toISOString(), filesChecked: htmlFiles.length, failures };
   fs.mkdirSync(OUTPUT, { recursive: true });
   fs.writeFileSync(path.join(OUTPUT, "report.json"), JSON.stringify(report, null, 2));
@@ -126,5 +113,4 @@ function run() {
 }
 
 if (require.main === module) run();
-
 module.exports = { validateHtml, run };
