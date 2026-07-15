@@ -99,7 +99,6 @@ function enhanceIndustry(html, item) {
 
   output = output.replace("Ready to Accelerate Your Business?", "Discuss the operational constraint you need to resolve.");
   output = output.replace("Transform your digital operations with practical consultancy built for measurable commercial results.", "Use the first conversation to clarify the current position, available evidence and practical next step.");
-  output = output.replace("Book a Consultation", "Start the conversation");
 
   return output;
 }
@@ -125,12 +124,7 @@ function enhanceInsight(html, item) {
   output = output.replace("Practical consultancy for retail, ecommerce and manufacturing businesses ready to accelerate digital-first growth — hands-on delivery, not just strategy decks.", "Jared Collum writes about ecommerce, digital operations, measurement and practical delivery.");
   output = output.replace("Ready to explore this further?", "Discuss the operating problem behind the symptom.");
   output = output.replace("Book a consultation with our team to discuss how these insights apply to your business.", "Use the first conversation to clarify the context, available evidence and practical next step.");
-  output = output.replace("Book a Consultation", "Start the conversation");
   output = output.replace('<div style="margin-top: var(--space-64);" hidden>', '<div id="post-related-section" class="insight-related" hidden>');
-
-  if (Array.isArray(item.related_blog_posts) && item.related_blog_posts.length) {
-    output = revealById(output, "post-related-section");
-  }
 
   if (item.cover_image_url) {
     output = output.replace('alt="" loading="eager"', `alt="${escapeHtml(item.title)}" loading="eager"`);
