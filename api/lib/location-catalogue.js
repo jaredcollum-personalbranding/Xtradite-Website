@@ -1,6 +1,6 @@
 const SUPABASE_URL = process.env.XTRADITE_SUPABASE_URL || "https://bmhkdyshluiloorgnwoy.supabase.co";
 const SUPABASE_KEY = process.env.XTRADITE_SUPABASE_PUBLISHABLE_KEY || "sb_publishable_Aj9nCJLFY9aMycZeQ3buTQ_-n-Q7SFK";
-const { isEligibleLocation, isEligibleLocationService } = require("./publication-eligibility");
+const { isEligibleLocation, isEligibleLocationService } = require("../../server/publication-eligibility");
 
 const PAGE_SIZE = 1000;
 const CACHE_TTL = 5 * 60 * 1000;
