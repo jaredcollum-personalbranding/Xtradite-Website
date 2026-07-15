@@ -1,4 +1,4 @@
-name: One-time branch inventory audit
+name: One-time final branch cleanup
 
 on:
   pull_request:
@@ -11,25 +11,30 @@ permissions:
   pull-requests: write
 
 jobs:
-  audit:
+  cleanup:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Record remaining branches on maintenance PR
+      - name: Delete final obsolete branch and record inventory
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
+
+          gh api -X DELETE "repos/${GITHUB_REPOSITORY}/git/refs/heads/fix/case-study-detail-rendering"
+
           mapfile -t branches < <(
             gh api --paginate "repos/${GITHUB_REPOSITORY}/branches?per_page=100" --jq '.[].name'
           )
-          body="## Branch inventory after pruning\n\nRemaining branches: **${#branches[@]}**\n"
+
+          body="## Final branch inventory\n\nRemaining before the temporary audit branch removes itself: **${#branches[@]}**\n"
           for branch in "${branches[@]}"; do
             body+="\n- \`${branch}\`"
           done
+
           printf '%b\n' "$body"
-          gh pr comment 72 --body "$(printf '%b' "$body")"
+          gh pr comment 72 --repo "$GITHUB_REPOSITORY" --body "$(printf '%b' "$body")"
 
       - name: Remove temporary audit branch
         if: success()
