@@ -65,13 +65,26 @@ function revealById(html, id) {
   return `${html.slice(0, openingStart)}${opening.slice(0, -1)} data-server-rendered="true">${html.slice(openingEnd + 1)}`;
 }
 
-function enhanceIndustry(html, item) {
-  let output = addSharedDetailShell(html);
+function addIndustryHero(html) {
+  const renderedRoot = '<div id="industry-detail-root" data-server-rendered="true">';
+  const placeholderRoot = '<div id="industry-detail-root" hidden>';
+  const renderedReplacement = '<div id="industry-detail-root" class="industry-detail" data-server-rendered="true"><header class="industry-hero"><div class="industry-hero__copy">';
+  const placeholderReplacement = '<div id="industry-detail-root" class="industry-detail" hidden><header class="industry-hero"><div class="industry-hero__copy">';
+  if (html.includes(renderedRoot)) return html.replace(renderedRoot, renderedReplacement);
+  return html.replace(placeholderRoot, placeholderReplacement);
+}
 
-  output = output.replace(
-    '<div id="industry-detail-root" hidden>',
-    '<div id="industry-detail-root" class="industry-detail" hidden><header class="industry-hero"><div class="industry-hero__copy">'
-  );
+function addInsightHero(html) {
+  const renderedRoot = '<div id="post-root" data-server-rendered="true">';
+  const placeholderRoot = '<div id="post-root" hidden>';
+  const renderedReplacement = '<div id="post-root" class="insight-detail" data-server-rendered="true"><header class="insight-hero"><span class="eyebrow">Insight</span>';
+  const placeholderReplacement = '<div id="post-root" class="insight-detail" hidden><header class="insight-hero"><span class="eyebrow">Insight</span>';
+  if (html.includes(renderedRoot)) return html.replace(renderedRoot, renderedReplacement);
+  return html.replace(placeholderRoot, placeholderReplacement);
+}
+
+function enhanceIndustry(html, item) {
+  let output = addIndustryHero(addSharedDetailShell(html));
 
   output = insertAfterElementById(
     output,
@@ -104,12 +117,7 @@ function enhanceIndustry(html, item) {
 }
 
 function enhanceInsight(html, item) {
-  let output = addSharedDetailShell(html);
-
-  output = output.replace(
-    '<div id="post-root" hidden>',
-    '<div id="post-root" class="insight-detail" hidden><header class="insight-hero"><span class="eyebrow">Insight</span>'
-  );
+  let output = addInsightHero(addSharedDetailShell(html));
 
   output = insertAfterElementById(
     output,
