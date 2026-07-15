@@ -186,7 +186,10 @@ function additionalEntitiesFor(type, item, canonical) {
 
 function buildGraph({ canonical, title, description, pageType = "WebPage", primaryEntity, additionalEntities = [], breadcrumbItems = [] }) {
   const pageId = `${canonical}#webpage`;
-  const graph = [organisation(), person(), website(), {
+  const personNode = primaryEntity?.["@id"] === PERSON_ID
+    ? compact({ ...person(), ...primaryEntity })
+    : person();
+  const graph = [organisation(), personNode, website(), {
     "@type": pageType,
     "@id": pageId,
     url: canonical,
@@ -199,7 +202,7 @@ function buildGraph({ canonical, title, description, pageType = "WebPage", prima
   }];
 
   if (breadcrumbItems.length > 1) graph.push({ ...breadcrumbs(breadcrumbItems), "@id": `${canonical}#breadcrumb` });
-  if (primaryEntity) graph.push(primaryEntity);
+  if (primaryEntity && primaryEntity["@id"] !== PERSON_ID) graph.push(primaryEntity);
   if (Array.isArray(additionalEntities)) graph.push(...additionalEntities);
 
   return compact({ "@context": "https://schema.org", "@graph": graph });
