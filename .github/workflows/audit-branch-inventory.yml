@@ -1,0 +1,38 @@
+name: One-time branch inventory audit
+
+on:
+  pull_request:
+    branches:
+      - chore/branch-and-pipeline-cleanup
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Record remaining branches on maintenance PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t branches < <(
+            gh api --paginate "repos/${GITHUB_REPOSITORY}/branches?per_page=100" --jq '.[].name'
+          )
+          body="## Branch inventory after pruning\n\nRemaining branches: **${#branches[@]}**\n"
+          for branch in "${branches[@]}"; do
+            body+="\n- \`${branch}\`"
+          done
+          printf '%b\n' "$body"
+          gh pr comment 72 --body "$(printf '%b' "$body")"
+
+      - name: Remove temporary audit branch
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X DELETE "repos/${GITHUB_REPOSITORY}/git/refs/heads/chore/audit-branch-inventory"
