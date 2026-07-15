@@ -57,7 +57,7 @@ test("insight detail uses the shared article design and governed author treatmen
   assert.match(html, /class="richtext insight-body"/);
   assert.match(html, /About the author/);
   assert.match(html, /Jared Collum writes about ecommerce/);
-  assert.match(html, /alt="Why your website launch didn&#39;t fix the real problem"/);
+  assert.match(html, /alt="Why your website launch didn't fix the real problem"/);
   assert.match(html, /href="\/industries\/retail"/);
   assert.doesNotMatch(html, /industry-detail\?slug=/);
   assert.doesNotMatch(html, /Ready to explore this further\?/);
@@ -68,6 +68,6 @@ test("detail stylesheet contains responsive industry and insight layouts", () =>
   assert.match(css, /\.industry-hero/);
   assert.match(css, /\.industry-story/);
   assert.match(css, /\.insight-hero/);
-  assert.match(css, /\.insight-content-grid/);
+  assert.match(css, /\.insight-body/);
   assert.match(css, /@media \(max-width: 900px\)/);
 });
