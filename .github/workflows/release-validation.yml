@@ -14,16 +14,22 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - name: Check out release candidate
+      - name: Check out release candidate head
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
 
       - name: Confirm application tree matches approved main commit
         shell: bash
         run: |
           set -euo pipefail
-          git diff --exit-code 5e9597d7398a432d2114be6ed44ba0cf2df61e4c -- . \
-            ':(exclude).github/workflows/release-validation.yml' \
-            ':(exclude)RELEASE_VALIDATION.md'
+          unexpected="$(git diff --name-only 5e9597d7398a432d2114be6ed44ba0cf2df61e4c HEAD | grep -Ev '^(\.github/workflows/release-validation\.yml|RELEASE_VALIDATION\.md)$' || true)"
+          if [[ -n "$unexpected" ]]; then
+            echo "Unexpected application differences from the approved release commit:"
+            printf '%s\n' "$unexpected"
+            exit 1
+          fi
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
